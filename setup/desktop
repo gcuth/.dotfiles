@@ -18,6 +18,7 @@ gsettings set org.gnome.desktop.input-sources xkb-options "['caps:swapescape']"
 gsettings set org.gnome.desktop.input-sources mru-sources "[('xkb', 'us+dvorak'), ('xkb', 'au')]"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us+dvorak'), ('xkb', 'au')]"
 
+gsettings set org.gnome.nautilus.preferences show-hidden-files false
 
 # Make it Pretty
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'

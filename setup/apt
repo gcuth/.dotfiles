@@ -1,0 +1,59 @@
+#!/bin/bash
+
+sudo apt update
+
+function install {
+  which $1 &> /dev/null
+
+  if [ $? -ne 0 ]; then
+    echo "Installing: ${1}..."
+    sudo apt install -y $1
+  else
+    echo "Already installed: ${1}"
+  fi
+}
+
+# Basics
+install awscli
+install chromium-browser
+install curl
+install wget
+install cmake
+install exfat-utils
+install file
+install git
+install htop
+install nmap
+install openvpn
+install tmux
+install vim
+install gnupg
+
+# Heavy Lifting
+install python3
+install python3-pip
+install r-base-core
+install libopenblas-base
+install ipython
+install jupyter
+install build-essential
+install libatomic1
+install gfortran
+install perl
+install m4
+install pkg-config
+install texlive
+install pandoc
+install anki
+install ffmpeg
+install postgresql
+install fail2ban
+install emacs25
+install rclone
+install xclip
+install default-jre
+install ess
+
+# Fun stuff
+install figlet
+install lolcat

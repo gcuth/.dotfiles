@@ -1,0 +1,17 @@
+# basics
+alias c="clear; ls"
+alias l="ls -lah"
+alias vi="vim"
+
+# git
+alias gs="git status"
+alias gd="git diff"
+alias ga="git add"
+alias gc="git commit -m"
+alias gcam="git commit -a -m"
+alias gp="git pull"
+alias gpom="git push origin master"
+
+# helpful extras
+alias rg="grep -r '$*' ."
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'

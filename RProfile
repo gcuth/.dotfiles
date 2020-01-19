@@ -1,0 +1,19 @@
+## My R Profile
+
+## Packages I install and redownload when R is upgraded:
+
+## install.packages(c("dplyr","ggplot2"))
+
+## Config options:
+
+utils::rc.settings(ipck = TRUE)
+
+options(prompt="R> ", digits=4, show.signif.stars=FALSE)
+options(showWarnCalls=T, showErrorCalls=T)
+options(menu.graphics = FALSE)
+options(repos="https://cran.csiro.au")
+options(digits.secs=3)              # show sub-second time stamps
+options(max.print=200)         # do not print more than 200 lines
+options(device="quartz")
+options(useFancyQuotes = FALSE)
+

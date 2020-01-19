@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+# runs an encrypted backup of the directories listed
+cd ~
+
+now=$(date +%Y-%m-%d-%H-%M-%S)
+
+tar -zcf - Documents Music Pictures Videos Code | openssl aes-256-cbc -salt -out $now.tar.gz.aes
+
+rclone copy ./$now.tar.gz.aes Cloudstor:/
+
+rm ./$now.tar.gz.aes
+
+# to extract, run: openssl aes-256-cbc -d -salt -in backup.tar.gz.aes | tar -xz -f -
+

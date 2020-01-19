@@ -1,0 +1,31 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean: ['~']
+
+- link:
+    ~/.dotfiles: ''
+    ~/.bash_profile: bash_profile
+    ~/.bashrc: bashrc
+    ~/.vimrc: vimrc
+    ~/.zshrc: zshrc
+    ~/.RProfile: RProfile
+    ~/.spacemacs: spacemacs
+    ~/bin/:
+      path: bin/
+      create: true
+
+- create:
+    - ~/.vim/undo-history
+    - ~/Documents/blog/
+    - ~/Documents/thesis/
+    - ~/Pictures/Wallpapers/
+    - ~/Code/
+
+- shell:
+    - ./setup/apt
+    - ./setup/desktop
+    - ./setup/extra
+    - git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d

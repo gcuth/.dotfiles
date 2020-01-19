@@ -1,0 +1,6 @@
+#!/bin/bash
+
+./programs/docker
+./programs/firefox
+./programs/vundle
+./programs/signal

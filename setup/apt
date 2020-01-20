@@ -48,11 +48,9 @@ install anki
 install ffmpeg
 install postgresql
 install fail2ban
-install emacs25
 install rclone
 install xclip
 install default-jre
-install ess
 
 # Fun stuff
 install figlet

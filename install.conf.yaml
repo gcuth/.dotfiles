@@ -8,13 +8,20 @@
 - link:
     ~/.dotfiles: ''
     ~/.bash_profile: bash_profile
-    ~/.bashrc: bashrc
+    ~/.bashrc:
+      path: bashrc
+      create: true
+      relink: true
+      force: true
     ~/.vimrc: vimrc
     ~/.RProfile: RProfile
     ~/.spacemacs: spacemacs
     ~/bin/:
       path: bin/
       create: true
+    ~/.aliases: aliases
+    ~/.gitignore: gitignore
+    ~/.gitconfig: gitconfig
 
 - create:
     - ~/.vim/undo-history
@@ -24,6 +31,7 @@
     - ./setup/apt
 
 - shell:
+    - sudo apt install zsh
     - sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 - link:

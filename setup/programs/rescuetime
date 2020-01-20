@@ -1,0 +1,9 @@
+#!/bin/bash
+
+curl -o $HOME/Downloads/rescuetime-install.deb https://www.rescuetime.com/installers/rescuetime_current_amd64.deb
+
+sudo apt install $HOME/Downloads/rescuetime-install.deb
+
+sh rescuetime
+
+rm $HOME/Downloads/rescuetime-install.deb

@@ -18,9 +18,6 @@
 
 - create:
     - ~/.vim/undo-history
-    - ~/Documents/blog/
-    - ~/Documents/thesis/
-    - ~/Pictures/Wallpapers/
     - ~/Code/
 
 - shell:

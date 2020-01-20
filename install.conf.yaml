@@ -17,7 +17,7 @@
     ~/.RProfile: RProfile
     ~/.spacemacs: spacemacs
     ~/bin/:
-      path: bin/
+      path: scripts/
       create: true
     ~/.aliases: aliases
     ~/.gitignore: gitignore

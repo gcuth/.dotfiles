@@ -10,7 +10,6 @@
     ~/.bash_profile: bash_profile
     ~/.bashrc: bashrc
     ~/.vimrc: vimrc
-    ~/.zshrc: zshrc
     ~/.RProfile: RProfile
     ~/.spacemacs: spacemacs
     ~/bin/:
@@ -26,6 +25,15 @@
 
 - shell:
     - ./setup/apt
+
+- shell:
+    - sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+- link:
+    ~/.oh-my-zsh/themes/custom.zsh-theme: custom.zsh-theme
+    ~/.zshrc: zshrc
+
+- shell:
     - ./setup/desktop
     - ./setup/extra
     - git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d

@@ -7,7 +7,8 @@
 
 AUTHTOKEN=$1
 USERNAME="galenhimself"
-CURRENT_TOTAL=$(find ~/Documents/thesis/chapters/. -type f -name "*md" -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}')
+CURRENT_TOTAL=$(find ~/Documents/thesis/papers/. ~/Documents/thesis/chapters/. -type f -name "*md" -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}')
+echo $CURRENT_TOTAL
 
 # Get current goal total from beeminder
 RAW_BEEMINDER_INFO=$(curl -s "https://www.beeminder.com/api/v1/users/${USERNAME}/goals/thesis.json?auth_token=${AUTHTOKEN}")

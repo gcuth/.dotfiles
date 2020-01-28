@@ -1,0 +1,15 @@
+#!/bin/bash
+
+wget -O $HOME/Downloads/zotero.tar.bz2 "https://www.zotero.org/download/client/dl?channel=release&platform=linux-x86_64"
+
+tar xjf $HOME/Downloads/zotero.tar.bz2 -C $HOME/Downloads/
+
+rm $HOME/Downloads/zotero.tar.bz2
+
+sudo mkdir -p /opt/zotero
+
+sudo cp -rf $HOME/Downloads/Zotero_linux-x86_64/* /opt/zotero/
+
+ln -sf /opt/zotero/zotero.desktop $HOME/.local/share/applications/zotero.desktop
+
+rm -rf $Home/Downloads/Zotero_linux-x86_64

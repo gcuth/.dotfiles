@@ -335,10 +335,6 @@ you should place your code here."
   (spaceline-toggle-hud-off)
   (spaceline-toggle-minor-modes-off)
   (spaceline-toggle-buffer-encoding-abbrev-off)
-  (spaceline-define-segment remaining-words
-    "Words Remaining"
-    (shell-command-to-string "echo -n $(( $(($(find ~/Documents/thesis/chapters/. -type f -name '*md' -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}'))) - $(( 80000 - $(( ($(date --date='2020-06-25' +%s) - $(date +%s) )/(60*60*24) * 400 )) )) )); echo -n ':'; git -C ~/Documents/thesis rev-list HEAD --count --first-parent --since=\"$(date -d 'today 00:00:00')\" | xargs | tr -d '\n'"))
-  (spaceline-spacemacs-theme 'remaining-words)
  )
 
 ;; Do not write anything past this comment. This is where Emacs will

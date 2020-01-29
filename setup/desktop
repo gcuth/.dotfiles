@@ -13,19 +13,21 @@ gsettings set org.gnome.shell.overrides dynamic-workspaces true
 gsettings set org.gnome.shell.overrides workspaces-only-on-primary false
 gsettings set org.gnome.mutter dynamic-workspaces true
 gsettings set org.gnome.mutter workspaces-only-on-primary false
-
 gsettings set org.gnome.desktop.input-sources xkb-options "['caps:swapescape']"
 gsettings set org.gnome.desktop.input-sources mru-sources "[('xkb', 'us+dvorak'), ('xkb', 'au')]"
 gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us+dvorak'), ('xkb', 'au')]"
 
+# Make it Pretty
 gsettings set org.gnome.nautilus.preferences show-hidden-files false
 gsettings set org.gnome.shell favorite-apps "[]"
-
-# Make it Pretty
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 gsettings set org.gnome.desktop.interface icon-theme 'ubuntu-mono-dark'
 gsettings set org.gnome.desktop.wm.preferences theme 'Adwaita-dark'
 gsettings set org.gnome.desktop.background show-desktop-icons false
-gsettings set org.gnome.shell.extensions.desktop-icons show-trash false
-gsettings set org.gnome.shell.extensions.desktop-icons show-home false
+gsettings set org.gnome.nautilus.desktop trash-icon-visible false
+gsettings set org.gnome.nautilus.desktop home-icon-visible false
 gsettings set org.gnome.desktop.background picture-options 'spanned'
+gsettings set org.gnome.desktop.interface clock-show-seconds 'true'
+gsettings set org.gnome.desktop.interface clock-show-weekday 'false'
+gsettings set org.gnome.desktop.interface clock-show-date 'false'
+

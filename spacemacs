@@ -335,6 +335,10 @@ you should place your code here."
   (spaceline-toggle-hud-off)
   (spaceline-toggle-minor-modes-off)
   (spaceline-toggle-buffer-encoding-abbrev-off)
+  (spaceline-define-segment word-count
+    "Count of words in the buffer"
+    (format "%s" (count-words (point-min) (point-max))))
+  (spaceline-spacemacs-theme 'word-count)
  )
 
 ;; Do not write anything past this comment. This is where Emacs will

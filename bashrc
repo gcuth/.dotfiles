@@ -1,5 +1,5 @@
 # SCRIPTS
-PATH="$HOME/bin:$PATH"
+PATH="$HOME/bin/:$PATH"
 
 # HISTORY
 # don't add duplicate lines (or lines beginning with spaces) into the history

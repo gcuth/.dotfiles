@@ -44,6 +44,7 @@ install m4
 install pkg-config
 install texlive
 install pandoc
+install pandoc-citeproc
 install anki
 install ffmpeg
 install postgresql

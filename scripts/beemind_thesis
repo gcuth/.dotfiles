@@ -7,7 +7,7 @@
 
 AUTHTOKEN=$1
 USERNAME="galenhimself"
-CURRENT_TOTAL=$(find ~/Documents/thesis/papers/. ~/Documents/thesis/chapters/. -type f -name "*md" -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}')
+CURRENT_TOTAL=$(find ~/Documents/thesis/chapters/. -type f -name "*md" -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}')
 echo $CURRENT_TOTAL
 
 # Get current goal total from beeminder
@@ -20,5 +20,4 @@ if [ "$CURRENT_TOTAL" -ne "$CURRENT_BEE_VALUE" ]; then
 fi
 
 # Append to a local log just in case
-
 echo $(echo -n $(date +%s); echo -n ", "; echo -n "$CURRENT_TOTAL") >> ~/.dotfiles/secrets/logs/thesis_chapter_words.log

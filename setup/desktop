@@ -27,7 +27,15 @@ gsettings set org.gnome.desktop.background show-desktop-icons false
 gsettings set org.gnome.nautilus.desktop trash-icon-visible false
 gsettings set org.gnome.nautilus.desktop home-icon-visible false
 gsettings set org.gnome.desktop.background picture-options 'spanned'
-gsettings set org.gnome.desktop.interface clock-show-seconds 'true'
+gsettings set org.gnome.desktop.interface clock-show-seconds 'false'
 gsettings set org.gnome.desktop.interface clock-show-weekday 'false'
 gsettings set org.gnome.desktop.interface clock-show-date 'false'
+
+# Deal with the other annoying bits
+gsettings set org.gnome.desktop.sound event-sounds 'false'
+gsettings set org.gnome.desktop.interface enable-animations 'false'
+
+# Kill active notifications
+gsettings set org.gnome.desktop.notifications show-in-lock-screen 'false'
+gsettings set org.gnome.desktop.notifications show-banners 'false'
 

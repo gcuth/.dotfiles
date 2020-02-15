@@ -1,0 +1,13 @@
+{
+    "keyboard.dispatch": "keyCode",
+    "editor.fontSize": 14,
+    "workbench.startupEditor": "",
+    "workbench.colorTheme": "Dark+ Black",
+    "files.trimTrailingWhitespace": true,
+    "editor.minimap.enabled": false,
+    "workbench.activityBar.visible": true,
+    "telemetry.enableCrashReporter": false,
+    "telemetry.enableTelemetry": false,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 2000
+}

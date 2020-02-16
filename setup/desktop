@@ -26,10 +26,23 @@ gsettings set org.gnome.desktop.wm.preferences theme 'Adwaita-dark'
 gsettings set org.gnome.desktop.background show-desktop-icons false
 gsettings set org.gnome.nautilus.desktop trash-icon-visible false
 gsettings set org.gnome.nautilus.desktop home-icon-visible false
-gsettings set org.gnome.desktop.background picture-options 'spanned'
 gsettings set org.gnome.desktop.interface clock-show-seconds 'false'
 gsettings set org.gnome.desktop.interface clock-show-weekday 'false'
 gsettings set org.gnome.desktop.interface clock-show-date 'false'
+
+# Background & Lock Screen to Black
+gsettings set org.gnome.desktop.background primary-color '#000000'
+gsettings set org.gnome.desktop.background secondary-color '#000000'
+gsettings set org.gnome.desktop.background color-shading-type 'solid'
+gsettings set org.gnome.desktop.background picture-options 'spanned'
+gsettings set org.gnome.desktop.background picture-uri ''
+
+gsettings set org.gnome.desktop.screensaver primary-color '#000000'
+gsettings set org.gnome.desktop.screensaver secondary-color '#000000'
+gsettings set org.gnome.desktop.screensaver color-shading-type 'solid'
+gsettings set org.gnome.desktop.screensaver picture-options 'spanned'
+gsettings set org.gnome.desktop.screensaver picture-uri ''
+
 
 # Deal with the other annoying bits
 gsettings set org.gnome.desktop.sound event-sounds 'false'

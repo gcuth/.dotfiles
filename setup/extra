@@ -1,9 +1,0 @@
-#!/bin/bash
-
-$HOME/.dotfiles/setup/programs/docker
-$HOME/.dotfiles/setup/programs/firefox
-$HOME/.dotfiles/setup/programs/vundle
-$HOME/.dotfiles/setup/programs/signal
-$HOME/.dotfiles/setup/programs/emacs
-$HOME/.dotfiles/setup/programs/rescuetime
-$HOME/.dotfiles/setup/programs/vscode

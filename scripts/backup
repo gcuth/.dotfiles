@@ -4,9 +4,10 @@ cd ~
 
 now=$(date +%Y-%m-%d-%H-%M-%S)
 
-tar -zcf - Documents Music Pictures Videos Code | openssl aes-256-cbc -salt -out $now.tar.gz.aes
+tar -zcf - Documents Music Pictures Videos Code Zotero | openssl aes-256-cbc -salt -out $now.tar.gz.aes
 
-rclone copy ./$now.tar.gz.aes Cloudstor:/
+rclone copy ./$now.tar.gz.aes cloudstor:/
+rclone copy ./$now.tar.gz.aes gdrive:/
 
 rm ./$now.tar.gz.aes
 

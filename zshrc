@@ -1,7 +1,4 @@
 #!/bin/zsh
-# SCRIPTS
-PATH="$HOME/bin/:$PATH"
-
 # HISTORY
 # don't add duplicate lines (or lines beginning with spaces) into the history
 HISTCONTROL=ignoreboth
@@ -30,3 +27,6 @@ DISABLE_LS_COLORS="false"
 export ZSH=$HOME/.oh-my-zsh;
 ZSH_THEME="custom"
 source $ZSH/oh-my-zsh.sh;
+
+# Include anaconda
+PATH="~/anaconda/bin:$PATH"

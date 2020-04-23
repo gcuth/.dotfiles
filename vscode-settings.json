@@ -1,13 +1,19 @@
 {
     "keyboard.dispatch": "keyCode",
     "editor.fontSize": 16,
+    "editor.tabCompletion": "on",
+    "editor.cursorBlinking": "solid",
     "workbench.startupEditor": "",
-    "workbench.colorTheme": "Dark+ Black",
     "files.trimTrailingWhitespace": true,
     "editor.minimap.enabled": false,
     "workbench.activityBar.visible": true,
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 2000
+    "files.autoSaveDelay": 2000,
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": false,
+    "editor.fontFamily": "'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+    "editor.fontLigatures": true,
+    "breadcrumbs.enabled": true,
 }

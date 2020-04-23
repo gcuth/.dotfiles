@@ -1,7 +1,0 @@
-#!/bin/bash
-
-sudo add-apt-repository ppa:ubuntu-elisp/ppa
-sudo apt-get update
-sudo apt-get install -y emacs-snapshot
-sudo apt-get install -y ess
-

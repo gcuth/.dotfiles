@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+#
+# A script to enforce focus (by killing all fun capabilities) based on current phd commits.
+# When run as a
+
+PHD_COMMITS=$(git -C /home/g/Documents/thesis log --format=format:"%ai %H" | grep -c $(date +%Y-%m-%d))
+BLOG_COMMITS=$(git -C /home/g/Documents/blog log --format=format:"%ai %H" | grep -c $(date +%Y-%m-%d))
+
+if test $PHD_COMMITS -lt 12; then
+    DISPLAY=:0.0 wmctrl -c "Firefox"
+    DISPLAY=:0.0 wmctrl -c "Thunderbird"
+    DISPLAY=:0.0 wmctrl -c "Signal"
+    DISPLAY=:0.0 wmctrl -c "Videos"
+    DISPLAY=:0.0 wmctrl -c "Spotify"
+    DISPLAY=:0.0 wmctrl -c "Discord"
+    DISPLAY=:0.0 wmctrl -c "Slack"
+fi
+
+if test $BLOG_COMMITS -lt 1; then
+    DISPLAY=:0.0 wmctrl -c "Firefox"
+    DISPLAY=:0.0 wmctrl -c "Thunderbird"
+    DISPLAY=:0.0 wmctrl -c "Signal"
+    DISPLAY=:0.0 wmctrl -c "Videos"
+    DISPLAY=:0.0 wmctrl -c "Spotify"
+    DISPLAY=:0.0 wmctrl -c "Discord"
+    DISPLAY=:0.0 wmctrl -c "Slack"
+fi

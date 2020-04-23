@@ -1,0 +1,98 @@
+{
+	// Place your global snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Jekyll Post Header -- Journal": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "hheadj",
+		"body": [
+			"---",
+			"title: Morning Pages ($CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE)",
+			"layout: post",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+			"categories: journals",
+			"published: false",
+			"---",
+			"",
+			"$0"
+		],
+		"description": "Add a jekyll-style post header for a private (unpublished) 'morning pages' journal post."
+	},
+	"Jekyll Post Header -- Quote": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "hheadq",
+		"body": [
+			"---",
+			"title: $3",
+			"layout: post",
+			"permalink: /q/$4",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+			"categories: quotes",
+			"published: true",
+			"---",
+			"",
+			"> $CLIPBOARD ([$1]($2))",
+			"",
+			"$0"
+		],
+		"description": "Add a jekyll-style post header for a quote or citation post (with short note)."
+	},
+	"Jekyll Post Header -- Note": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "hheadn",
+		"body": [
+			"---",
+			"title: $1",
+			"layout: post",
+			"permalink: /$2",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+			"categories: notes",
+			"published: false",
+			"---",
+			"",
+			"$0"
+		],
+		"description": "Add a jekyll-style post header for a note post (default unpublished)."
+	},
+	"YAML Paper Header": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "hheadp",
+		"body": [
+			"---",
+			"title: $1",
+			"subtitle: $2",
+			"author: Galen Cuthbertson",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
+			"bibliography: ../phd.bib",
+			"csl: ../modern-language-association.csl",
+			"output: pdf_document",
+			"---",
+			"",
+			"$0"
+		],
+		"description": "Add a yaml header for a paper/chapter."
+	},
+	"Current Date in ISO": {
+		"prefix": "ddate",
+		"body": "$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
+		"description": "Current date the form 2020-12-01."
+	},
+	"Current Time in ISO": {
+		"prefix": "ttime",
+		"body": "$CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+		"description": "Current time in the form 14:30:01."
+	}
+}

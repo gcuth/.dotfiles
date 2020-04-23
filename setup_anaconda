@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# a script to install Anaconda3 in four steps
+
+# (0) Go to home directory
+cd ~
+
+# (1) Download the version
+# (note: you can check https://repo.continuum.io/archive/ if you want something different)
+wget https://repo.continuum.io/archive/Anaconda3-2020.02-Linux-x86_64.sh
+
+# (2) Install it to ~/anaconda
+bash Anaconda3-2020.02-Linux-x86_64.sh -b -p ~/anaconda
+
+# (3) Remove the cruft
+rm Anaconda3-2020.02-Linux-x86_64.sh
+
+# (4) Refresh
+source .bashrc
+
+conda update conda

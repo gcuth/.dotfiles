@@ -24,6 +24,11 @@
       path: gitignore
     ~/.gitconfig:
       path: gitconfig
+    /usr/local/bin:
+      path: scripts
+      create: true
+      relink: true
+      force: true
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -67,7 +72,8 @@
     - sudo apt install -y perl
     - sudo apt install -y m4
     - sudo apt install -y autotrash
-    - sudo apt install -y nvm
+    - sudo apt install -y nodejs
+    - sudo apt install -y npm
     - sudo apt install -y pkg-config
     - sudo apt install -y texlive
     - sudo apt install -y pandoc
@@ -90,22 +96,6 @@
     - sudo apt install -y gnupg-agent
     - sudo apt install -y software-properties-common
     - sudo apt install -y fonts-firacode
-
-# ADD A BACKUP SCRIPT
-- link:
-    /usr/local/bin/backup:
-      path: scripts/backup
-      force: true
-
-# ADD A DIRTY 'ENFORCE FOCUS' SCRIPT
-- link:
-    /usr/local/bin/enforce_focus:
-      path: scripts/enforce_focus
-
-# ADD BEEMIND_THESIS SCRIPT
-- link:
-    /usr/local/bin/beemind_thesis:
-      path: scripts/beemind_thesis
 
 # GET OH-MY-ZSH
 - shell:
@@ -144,8 +134,12 @@
 - link:
     ~/.config/Code/User/settings.json:
       path: vscode-settings.json
+      force: true
+      relink: true
     ~/.config/Code/User/snippets/global.code-snippets:
       path: snippets/global-vscode.code-snippets
+      force: true
+      relink: true
 # ADD VSCODE EXTENSIONS
 - shell:
     - code --install-extension ms-python.python
@@ -194,6 +188,10 @@
     - sudo cp -rf $HOME/Downloads/Zotero_linux-x86_64/* /opt/zotero/
     - ln -sf /opt/zotero/zotero.desktop $HOME/.local/share/applications/zotero.desktop
     - rm -rf $Home/Downloads/Zotero_linux-x86_64
+
+- link:
+    ~/Documents/thesis/.git/hooks/post-commit:
+      path: thesis-post-commit
 
 - shell:
     - ./setup_desktop

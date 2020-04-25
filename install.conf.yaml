@@ -32,8 +32,8 @@
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
-    - ~/.vim/undo-history
-    - ~/Code/
+    - /home/g/.vim/undo-history
+    - /home/g/Code/
 
 # UPDATE APT
 - shell:
@@ -103,20 +103,20 @@
 
 # INSTALL THE CUSTOM ZSH THEME AND SET UP ZSH
 - link:
-    ~/.oh-my-zsh/themes/custom.zsh-theme: custom.zsh-theme
-    ~/.zshrc: zshrc
+    /home/g/.oh-my-zsh/themes/custom.zsh-theme: custom.zsh-theme
+    /home/g/.zshrc: zshrc
 
 # INSTALL TELEGRAM VIA SNAP
 - shell:
-    - sudo snap install telegram-desktop
+    - snap install telegram-desktop
 
 # INSTALL SLACK VIA SNAP
 - shell:
-    - sudo snap install slack --classic
+    - snap install slack --classic
 
 # INSTALL SPOTIFY VIA SNAP
 - shell:
-    - sudo snap install spotify
+    - snap install spotify
 
 # GET DOCKER RUNNING
 - shell:
@@ -133,14 +133,14 @@
 
 # INSTALL VSCODE VIA SNAP
 - shell:
-    - sudo snap install code --classic
+    - snap install code --classic
 # SET VSCODE SETTINGS (AND SNIPPETS)
 - link:
-    ~/.config/Code/User/settings.json:
+    /home/g/.config/Code/User/settings.json:
       path: vscode-settings.json
       force: true
       relink: true
-    ~/.config/Code/User/snippets/global.code-snippets:
+    /home/g/.config/Code/User/snippets/global.code-snippets:
       path: snippets/global-vscode.code-snippets
       force: true
       relink: true
@@ -163,7 +163,7 @@
 
 # LINK RCLONE CONF
 - link:
-    ~/.config/rclone/rclone.conf:
+    /home/g/.config/rclone/rclone.conf:
       path: secrets/rclone/rclone.conf
 
 # INSTALL ANACONDA
@@ -195,7 +195,7 @@
 
 # Add thesis post-commit hook
 - link:
-    ~/Documents/thesis/.git/hooks/post-commit:
+    /home/g/Documents/thesis/.git/hooks/post-commit:
       path: thesis-post-commit
 
 # install my favourite cron jobs

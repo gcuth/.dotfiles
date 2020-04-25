@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# a script to install my 'standard' cron jobs
+
+# write out the current crontab
+crontab -l > temp_cron
+
+# add the contents of my standard crons
+cat ./standard-cron-jobs >> temp_cron
+
+# make sure there aren't any duplicates
+sort temp_cron | uniq > temp_dedupe_cron
+
+# install the new cron file
+crontab temp_dedupe_cron
+
+# clean up
+rm temp_cron
+rm temp_dedupe_cron

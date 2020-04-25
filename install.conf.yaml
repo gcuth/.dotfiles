@@ -114,6 +114,10 @@
 - shell:
     - sudo snap install slack --classic
 
+# INSTALL SPOTIFY VIA SNAP
+- shell:
+    - sudo snap install spotify
+
 # GET DOCKER RUNNING
 - shell:
     - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -189,9 +193,15 @@
     - ln -sf /opt/zotero/zotero.desktop $HOME/.local/share/applications/zotero.desktop
     - rm -rf $Home/Downloads/Zotero_linux-x86_64
 
+# Add thesis post-commit hook
 - link:
     ~/Documents/thesis/.git/hooks/post-commit:
       path: thesis-post-commit
 
+# install my favourite cron jobs
+- shell:
+    - ./setup_cron
+
+# tweak the standard desktop
 - shell:
     - ./setup_desktop

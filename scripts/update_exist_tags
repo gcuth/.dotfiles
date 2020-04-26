@@ -6,7 +6,7 @@
 #          update_exist_tags add --tag "another tag" --token "80424091tdsi6d9y30etc"
 #          update_exist_tags remove --tag "some additional tag"
 #
-# Purpose: A script for interfacing with (and displaying) exist tags.
+# Purpose: A script for interfacing with (and displaying) custom tags on exist.io
 
 import argparse
 import datetime

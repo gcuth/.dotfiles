@@ -2,10 +2,8 @@
 #
 # A script to update a beeminder thesis goal with current word count total.
 # Useful as part of a post-commit hook, with a beeminder 'odometer' goal.
-# Takes one argument: the auth token.
-# Also outputs the current total to a local log in case it's handy later.
 
-AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/thesis_auth)
+AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/auth_token)
 USERNAME="galenhimself"
 CURRENT_TOTAL=$(find ~/Documents/thesis/chapters/. -type f -name "*md" -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}')
 echo $CURRENT_TOTAL

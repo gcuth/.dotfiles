@@ -10,7 +10,7 @@ echo $CURRENT_TOTAL
 
 # Get current goal total from beeminder
 RAW_BEEMINDER_INFO=$(curl -s "https://www.beeminder.com/api/v1/users/${USERNAME}/goals/thesis.json?auth_token=${AUTHTOKEN}")
-CURRENT_BEE_VALUE=$(echo "$RAW_BEEMINDER_INFO" | python -m json.tool | grep -e '.*"curval":.*$' | sed 's/^.*: \([0-9]\+\)/\1/g' | sed 's/\..*//g' | sed "s/[^0-9]//g")
+CURRENT_BEE_VALUE=$(echo "$RAW_BEEMINDER_INFO" | python3 -m json.tool | grep -e '.*"curval":.*$' | sed 's/^.*: \([0-9]\+\)/\1/g' | sed 's/\..*//g' | sed "s/[^0-9]//g")
 
 # If current total on local machine doesn't match what's on beeminder, update the beeminder value:
 if [ "$CURRENT_TOTAL" -ne "$CURRENT_BEE_VALUE" ]; then

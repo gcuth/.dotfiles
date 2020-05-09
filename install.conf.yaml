@@ -106,30 +106,10 @@
     /home/g/.oh-my-zsh/themes/custom.zsh-theme: custom.zsh-theme
     /home/g/.zshrc: zshrc
 
-# INSTALL TELEGRAM VIA SNAP
-- shell:
-    - snap install telegram-desktop
-
-# INSTALL SLACK VIA SNAP
-- shell:
-    - snap install slack --classic
 
 # INSTALL SPOTIFY VIA SNAP
 - shell:
     - snap install spotify
-
-# GET DOCKER RUNNING
-- shell:
-    - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    - sudo apt install -y docker-ce docker-ce-cli containerd.io
-    - sudo docker run hello-world
-
-# GET FIREFOX RUNNING
-- shell:
-    - sudo add-apt-repository ppa:mozillateam/firefox-next -y
-    - sudo apt update
-    - sudo apt install -y firefox
 
 # INSTALL VSCODE VIA SNAP
 - shell:
@@ -169,19 +149,6 @@
 # INSTALL ANACONDA
 - shell:
     - ./setup_anaconda
-
-# GET RESCUETIME RUNNING
-- shell:
-    - curl -o $HOME/Downloads/rescuetime-install.deb https://www.rescuetime.com/installers/rescuetime_current_amd64.deb
-    - sudo apt install $HOME/Downloads/rescuetime-install.deb
-    - sh rescuetime
-    - rm $HOME/Downloads/rescuetime-install.deb
-
-# GET SIGNAL RUNNING
-- shell:
-    - curl -s https://updates.signal.org/desktop/apt/keys.asc | sudo apt-key add -
-    - echo "deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main" | sudo tee -a /etc/apt/sources.list.d/signal-xenial.list
-    - sudo apt update && sudo apt install signal-desktop
 
 # INSTALL ZOTERO
 - shell:

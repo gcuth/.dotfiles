@@ -4,12 +4,12 @@ cd ~
 
 now=$(date +%Y-%m-%d-%H-%M-%S)
 
-tar -zcf - Documents Music Pictures Videos Code Zotero | openssl aes-256-cbc -salt -out $now.tar.gz.aes
+tar -zcf - Documents Music Pictures Videos Code Zotero | openssl aes-256-cbc -salt -out $(hostname)-$(whoami)-$now.tar.gz.aes
 
-rclone copy ./$now.tar.gz.aes cloudstor:/
-rclone copy ./$now.tar.gz.aes gdrive:/
+rclone copy ./$(hostname)-$(whoami)-$now.tar.gz.aes cloudstor:/
+rclone copy ./$(hostname)-$(whoami)-$now.tar.gz.aes gdrive:/
 
-rm ./$now.tar.gz.aes
+rm ./$(hostname)-$(whoami)-$now.tar.gz.aes
 
 # to extract, run: openssl aes-256-cbc -d -salt -in backup.tar.gz.aes | tar -xz -f -
 

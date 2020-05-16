@@ -1,26 +1,28 @@
 #!/usr/bin/env sh
 #
-# A script to enforce focus (by killing fun distractions) based on phd commits.
-# Also enforces at least one 'blog post' (a note for Future Me) every day.
-# And --- regardless of how much work I've done --- cuts distraction windows.
+# A script to enforce focus (by killing fun distractions) based on phd words.
+# Also enforces at least one 'blog post' (a note for Future Me) every day,
+# along with readings & highlighted passages. Always cuts distraction windows.
 #
 # Note: I understand I could use the hostfile or something, but killing windows
 #       is way more aggressive in that it reminds me by *closing the browser*.
 
-PHD_COMMITS=$(git -C /home/g/Documents/thesis log --format=format:"%ai %H" | grep -c $(date +%Y-%m-%d))
-QUOTES=$(ls /home/g/Documents/blog/_posts/quotes | grep -c $(date +%Y-%m-%d))
-JOURNALS=$(ls /home/g/Documents/blog/_posts/journals | grep -c $(date +%Y-%m-%d))
-READINGS=$(ls /home/g/Documents/blog/_posts/readings | grep -c $(date +%Y-%m-%d))
+if [ $(date +%u) -lt 6 ] ; then
+    PHD_WORDS=$(/home/g/.dotfiles/scripts/calculate_words_today)
+    QUOTES=$(ls /home/g/Documents/blog/_posts/quotes | grep -c $(date +%Y-%m-%d))
+    JOURNALS=$(ls /home/g/Documents/blog/_posts/journals | grep -c $(date +%Y-%m-%d))
+    READINGS=$(ls /home/g/Documents/blog/_posts/readings | grep -c $(date +%Y-%m-%d))
 
-if [ $PHD_COMMITS -lt 12 ] || [ $QUOTES -lt 1 ] || [ $JOURNALS -lt 1 ] || [ $READINGS -lt 1 ] ; then
-    DISPLAY=:0.0 wmctrl -c "Firefox"
-    DISPLAY=:0.0 wmctrl -c "Chromium"
-    DISPLAY=:0.0 wmctrl -c "Thunderbird"
-    DISPLAY=:0.0 wmctrl -c "Signal"
-    DISPLAY=:0.0 wmctrl -c "Videos"
-    DISPLAY=:0.0 wmctrl -c "Discord"
-    DISPLAY=:0.0 wmctrl -c "Slack"
-    DISPLAY=:0.0 wmctrl -c "Telegram"
+    if [ $PHD_WORDS -lt 250 ] || [ $QUOTES -lt 1 ] || [ $JOURNALS -lt 1 ] || [ $READINGS -lt 1 ] ; then
+        DISPLAY=:0.0 wmctrl -c "Firefox"
+        DISPLAY=:0.0 wmctrl -c "Chromium"
+        DISPLAY=:0.0 wmctrl -c "Thunderbird"
+        DISPLAY=:0.0 wmctrl -c "Signal"
+        DISPLAY=:0.0 wmctrl -c "Videos"
+        DISPLAY=:0.0 wmctrl -c "Discord"
+        DISPLAY=:0.0 wmctrl -c "Slack"
+        DISPLAY=:0.0 wmctrl -c "Telegram"
+    fi
 fi
 
 DISPLAY=:0.0 wmctrl -c "YouTube"

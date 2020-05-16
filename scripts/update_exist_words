@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+#
+# Usage:   ./update_exist_words "wc" "date (optional)"
+#
+# Example: ./update_exist_words 10 2019-02-01
+#
+# Purpose: Works to update exist.io's 'words_written' attribute.
+#          Takes a word count integer, along with (optionally) the date.
+
+import requests
+import json
+import sys
+import os
+import datetime
+
+TODAY_SHORT = datetime.datetime.today().strftime('%Y-%m-%d')
+
+def read_access_token_from_file(path_to_saved_token='~/.dotfiles/secrets/exist/existwordstoken'):
+    with open(os.path.expanduser(path_to_saved_token), 'r') as f:
+        raw_exist_token = f.read()
+    return raw_exist_token.strip()
+
+def build_oauth_header(access_token):
+    """Takes an access token and returns a valid oauth header for requests."""
+    bearer_token = 'Bearer ' + str(access_token).strip()
+    header = {'Content-type': 'application/json', 'Authorization':bearer_token}
+    return(header)
+
+
+def is_date(text):
+    """Takes a string and returns true if a valid of the form YYYY-MM-DD."""
+    try:
+        datetime.datetime.strptime(text, '%Y-%m-%d')
+        return True
+    except ValueError:
+        raise ValueError("Incorrect data format, should be YYYY-MM-DD.")
+        return False
+
+def is_wc_number(text):
+    """Takes a string and returns true if text is a valid integer."""
+    try:
+        wc_number = int(text)
+        return True
+    except ValueError:
+        raise ValueError("Incorrect data format, should be an integer.")
+        return False
+
+
+def acquire_attribute(attribute_name, auth_header):
+    """Takes an attribute name + an exist.io oauth header and acquires the attribute."""
+    url = 'https://exist.io/api/1/attributes/acquire/'
+    attributes = [{"name":attribute_name, "active":True}]
+    response = requests.post(url,
+                             headers=auth_header,
+                             data=json.dumps(attributes))
+    if not response.ok:
+        print(str(response.ok) + ' ' + str(response.status_code))
+    response_data = response.json()
+    return(response_data)
+
+
+def list_owned_attributes(auth_header):
+    """Takes an exist.io oauth header and returns a list of attributes owned by it."""
+    url = 'https://exist.io/api/1/attributes/owned/'
+    response = requests.get(url, headers=auth_header)
+    response_data = response.json()
+    return(response_data)
+
+
+def release_attribute(attribute_name, auth_header):
+    url = 'https://exist.io/api/1/attributes/release/'
+    attributes = [{"name":attribute_name}]
+    response = requests.post(url,
+                             headers=auth_header,
+                             data=json.dumps(attributes))
+    response_data = response.json()
+    return(response_data)
+
+
+def update_attribute(attribute_name, date, value, auth_header):
+    url = 'https://exist.io/api/1/attributes/update/'
+    attributes = [{"name":attribute_name, "date":date, "value":value}]
+    response = requests.post(url,
+                             headers=auth_header,
+                             data=json.dumps(attributes))
+    response_data = response.json()
+    return(response_data)
+
+
+def read_attribute(attribute_name, date, auth_header):
+    url = 'https://exist.io/api/1/users/$self/attributes/'+str(attribute_name)+'/'
+    response = requests.get(url, headers=auth_header)
+    response_data = response.json()
+    attr_value = 0
+    for dv_pair in response_data['results']:
+        if dv_pair['date'] == date:
+            attr_value = dv_pair['value']
+    return(attr_value)
+
+
+def is_owned(attribute_name, auth_header):
+    owned = []
+    owned_response = list_owned_attributes(auth_header)
+    if len(owned_response) > 0:
+        for i in owned_response:
+            if 'attribute' in i:
+                owned.append(i['attribute'])
+    return(attribute_name in owned)
+
+
+def confirm_ownership(attribute_name, auth_header):
+    if not is_owned(attribute_name, auth_header):
+        acquire_attribute(attribute_name, auth_header)
+
+
+def update_current_word_count(word_count, access_token):
+    update_word_count(word_count, TODAY_SHORT, access_token)
+
+
+def update_word_count(word_count, date, access_token):
+    """Takes a word count string, date string, and oauth header; updates that day"""
+    structured_auth = build_oauth_header(access_token)
+    confirm_ownership("words_written", auth_header=structured_auth)
+    current_value = read_attribute("words_written", date, structured_auth)
+    if current_value is None or word_count > current_value:
+        update_attribute("words_written", date, word_count, structured_auth)
+
+def main():
+    raw_wc = sys.argv[1]
+    if len(sys.argv) > 2:
+        raw_date_text = sys.argv[2]
+    else:
+        raw_date_text = TODAY_SHORT
+    access_token = read_access_token_from_file()
+    if is_date(raw_date_text) and is_wc_number(raw_wc):
+        update_word_count(abs(int(raw_wc)), raw_date_text, access_token)
+
+if __name__=="__main__":
+    main()

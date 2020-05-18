@@ -165,6 +165,11 @@
     /home/g/Documents/thesis/.git/hooks/post-commit:
       path: thesis-post-commit
 
+# Add blog post-commit hook
+- link:
+    /home/g/Documents/blog/.git/hooks/post-commit:
+      path: blog-post-commit
+
 # install my favourite cron jobs
 - shell:
     - ./setup_cron

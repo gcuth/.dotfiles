@@ -10,7 +10,7 @@
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 2000,
+    "files.autoSaveDelay": 1000,
     "vim.useSystemClipboard": true,
     "vim.useCtrlKeys": false,
     "editor.fontFamily": "'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",

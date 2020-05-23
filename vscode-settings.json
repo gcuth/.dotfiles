@@ -18,5 +18,6 @@
     "breadcrumbs.enabled": true,
     "python.pythonPath": "/home/g/anaconda/bin/python",
     "git.confirmSync": false,
-    "git.autofetch": true
+    "git.autofetch": true,
+    "latex-workshop.view.pdf.viewer": "tab"
 }

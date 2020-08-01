@@ -94,7 +94,7 @@
     - sudo apt install -y gnupg-agent
     - sudo apt install -y software-properties-common
     - sudo apt install -y fonts-firacode
-
+    - sudo apt install -y leiningen
 
 # INSTALL ZOTERO
 - shell:

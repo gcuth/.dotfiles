@@ -8,28 +8,6 @@ set incsearch
 " leader key that makes sense for dvorak
 let mapleader = ","
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-Plugin 'tpope/vim-unimpaired'
-Plugin 'briandoll/change-inside-surroundings.vim'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'tomtom/tcomment_vim'
-Plugin 'MarcWeber/vim-addon-mw-utils'
-Plugin 'tomtom/tlib_vim'
-Plugin 'garbas/vim-snipmate'
-Plugin 'honza/vim-snippets'
-
-
-" All of your Plugins must be added before the following line
-call vundle#end()
-
 set backspace=2 "make backspace work like other text editors
 set number relativenumber "set hybrid line numbers
 set visualbell "flash screen in error instead of sounding a beep
@@ -52,7 +30,7 @@ noremap <Right> <NOP>
 
 " Colours
 syntax enable
-let g:airline_theme='monochrome'
+"let g:airline_theme='monochrome'
 "set background=dark
 "colorscheme molokai 
 highlight LineNr ctermfg=darkgrey

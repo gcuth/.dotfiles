@@ -1,0 +1,21 @@
+# don't add a line break after the prompt info!
+[line_break]
+disabled = true
+
+# only let starship scan the current dir for 10 milliseconds
+scan_timeout = 10
+
+# set a simple prompt character (:)
+[character]
+symbol = ":"
+
+# Disable the package module, hiding it from the prompt completely
+[package]
+disabled = true
+
+# disable aws region (etc) info
+[aws]
+disabled = true
+
+[directory]
+truncation_length = 2

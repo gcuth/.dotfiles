@@ -23,10 +23,5 @@ plugins=(
 
 DISABLE_LS_COLORS="false"
 
-## Setup oh-my-zsh
-export ZSH=$HOME/.oh-my-zsh;
-ZSH_THEME="custom"
-source $ZSH/oh-my-zsh.sh;
-
-# Include anaconda
-PATH="~/anaconda/bin:$PATH"
+# use starship if it's available
+eval "$(starship init zsh)"

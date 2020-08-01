@@ -17,4 +17,7 @@ if [ -f ~/.aliases ]; then
 fi
 
 CASE_SENSITIVE="false"
-PATH="~/anaconda/bin:$PATH"
+
+eval "$(starship init bash)"
+
+[[ -s "/etc/profile.d/grc.bashrc" ]] && source /etc/profile.d/grc.bashrc

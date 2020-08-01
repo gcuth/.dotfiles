@@ -1,7 +1,12 @@
 # basics
 alias c="clear; ls"
-alias l="ls -lah"
 alias vi="vim"
+
+# adding color to the usuals
+alias l="ls -lah --color=auto"
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias diff='diff --color=auto'
 
 # git
 alias gs="git status"

@@ -24,16 +24,18 @@
       path: gitignore
     ~/.gitconfig:
       path: gitconfig
-    /usr/local/bin:
-      path: scripts
-      create: true
-      relink: true
-      force: true
+    ~/.tmux.conf:
+      path: tmux.conf
+    ~/.config/starship.toml:
+      path: starship.toml
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
-    - /home/g/.vim/undo-history
     - /home/g/Code/
+
+# install starship for enlivening the shell a little
+- shell:
+    - curl -fsSL https://starship.rs/install.sh -o ./starship.sh; bash ./starship.sh -y; rm ./starship.sh
 
 # UPDATE APT
 - shell:
@@ -57,6 +59,7 @@
     - sudo apt install -y vim
     - sudo apt install -y gnupg
     - sudo apt install -y zip
+    - sudo apt install -y grc
 
 # INSTALL MORE STUFF
 - shell:
@@ -92,63 +95,10 @@
     - sudo apt install -y snapd
     - sudo apt install -y apt-transport-https
     - sudo apt install -y ca-certificates
-    - sudo apt install -y curl
     - sudo apt install -y gnupg-agent
     - sudo apt install -y software-properties-common
     - sudo apt install -y fonts-firacode
 
-# GET OH-MY-ZSH
-- shell:
-    - sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-# INSTALL THE CUSTOM ZSH THEME AND SET UP ZSH
-- link:
-    /home/g/.oh-my-zsh/themes/custom.zsh-theme: custom.zsh-theme
-    /home/g/.zshrc: zshrc
-
-
-# INSTALL SPOTIFY VIA SNAP
-- shell:
-    - snap install spotify
-
-# INSTALL VSCODE VIA SNAP
-- shell:
-    - snap install code --classic
-# SET VSCODE SETTINGS (AND SNIPPETS)
-- link:
-    /home/g/.config/Code/User/settings.json:
-      path: vscode-settings.json
-      force: true
-      relink: true
-    /home/g/.config/Code/User/snippets/global.code-snippets:
-      path: snippets/global-vscode.code-snippets
-      force: true
-      relink: true
-# ADD VSCODE EXTENSIONS
-- shell:
-    - code --install-extension ms-python.python
-    - code --install-extension ms-vscode.wordcount
-    - code --install-extension ms-vsliveshare.vsliveshare
-    - code --install-extension vscodevim.vim
-    - code --install-extension Ikuyadeu.r
-    - code --install-extension burkeholland.simple-timer
-    - code --install-extension mechatroner.rainbow-csv
-    - code --install-extension mohsen1.prettify-json
-
-# VUNDLE FOR VIM
-- shell:
-    - mkdir -p $HOME/.vim/bundle
-    - git clone git://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/
-    - vim +PluginInstall +qall
-
-# LINK RCLONE CONF
-- link:
-    /home/g/.config/rclone/rclone.conf:
-      path: secrets/rclone/rclone.conf
-
-# INSTALL ANACONDA
-- shell:
-    - ./setup_anaconda
 
 # INSTALL ZOTERO
 - shell:
@@ -177,3 +127,4 @@
 # tweak the standard desktop
 - shell:
     - ./setup_desktop
+

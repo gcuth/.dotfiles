@@ -2,5 +2,4 @@
 1 * * * * git -C ~/Documents/thesis push origin master >/dev/null 2>&1
 0 * * * * git -C ~/Documents/blog/ add .; git -C ~/Documents/blog/ commit -m 'Auto-commit'; git -C ~/Documents/blog push origin master >/dev/null 2>&1
 * * * * * ~/.dotfiles/scripts/enforce_focus >/dev/null 2>&1
-0 20 * * * autotrash -d 7 >/dev/null 2>&1
 

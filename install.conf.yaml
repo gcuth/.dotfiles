@@ -43,9 +43,7 @@
 
 # INSTALL A TONNE OF STUFF
 - shell:
-    - sudo apt install -y awscli
     - sudo apt install -y wmctrl
-    - sudo apt install -y chromium-browser
     - sudo apt install -y curl
     - sudo apt install -y wget
     - sudo apt install -y cmake
@@ -60,6 +58,7 @@
     - sudo apt install -y gnupg
     - sudo apt install -y zip
     - sudo apt install -y grc
+    - sudo apt install -y fzf
 
 # INSTALL MORE STUFF
 - shell:
@@ -67,14 +66,11 @@
     - sudo apt install -y python3-pip
     - sudo apt install -y r-base-core
     - sudo apt install -y libopenblas-base
-    - sudo apt install -y ipython
-    - sudo apt install -y jupyter
     - sudo apt install -y build-essential
     - sudo apt install -y libatomic1
     - sudo apt install -y gfortran
     - sudo apt install -y perl
     - sudo apt install -y m4
-    - sudo apt install -y autotrash
     - sudo apt install -y nodejs
     - sudo apt install -y npm
     - sudo apt install -y pkg-config

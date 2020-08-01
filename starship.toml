@@ -5,9 +5,9 @@ disabled = true
 # only let starship scan the current dir for 10 milliseconds
 scan_timeout = 10
 
-# set a simple prompt character (:)
+# set a simple prompt character
 [character]
-symbol = ":"
+symbol = "»"
 
 # Disable the package module, hiding it from the prompt completely
 [package]

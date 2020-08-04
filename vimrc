@@ -2,6 +2,28 @@
 set nocompatible
 filetype off
 
+
+"  -------
+"  PLUGINS
+"  (managed via junegunn/vim-plug)
+"  -------
+
+if empty(glob('~/.vim/autoload/plug.vim'))
+    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin()
+
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
+Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
+
+call plug#end()
+
+
+
 " sensible search highlighting
 set incsearch
 set nohlsearch
@@ -9,7 +31,7 @@ set smartcase
 
 set backspace=2 "make backspace work like other text editors
 
-set number relativenumber "set hybrid line numbers
+set relativenumber "set relative line numbers
 
 set visualbell "flash screen in error instead of sounding a beep
 
@@ -39,7 +61,6 @@ highlight LineNr ctermfg=darkgrey
 highlight Search ctermbg=white
 highlight Search ctermfg=black
 
-
 " wrap long lines
 set wrap
 " ruler can be useful
@@ -56,12 +77,14 @@ set tabpagemax=100
 set clipboard^=unnamed
 
 
-" Autoclose [, {, "
-imap [ []<left>
-imap ( ()<left>
-imap {<cr> {<cr>}<esc>O
+" save files on InsertLeave
+autocmd InsertLeave * :w!
+autocmd InsertLeave * :execute 'silent !tmux refresh-client -S &' | redraw!
 
+" Writing Mode for Markdown files
+au BufNewFile,BufRead *.{md,markdown,Rmd} call WritingMode()
 
-
-
-
+function! WritingMode()
+    set linebreak
+    Goyo
+endfunction

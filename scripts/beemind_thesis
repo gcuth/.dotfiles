@@ -3,7 +3,7 @@
 # A script to update a beeminder thesis goal with current word count total.
 # Useful as part of a post-commit hook, with a beeminder 'odometer' goal.
 
-AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/auth_token)
+AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/beeminder_auth_token)
 USERNAME="galenhimself"
 RAW_TOTAL=$(find ~/Documents/thesis/chapters/. -type f -name "*md" -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}')
 BLOCKQUOTE_TOTAL=$(grep -r "^> " ~/Documents/thesis/chapters | wc -w)

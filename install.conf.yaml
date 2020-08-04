@@ -59,11 +59,9 @@
     - sudo apt install -y zip
     - sudo apt install -y grc
     - sudo apt install -y fzf
-
-# INSTALL MORE STUFF
-- shell:
     - sudo apt install -y python3
     - sudo apt install -y python3-pip
+    - sudo apt install -y python3-setuptools
     - sudo apt install -y r-base-core
     - sudo apt install -y libopenblas-base
     - sudo apt install -y build-essential
@@ -95,6 +93,8 @@
     - sudo apt install -y software-properties-common
     - sudo apt install -y fonts-firacode
     - sudo apt install -y leiningen
+    - sudo apt install -y openvpn
+    - sudo apt install -y dialog
 
 # INSTALL ZOTERO
 - shell:

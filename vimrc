@@ -16,6 +16,8 @@ endif
 
 call plug#begin()
 
+Plug 'SirVer/ultisnips' " snippet engine of choice
+Plug 'honza/vim-snippets' " default snippets
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
 Plug 'junegunn/goyo.vim', { 'for': 'markdown' }

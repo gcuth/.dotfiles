@@ -11,7 +11,7 @@ cd .dotfiles
 
 ## Credit
 
-Check out [@kieranbrowne](https://github.com/kieranbrowne/dotfiles), [@jvns](https://github.com/jvns), [@zserge](https://github.com/zserge/dotfiles/).
+Check out [@kieranbrowne](https://github.com/kieranbrowne/dotfiles), [@jvns](https://github.com/jvns/dotfiles), [@zserge](https://github.com/zserge/dotfiles/).
 
 
 Now get back to work.

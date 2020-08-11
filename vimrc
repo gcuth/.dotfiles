@@ -18,12 +18,13 @@ call plug#begin()
 
 Plug 'SirVer/ultisnips' " snippet engine of choice
 Plug 'honza/vim-snippets' " default snippets
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
-Plug 'junegunn/goyo.vim', { 'for': 'markdown' }
+Plug 'tpope/vim-commentary' " sensible commenting
+Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's greatest programming language
+Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } 
+Plug 'junegunn/goyo.vim', { 'for': 'markdown' } " a (*dry-retch*) 'distraction-free' writing environment
+Plug 'junegunn/limelight.vim', { 'for': 'markdown' } " ... that greys all non-focus grafs
 
 call plug#end()
-
 
 
 " sensible search highlighting
@@ -63,6 +64,31 @@ highlight LineNr ctermfg=darkgrey
 highlight Search ctermbg=white
 highlight Search ctermfg=black
 
+" Color name (:help cterm-colors) or ANSI code
+let g:limelight_conceal_ctermfg = 'gray'
+let g:limelight_conceal_ctermfg = 240
+
+" Color name (:help gui-colors) or RGB color
+let g:limelight_conceal_guifg = 'DarkGray'
+let g:limelight_conceal_guifg = '#777777'
+
+" Default 0.5
+let g:limelight_default_coefficient = 0.7
+
+" Number of preceding/following paragraphs to include (default: 0)
+" let g:limelight_paragraph_span = 1
+
+" Beginning/end of paragraph
+" "   When there's no empty line between the paragraphs
+" "   and each paragraph starts with indentation
+" let g:limelight_bop = '^\s'
+" let g:limelight_eop = '\ze\n^\s'
+"
+" " Highlighting priority (default: 10)
+" "   Set it to -1 not to overrule hlsearch
+" let g:limelight_priority = -1
+
+
 " wrap long lines
 set wrap
 " ruler can be useful
@@ -89,4 +115,16 @@ au BufNewFile,BufRead *.{md,markdown,Rmd} call WritingMode()
 function! WritingMode()
     set linebreak
     Goyo
+    Limelight
+endfunction
+
+
+" Clojure Mode for clj
+au BufNewFile,BufRead *.{clj,cljs,cljc,cljx} call ClojureMode()
+
+function! ClojureMode()
+    RainbowParenthesesToggle
+    RainbowParenthesesLoadRound
+    RainbowParenthesesLoadSquare
+    RainbowParenthesesLoadBraces
 endfunction

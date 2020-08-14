@@ -21,8 +21,8 @@ Plug 'honza/vim-snippets' " default snippets
 Plug 'tpope/vim-commentary' " sensible commenting
 Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's greatest programming language
 Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } 
-Plug 'junegunn/goyo.vim', { 'for': 'markdown' } " a (*dry-retch*) 'distraction-free' writing environment
-Plug 'junegunn/limelight.vim', { 'for': 'markdown' } " ... that greys all non-focus grafs
+Plug 'junegunn/goyo.vim' " a (*dry-retch*) 'distraction-free' writing environment
+Plug 'junegunn/limelight.vim' " ... that greys all non-focus grafs
 
 call plug#end()
 

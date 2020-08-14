@@ -1,15 +1,36 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # runs an encrypted backup of the directories listed
-cd ~
 
-now=$(date +%Y-%m-%d-%H-%M-%S)
+if (( $# != 0 )); then
+    for BASEFOLDER in "$@"; do
+        if [ -d $BASEFOLDER ] && [ $(ls $BASEFOLDER | wc -l) -gt 0 ]; then
+            now=$(date +%Y-%m-%d-%H-%M-%S)
+            echo "Backing up '$BASEFOLDER' ... "
+            tar -czvf $(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz $BASEFOLDER
+            gpg -c $(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz
+            rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz
+            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg cloudstor:/backups/ --progress
+            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg gdrive:/backups/ --progress
+            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
+            rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg
+        fi
+    done
+else
+    cd ~
+    for BASEFOLDER in Documents Code Zotero Videos Pictures Music; do
+        if [ -d $BASEFOLDER ] && [ $(ls $BASEFOLDER | wc -l) -gt 0 ]; then
+            now=$(date +%Y-%m-%d-%H-%M-%S)
+            echo "Backing up '$BASEFOLDER' ... "
+            tar -czvf $(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz $BASEFOLDER
+            gpg -c $(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz
+            rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz
+            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg cloudstor:/backups/ --progress
+            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg gdrive:/backups/ --progress
+            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
+            rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg
+        fi
+    done
+fi
 
-tar -zcf - Documents Music Pictures Videos Code Zotero | openssl aes-256-cbc -salt -out $(hostname)-$(whoami)-$now.tar.gz.aes
-
-rclone copy ./$(hostname)-$(whoami)-$now.tar.gz.aes cloudstor:/
-rclone copy ./$(hostname)-$(whoami)-$now.tar.gz.aes gdrive:/
-
-rm ./$(hostname)-$(whoami)-$now.tar.gz.aes
-
-# to extract, run: openssl aes-256-cbc -d -salt -in backup.tar.gz.aes | tar -xz -f -
+# to extract, run: gpg -d (file)
 

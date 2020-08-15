@@ -287,8 +287,6 @@ def main(system_args):
         toggl_call = build_toggl_call(best_project, project_tags, best_description)
         if toggl_call:
             subprocess.call(toggl_call, shell=True)
-        with open('/home/g/Desktop/test.txt','a+') as f:
-            f.write(toggl_call)
         exit(0)
 
 if __name__ == "__main__":

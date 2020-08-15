@@ -9,17 +9,34 @@ alias grep="grep --color=auto"
 alias diff='diff --color=auto'
 
 # git
-alias gs="git status"
+alias gs="git status -bs"
 alias gd="git diff"
 alias ga="git add"
 alias gc="git commit -m"
 alias gcam="git commit -a -m"
 alias gp="git pull"
 alias gpom="git push origin master"
+# jump to top level of git repo
+alias gt="cd \$(git rev-parse --show-toplevel)"
+# Remove all traces of git from a folder
+alias degit="find . -name '.git' -exec rm -rf {} \;"
 
 # helpful extras
 alias rg="grep -r '$*' ."
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# Use ack to locate TOD* and FIXM* lines in current folder tree
+alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+):.*((TODO|FIXME):.*)/\2 :>> \1/"|grep -E --color=always ":>>.*:\d+"'
+
+alias ax='chmod a+x'
+
+# Print argument right aligned
+alias right="printf '%*s' $(tput cols)"
+
+# Get current external IP
+alias myip="curl icanhazip.com"
+
+alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
 
 # notetaking/filemaking shortcuts
 function take_note() {

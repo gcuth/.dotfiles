@@ -128,3 +128,13 @@ function! ClojureMode()
     RainbowParenthesesLoadSquare
     RainbowParenthesesLoadBraces
 endfunction
+
+" Quick Call to a Toggl-Starting Script
+
+function! Toggl()
+    let syntax = b:current_syntax
+    let here = expand('%:p')
+    let toggl_call = 'silent !python3 /home/g/.dotfiles/scripts/togglme "' . here .'" "' . syntax . '"'
+    :execute toggl_call
+    :redraw!
+endfunction

@@ -28,6 +28,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # Use ack to locate TOD* and FIXM* lines in current folder tree
 alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+):.*((TODO|FIXME):.*)/\2 :>> \1/"|grep -E --color=always ":>>.*:\d+"'
 
+# those pesky permissions
 alias ax='chmod a+x'
 
 # Print argument right aligned
@@ -36,12 +37,13 @@ alias right="printf '%*s' $(tput cols)"
 # Get current external IP
 alias myip="curl icanhazip.com"
 
+# trim newlines
+alias tn='tr -d "\n"'
+
 alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
 
 # notetaking/filemaking shortcuts
 function take_note() {
-    note_name=$1
-    now=$(date +%Y-%m-%d)
-    vim ~/Documents/blog/_posts/notes/$now-$note_name.md
+    vim ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias note="take_note"

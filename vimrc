@@ -110,6 +110,12 @@ set tabpagemax=100
 set clipboard^=unnamed
 
 
+" Snippet hotkeys
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+
 " save files on InsertLeave
 autocmd InsertLeave * :w!
 autocmd InsertLeave * :execute 'silent !tmux refresh-client -S &' | redraw!

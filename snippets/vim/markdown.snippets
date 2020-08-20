@@ -1,0 +1,52 @@
+priority -45
+
+#######################################################################
+#                      jekyll/yaml blog headers                       #
+#######################################################################
+
+snippet hheadj "Journal Post Header" b
+---
+title: Morning Pages (`!v strftime("%Y-%m-%d")`)
+layout: post
+permalink: /j/`!v strftime("%Y-%m-%d")`
+date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+categories: ['journal']
+published: false
+---
+
+$0
+endsnippet
+
+snippet hheadn "Note Post Header" b
+---
+title: $1
+layout: post
+permalink: /${1/\s+/-/g}
+date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+categories: ['note']
+published: false
+---
+
+$0
+endsnippet
+
+snippet hheadr "Reading Post Header" b
+---
+title: $2's '$1'
+layout: post
+permalink: /r/
+date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+reading_title: ${1}
+reading_author: ${2}
+reading_completed_date:
+reading_started_date:
+doi: ""
+reading_link:
+reading_rating: /5
+categories: ['review']
+published: false
+---
+
+$0
+endsnippet
+

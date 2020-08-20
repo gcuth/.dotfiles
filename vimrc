@@ -114,7 +114,8 @@ set clipboard^=unnamed
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-
+let g:snips_author="Galen"
+let g:snips_author_email="g@galen.me"
 
 " save files on InsertLeave
 autocmd InsertLeave * :w!

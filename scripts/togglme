@@ -16,7 +16,7 @@ def get_active_window_name():
 
 def get_current_toggl():
     try:
-        status = subprocess.check_output("toggl now", shell=True)
+        status = subprocess.check_output("/usr/local/bin/toggl now", shell=True)
         return status.decode('utf-8').strip()
     except subprocess.CalledProcessError as e:
         return e.output.decode('utf-8').strip()
@@ -172,7 +172,7 @@ def build_toggl_call(project, tags, description):
     call = None
     if isinstance(project, str) and isinstance(tags, list):
         tags = ','.join(tags)
-        call = f'toggl start -o "{project}" -a "{tags}"'
+        call = f'/usr/local/bin/toggl start -o "{project}" -a "{tags}"'
     if isinstance(description, str) and len(description) > 0:
         call = call + f' "{description}"'
     return call

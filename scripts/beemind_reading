@@ -3,7 +3,7 @@
 # A script to update a beeminder reading goal with the current number of read/noted sources.
 # Useful as part of a post-commit hook, with a beeminder 'odometer' goal.
 
-AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/auth_token)
+AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/beeminder_auth_token)
 USERNAME="galenhimself"
 CURRENT_TOTAL=$(ls ~/Documents/blog/_posts/readings/ | wc -l)
 echo $CURRENT_TOTAL

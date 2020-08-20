@@ -23,6 +23,9 @@ Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's 
 Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } 
 Plug 'junegunn/goyo.vim' " a (*dry-retch*) 'distraction-free' writing environment
 Plug 'junegunn/limelight.vim' " ... that greys all non-focus grafs
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
 
 call plug#end()
 
@@ -57,6 +60,8 @@ noremap <Left> <NOP>
 noremap <Right> <NOP>
 " leader key that makes sense for dvorak
 let mapleader = ","
+" fzf file picker to ctrl-p
+nnoremap <C-P> :FZF<CR>
 
 " Colours
 syntax enable

@@ -280,8 +280,7 @@ def main(system_args):
                 project_tags.append('writing')
             else:
                 project_tags.append('code')
-                if syntax in ['python','clojure','r','rmd','javascript']:
-                    project_tags.append(syntax)
+                project_tags.append(syntax)
         project_tags = sorted(list(set(project_tags)))
         best_description = build_best_description(path=active_fp, window_text=active_window)
         toggl_call = build_toggl_call(best_project, project_tags, best_description)

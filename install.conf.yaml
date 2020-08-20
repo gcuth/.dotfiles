@@ -33,6 +33,8 @@
       path: tmux.conf
     ~/.config/starship.toml:
       path: starship.toml
+    ~/.vim/UltiSnips:
+      path snippets/vim/*
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -129,4 +131,3 @@
 # tweak the standard desktop
 - shell:
     - ./setup_desktop
-

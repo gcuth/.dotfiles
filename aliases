@@ -50,6 +50,9 @@ alias note="take_note"
 
 alias journal="vim ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md"
 
+# record 
+alias record="ffmpeg -f pulse -i default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav"
+
 # Uni Convenience
 alias anuconnect="globalprotect connect --portal staff-access.anu.edu.au"
 alias anudisconnect="globalprotect disconnect"

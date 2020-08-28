@@ -33,12 +33,13 @@
       path: tmux.conf
     ~/.config/starship.toml:
       path: starship.toml
-    ~/.vim/UltiSnips:
-      path snippets/vim/*
+    ~/.vim/UltiSnips/markdown.snippets:
+      path: snippets/vim/markdown.snippets
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
     - /home/g/Code/
+    - /home/g/Recordings/
 
 # install starship for enlivening the shell a little
 - shell:
@@ -113,6 +114,10 @@
     - sudo cp -rf $HOME/Downloads/Zotero_linux-x86_64/* /opt/zotero/
     - ln -sf /opt/zotero/zotero.desktop $HOME/.local/share/applications/zotero.desktop
     - rm -rf $Home/Downloads/Zotero_linux-x86_64
+
+# INSTALL BABASHKA
+- shell:
+    - curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install -o install-babashka; chmod +x install-babashka && sudo ./install-babashka; rm ./install-babashka
 
 # Add thesis post-commit hook
 - link:

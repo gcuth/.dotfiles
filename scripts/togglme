@@ -200,9 +200,9 @@ def build_best_description(path=None, window_text=None):
                 else:
                     description = f'Working on {fname}.'
             elif project == 'Blog':
-                if '/notes/' in head:
+                if 'notes' in head:
                     description = f'Writing a note at {fname}.'
-                elif '/journals/' in head:
+                elif 'journals' in head:
                     description = f'Journalling for {fname}.'
                 else:
                     description = f'Tinkering with {tail} in the blog.'

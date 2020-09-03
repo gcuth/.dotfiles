@@ -35,6 +35,8 @@
       path: starship.toml
     ~/.vim/UltiSnips/markdown.snippets:
       path: snippets/vim/markdown.snippets
+    ~/.config/Code/User/settings.json:
+      path: vscode-settings.json
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:

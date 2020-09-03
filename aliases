@@ -50,6 +50,9 @@ alias note="take_note"
 
 alias journal="vim ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md"
 
+# Open the most recently edited thesis file
+alias thesis="vim ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`"
+
 # record 
 alias record="ffmpeg -f pulse -i default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav"
 

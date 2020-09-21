@@ -12,12 +12,18 @@ if (( $# != 0 )); then
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg cloudstor:/backups/ --progress
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg gdrive:/backups/ --progress
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
+            # rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg aws:/backups/ --progress
+            if $(lsblk | grep /media | grep -oP "sd[a-z]" | awk '{print "/dev/"$1}' | sort | uniq | wc -l); do
+                for EXTMEDIA in `ls /media/$(whoami)`; do
+                    cp ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg /media/$(whoami)/$EXTMEDIA
+                done
+            done
             rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg
         fi
     done
 else
     cd ~
-    for BASEFOLDER in Documents Code Zotero Videos Pictures Music; do
+    for BASEFOLDER in Documents Code Zotero Videos Pictures Music Recordings; do
         if [ -d $BASEFOLDER ] && [ $(ls $BASEFOLDER | wc -l) -gt 0 ]; then
             now=$(date +%Y-%m-%d-%H-%M-%S)
             echo "Backing up '$BASEFOLDER' ... "
@@ -27,6 +33,12 @@ else
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg cloudstor:/backups/ --progress
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg gdrive:/backups/ --progress
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
+            # rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg aws:/backups/ --progress
+            if $(lsblk | grep /media | grep -oP "sd[a-z]" | awk '{print "/dev/"$1}' | sort | uniq | wc -l); do
+                for EXTMEDIA in `ls /media/$(whoami)`; do
+                    cp ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg /media/$(whoami)/$EXTMEDIA
+                done
+            done
             rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg
         fi
     done

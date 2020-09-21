@@ -12,8 +12,8 @@ alias diff='diff --color=auto'
 alias gs="git status -bs"
 alias gd="git diff"
 alias ga="git add"
-alias gc="git commit -m"
-alias gcam="git commit -a -m"
+alias gc="git commit -S -m" # sign using -S by default!
+alias gcam="git commit -a -S -m" # sign using -S by default!
 alias gp="git pull"
 alias gpom="git push origin master"
 # jump to top level of git repo
@@ -37,6 +37,12 @@ alias right="printf '%*s' $(tput cols)"
 # Get current external IP
 alias myip="curl icanhazip.com"
 
+# List currently mounted usbs
+function list_my_usbs() {
+    lsblk | grep /media | grep -oP "sd[a-z]" | awk '{print "/dev/"$1}' | sort | uniq
+}
+alias myusbs="list_my_usbs"
+
 # trim newlines
 alias tn='tr -d "\n"'
 
@@ -49,6 +55,11 @@ function take_note() {
 alias note="take_note"
 
 alias journal="vim ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md"
+
+function fuzzy_find_and_vim() {
+    vim `fzf --preview="cat {}" --preview-window=right:70%:wrap`
+}
+alias fuz="fuzzy_find_and_vim"
 
 # Open the most recently edited thesis file
 alias thesis="vim ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`"

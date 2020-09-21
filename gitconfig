@@ -47,6 +47,7 @@
 [user]
 	name = Galen Cuthbertson
 	email = g@galen.me
+	signingkey = FA12B9DBBD15A5C47588F5CE8FFD92E1DE8776AE
 [github]
 	user = gcuth
 [credential]

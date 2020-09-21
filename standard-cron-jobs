@@ -4,3 +4,4 @@
 # * * * * * ~/.dotfiles/scripts/enforce_focus >/dev/null 2>&1
 */10 * * * * if [[ $(iwgetid -r) ]]; then /home/g/.dotfiles/scripts/update_exist_tags add --tag "wifi $(iwgetid -r)"; fi >/dev/null 2>&1
 */5 * * * * /home/g/.dotfiles/scripts/togglme >/dev/null 2>&1
+*/6 * * * * /home/g/.dotfiles/scripts/calculate_words_today > /home/g/.dotfiles/secrets/logs/words_today

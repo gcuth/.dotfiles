@@ -79,7 +79,7 @@
 			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
 			"reading_title: $2",
 			"reading_author: $3",
-			"reading_completed_date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
+			"reading_completed_date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
 			"reading_started_date: $4",
 			"isbn: tk",
 			"doi: tk",
@@ -111,14 +111,18 @@
 		],
 		"description": "Add a yaml header for a paper/chapter."
 	},
-	"Current Date in ISO": {
-		"prefix": "ddate",
-		"body": "$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
-		"description": "Current date the form 2020-12-01."
-	},
-	"Current Time in ISO": {
-		"prefix": "ttime",
-		"body": "$CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
-		"description": "Current time in the form 14:30:01."
+	"blot.im note header": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "hhn",
+		"body": [
+			"title: $1",
+			"permalink: /$2",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
+			"draft: true",
+			"",
+			"$0"
+		],
+		"description": "Add a header suitable for a note in blot.im"
 	}
 }
+

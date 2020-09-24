@@ -37,6 +37,8 @@
       path: snippets/vim/markdown.snippets
     ~/.config/Code/User/settings.json:
       path: vscode-settings.json
+    ~/.config/Code/User/headers.code-snippets:
+      path: snippets/global-vscode-headers.code-snippets
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:

@@ -1,3 +1,3 @@
 /home/g/.dotfiles/scripts/beemind_reading >/dev/null 2>&1
 /home/g/.dotfiles/scripts/beemind_highlights >/dev/null 2>&1
-/home/g/.dotfiles/scripts/update_exist_articles $(ls /home/g/Documents/blog/_posts/readings | grep -c $(date +%Y-%m-%d)) >/dev/null 2>&1
+/home/g/.dotfiles/scripts/update_exist_articles $(comm -12 <(grep -REl "categories: (quote|review)" ~/Documents/blot | sort) <(grep -REl $(date +%Y-%m-%d) ~/Documents/blot | sort) | wc -l) >/dev/null 2>&1

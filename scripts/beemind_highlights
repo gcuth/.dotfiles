@@ -5,7 +5,7 @@
 
 AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/auth_token)
 USERNAME="galenhimself"
-CURRENT_TOTAL=$(ls ~/Documents/blog/_posts/quotes/ | wc -l)
+CURRENT_TOTAL=$(grep -R "categories: quote" ~/Documents/blot | wc -l)
 echo $CURRENT_TOTAL
 
 # Get current goal total from beeminder

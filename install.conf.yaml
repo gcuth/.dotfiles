@@ -130,7 +130,7 @@
 
 # Add blog post-commit hook
 - link:
-    /home/g/Documents/blog/.git/hooks/post-commit:
+    /home/g/Documents/blot/.git/hooks/post-commit:
       path: blog-post-commit
 
 # install my favourite cron jobs

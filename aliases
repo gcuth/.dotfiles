@@ -50,11 +50,11 @@ alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
 
 # notetaking/filemaking shortcuts
 function take_note() {
-    vim ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
+    code ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias note="take_note"
 
-alias journal="vim ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md"
+alias journal="code ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md"
 
 function fuzzy_find_and_vim() {
     vim `fzf --preview="cat {}" --preview-window=right:70%:wrap`
@@ -62,10 +62,10 @@ function fuzzy_find_and_vim() {
 alias fuz="fuzzy_find_and_vim"
 
 # Open the most recently edited thesis file
-alias thesis="vim ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`"
+alias thesis="code ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`"
 
-# record 
-alias record="ffmpeg -f pulse -i default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav"
+# record
+# alias record="ffmpeg -f pulse -i default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav"
 
 # Uni Convenience
 alias anuconnect="globalprotect connect --portal staff-access.anu.edu.au"

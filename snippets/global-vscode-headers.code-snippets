@@ -157,6 +157,16 @@
 			"$0"
 		],
 		"description": "Add a jekyll-style post header for a note post (default unpublished)."
-	}
+	},
+	"Current Time": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "ttime",
+		"body": ["$CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND"]
+	},
+	"Current Date": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "ddate",
+		"body": ["$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"]
+	},
 }
 

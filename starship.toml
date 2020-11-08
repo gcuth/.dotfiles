@@ -21,3 +21,13 @@ disabled = true
 
 [directory]
 truncation_length = 2
+
+[conda]
+disabled = true
+
+[python]
+disabled = true
+
+[nodejs]
+disabled = true
+

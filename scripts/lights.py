@@ -55,7 +55,7 @@ def main():
         h,s,v = rerange_hsv(rgb_to_hsv(255, 255, 255))
     else:
         h,s,v = rerange_hsv(rgb_to_hsv(255, 0, 0))
-    command = {'on': True, 'hue': h, 'sat': s, 'bri': v, 'transitiontime': 300}
+    command = {'on': True, 'hue': h, 'sat': s, 'bri': v, 'transitiontime': 900}
     b.set_light(study_lights, command)
 
 if __name__ == "__main__":

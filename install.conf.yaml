@@ -144,3 +144,4 @@
 # Install some snaps
 - shell:
     - sudo snap install todoist
+    - sudo snap install codium

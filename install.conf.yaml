@@ -140,3 +140,7 @@
 # tweak the standard desktop
 - shell:
     - ./setup_desktop
+
+# Install some snaps
+- shell:
+    - sudo snap install todoist

@@ -90,6 +90,7 @@
     - sudo apt install -y anki
     - sudo apt install -y ffmpeg
     - sudo apt install -y postgresql
+    - sudo apt install -y sqlite3
     - sudo apt install -y fail2ban
     - sudo apt install -y rclone
     - sudo apt install -y xclip
@@ -107,6 +108,7 @@
     - sudo apt install -y leiningen
     - sudo apt install -y openvpn
     - sudo apt install -y dialog
+    - sudo apt install -y jq
     - sudo pip3 install togglcli
 
 # INSTALL ZOTERO

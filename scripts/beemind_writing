@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+#
+# A script to update a beeminder writing goal with incremental writing changes.
+# Useful as part of a post-commit hook, with a beeminder 'do more' goal.
+
+AUTHTOKEN=$(cat ~/.dotfiles/secrets/beeminder/beeminder_auth_token)
+USERNAME="galenhimself"
+WORDS_TODAY=$(cat ~/.dotfiles/secrets/logs/words_today)
+
+# Get current goal total from beeminder
+RAW_BEEMINDER_INFO=$(curl -s "https://www.beeminder.com/api/v1/users/${USERNAME}/goals/write.json?auth_token=${AUTHTOKEN}")
+LAST_BEEMINDER_VALUE=$(echo "$RAW_BEEMINDER_INFO" | jq '.last_datapoint.value')
+
+# If current total on local machine doesn't match what's on beeminder, update the beeminder value:
+if [ "$WORDS_TODAY" -ne "$LAST_BEEMINDER_VALUE" ]; then
+    DIFFERENCE=$(python3 -c "print(max($WORDS_TODAY - $LAST_BEEMINDER_VALUE,0))")
+    curl -d "auth_token=${AUTHTOKEN}" -d "value=${DIFFERENCE}" "https://www.beeminder.com/api/v1/users/USERNAME/goals/write/datapoints.json"
+fi

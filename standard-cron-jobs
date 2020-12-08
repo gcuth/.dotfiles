@@ -1,7 +1,7 @@
-*/5 * * * * git -C ~/Documents/thesis add .; git -C ~/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
-1 * * * * git -C ~/Documents/thesis push origin master >/dev/null 2>&1
-# * * * * * ~/.dotfiles/scripts/enforce_focus >/dev/null 2>&1
 */10 * * * * if [[ $(iwgetid -r) ]]; then /home/g/.dotfiles/scripts/update_exist_tags add --tag "wifi $(iwgetid -r)"; fi >/dev/null 2>&1
-*/5 * * * * /home/g/.dotfiles/scripts/togglme >/dev/null 2>&1
+1 * * * * git -C ~/Documents/thesis push origin master >/dev/null 2>&1
+*/5 * * * * git -C ~/Documents/thesis add .; git -C ~/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
 */6 * * * * /home/g/.dotfiles/scripts/calculate_words_today > /home/g/.dotfiles/secrets/logs/words_today
-* 7-18 * * 1,2,4,5 /usr/bin/python3 /home/g/.dotfiles/scripts/lights.py >/dev/null 2>&1
+*/6 * * * * /home/g/.dotfiles/scripts/beemind_writing >/dev/null 2>&1
+*/5 * * * * git -C ~/Documents/blog add .; git -C ~/Documents/blog/ commit -m 'Auto-commit' >/dev/null 2>&1
+5 * * * * git -C ~/Documents/blog push origin master >/dev/null 2>&1

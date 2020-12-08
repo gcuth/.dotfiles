@@ -37,6 +37,15 @@ def get_study_lights():
     study = b.get_group(b.get_group_id_by_name('Study'), 'lights')
     return [int(l) for l in study]
 
+def get_study_lights_status(target_state):
+    if target_state is 'any':
+        status = b.get_group('Study')['state']['any_on']
+    elif target_state is 'all':
+        status = b.get_group('Study')['state']['all_on']
+    else:
+        status = None
+    return status
+
 def list_changed(last_n=5, directories=['/home/g/Documents/','/home/g/Code/']):
     recent = time.time() - last_n * 60
     changed = []
@@ -49,15 +58,18 @@ def list_changed(last_n=5, directories=['/home/g/Documents/','/home/g/Code/']):
 
 def main():
     study_lights = get_study_lights()
+    study_status = get_study_lights_status('any') # check if any are on
     changed = list_changed(last_n=5)
     print(changed)
     if len(changed) > 0:
         h,s,v = rerange_hsv(rgb_to_hsv(255, 255, 255))
         command = {'on': True, 'hue': h, 'sat': s, 'bri': v, 'transitiontime': 600}
+        b.set_light(study_lights, command)
     else:
-        h,s,v = rerange_hsv(rgb_to_hsv(255, 0, 0))
-        command = {'on': True, 'hue': h, 'sat': s, 'bri': v, 'transitiontime': 1800}
-    b.set_light(study_lights, command)
+        if study_status:
+            h,s,v = rerange_hsv(rgb_to_hsv(255, 0, 0))
+            command = {'on': True, 'hue': h, 'sat': s, 'bri': v, 'transitiontime': 1800}
+            b.set_light(study_lights, command)
 
 if __name__ == "__main__":
     main()

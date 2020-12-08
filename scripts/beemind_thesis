@@ -8,11 +8,9 @@ USERNAME="galenhimself"
 RAW_TOTAL=$(find ~/Documents/thesis/chapters/. -type f -name "*md" -print0 | wc -w --files0-from=- | xargs | awk '{print $(NF-1)}')
 BLOCKQUOTE_TOTAL=$(grep -r "^> " ~/Documents/thesis/chapters | wc -w)
 COMMENTS_TOTAL=$(grep -r "<\!--" ~/Documents/thesis/chapters | wc -w)
+TK_TOTAL=$(rgrep "tk" ~/Documents/thesis/chapters | grep -Ev ".git" | sed 's/ /\n/g' | grep "tk" | wc -l)
 CURRENT_TOTAL=$(expr $RAW_TOTAL - $BLOCKQUOTE_TOTAL - $COMMENTS_TOTAL)
-echo $RAW_TOTAL
-echo $BLOCKQUOTE_TOTAL
-echo $COMMENTS_TOTAL
-echo $CURRENT_TOTAL
+# CURRENT_TOTAL=$(expr $RAW_TOTAL - $BLOCKQUOTE_TOTAL - $COMMENTS_TOTAL - $TK_TOTAL)
 
 # Get current goal total from beeminder
 RAW_BEEMINDER_INFO=$(curl -s "https://www.beeminder.com/api/v1/users/${USERNAME}/goals/thesis.json?auth_token=${AUTHTOKEN}")

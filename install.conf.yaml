@@ -39,13 +39,19 @@
       path: vscode-settings.json
     ~/.config/Code/User/headers.code-snippets:
       path: snippets/global-vscode-headers.code-snippets
+    ~/.newsboat/urls:
+      path: urls
+    ~/.newsboat/config:
+      path: newsboatrc
+    ~/.config/kitty/kitty.conf:
+      path: kitty.conf
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
     - /home/g/Code/
     - /home/g/Recordings/
 
-# install starship for enlivening the shell a little
+# install starship for enlivening the prompt a little
 - shell:
     - curl -fsSL https://starship.rs/install.sh -o ./starship.sh; bash ./starship.sh -y; rm ./starship.sh
 
@@ -109,7 +115,10 @@
     - sudo apt install -y openvpn
     - sudo apt install -y dialog
     - sudo apt install -y jq
+    - sudo apt install -y neovim
     - sudo pip3 install togglcli
+    - sudo pip3 install cookiecutter
+    - sudo apt install -y newsboat
 
 # INSTALL ZOTERO
 - shell:
@@ -120,6 +129,12 @@
     - sudo cp -rf $HOME/Downloads/Zotero_linux-x86_64/* /opt/zotero/
     - ln -sf /opt/zotero/zotero.desktop $HOME/.local/share/applications/zotero.desktop
     - rm -rf $Home/Downloads/Zotero_linux-x86_64
+ 
+# INSTALL PROTONVPN CLIENT
+- shell:
+    - wget -q -O - https://repo.protonvpn.com/debian/public_key.asc | sudo apt-key add - 
+    - sudo add-apt-repository 'deb https://repo.protonvpn.com/debian unstable main'
+    - sudo apt-get update && sudo apt-get install protonvpn
 
 # INSTALL BABASHKA
 - shell:

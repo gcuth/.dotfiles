@@ -72,6 +72,10 @@ function start_thesis_writing() {
 }
 alias thesis="start_thesis_writing"
 
+# cookie cut a (python) Data Science project
+alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science"
+
+
 # record
 # alias record="ffmpeg -f pulse -i default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav"
 

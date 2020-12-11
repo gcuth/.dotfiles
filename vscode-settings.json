@@ -16,7 +16,6 @@
     "editor.fontFamily": "'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
     "editor.fontLigatures": true,
     "breadcrumbs.enabled": true,
-    "python.pythonPath": "/home/g/anaconda/bin/python",
     "git.confirmSync": false,
     "git.autofetch": true
 }

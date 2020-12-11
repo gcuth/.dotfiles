@@ -84,6 +84,7 @@
     - sudo apt install -y libopenblas-base
     - sudo apt install -y build-essential
     - sudo apt install -y libatomic1
+    - sudo apt install -y x11-utils
     - sudo apt install -y gfortran
     - sudo apt install -y perl
     - sudo apt install -y m4
@@ -134,7 +135,7 @@
 - shell:
     - wget -q -O - https://repo.protonvpn.com/debian/public_key.asc | sudo apt-key add - 
     - sudo add-apt-repository 'deb https://repo.protonvpn.com/debian unstable main'
-    - sudo apt-get update && sudo apt-get install protonvpn
+    - sudo apt-get update && sudo apt-get install -y protonvpn
 
 # INSTALL BABASHKA
 - shell:

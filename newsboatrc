@@ -36,6 +36,10 @@ confirm-exit no
 
 # styling ---------------------------------------------------------------------
 
+include /usr/share/doc/newsboat/contrib/colorschemes/plain
+
+show-keymap-hint false
 datetime-format "%Y-%m-%d %H:%M:%S"
-# articlelist-format
+articlelist-format "%D | %20T | %t"
+feedlist-format "%11u %t"
 # articlelist-title-format

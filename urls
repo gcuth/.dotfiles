@@ -1,66 +1,70 @@
 
 "query:Unread Articles:unread = \"yes\""
 
-https://www.tandfonline.com/feed/rss/rajp20
-https://projecteuclid.org/feeds/euclid.ba_article_rss.xml
-https://projecteuclid.org/feeds/euclid.bj_article_rss.xml
-https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=bdsa&type=etoc&feed=rss
-https://academic.oup.com/rss/site_5152/3015.xml
-https://muse.jhu.edu/feeds/latest_articles?jid=215
-https://muse.jhu.edu/feeds/latest_articles?jid=32
-https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=ci
-https://academic.oup.com/rss/site_5447/3308.xml
-https://onlinelibrary.wiley.com/feed/14680262/most-recent
-https://www.cambridge.org/core/rss/product/id/B5D4296480440438DA66419338B16C88
-https://www.cambridge.org/core/rss/product/id/71889765CB94C81977C512106F267CD1
-https://culturalanalytics.org/feed
-https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=10824&query=
-https://www.tandfonline.com/feed/rss/rjec20
-https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=jpe
-https://www.jstatsoft.org/rss
-https://www.tandfonline.com/feed/rss/uasa20
-https://rss.onlinelibrary.wiley.com/action/showFeed?jc=14679868&type=etoc&feed=rss
-https://academic.oup.com/rss/site_5489/3350.xml
-https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=11023&query=
-https://muse.jhu.edu/feeds/latest_articles?jid=129
-https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=mp
-https://muse.jhu.edu/feeds/latest_articles?jid=144
-https://onlinelibrary.wiley.com/feed/14680068/most-recent
-https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=11098&query=
-https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=13347&query=
-https://onlinelibrary.wiley.com/feed/19331592/most-recent
-https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=phos
-https://www.mitpressjournals.org/action/showFeed?jc=rest&type=etoc&feed=rss
-https://www.cambridge.org/core/rss/product/id/CB16016004606AC7E72B9596447615F1
-https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=sssb&type=etoc&feed=rss
-https://projecteuclid.org/feeds/euclid.ss_article_rss.xml
-https://www.pdcnet.org/pdc/bvdb.nsf/getrssxml?openagent&synonym=techne
-https://www.tandfonline.com/feed/rss/utch20
-https://projecteuclid.org/feeds/euclid.aoap_article_rss.xml
-https://projecteuclid.org/feeds/euclid.aoas_article_rss.xml
-https://projecteuclid.org/feeds/euclid.aop_article_rss.xml
-https://projecteuclid.org/feeds/euclid.aos_article_rss.xml
-https://academic.oup.com/rss/site_5434/3295.xml
-https://www.pdcnet.org/pdc/bvdb.nsf/getrssxml?openagent&synonym=jphil
-https://academic.oup.com/rss/site_5504/3365.xml
-https://journal.r-project.org/rss.atom
-https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=tcsa&type=etoc&feed=rss
-https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=11245&query=
-https://www.cambridge.org/core/rss/product/id/56ED3BA46977662562A26BC04DD604FD
-https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=phos
-https://www.tandfonline.com/feed/rss/rics20
-https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=nms&type=etoc&feed=rss
-https://www.mlajournals.org/action/showFeed?ui=0&mi=5y6r9j&ai=rs&jc=pmla&type=etoc&feed=rss
-http://feeds.bbci.co.uk/news/world/rss.xml
-https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/section/world/rss.xml
-https://www.buzzfeed.com/world.xml
-http://www.aljazeera.com/xml/rss/all.xml
-https://www.thecipherbrief.com/feed
-http://rss.cnn.com/rss/edition_world.rss
-https://www.theguardian.com/world/rss
-http://feeds.washingtonpost.com/rss/world
-http://feeds.reuters.com/Reuters/worldNews
-http://www.independent.co.uk/news/world/rss
-https://blog.ap.org/feed.rss
-https://www.abc.net.au/news/feed/52278/rss.xml
-
+https://www.tandfonline.com/feed/rss/rajp20 "~Australasian Journal of Philosophy"
+https://projecteuclid.org/feeds/euclid.ba_article_rss.xml "~Bayesian Analysis"
+https://projecteuclid.org/feeds/euclid.bj_article_rss.xml "~Bernoulli"
+https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=bdsa&type=etoc&feed=rss "~Big Data & Society"
+https://academic.oup.com/rss/site_5152/3015.xml "~Classical Receptions"
+https://muse.jhu.edu/feeds/latest_articles?jid=215 "~College Literature"
+https://muse.jhu.edu/feeds/latest_articles?jid=32 "~Common Knowledge"
+https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=ci "~Critical Inquiry"
+https://academic.oup.com/rss/site_5447/3308.xml "~Digital Scholarship in the Humanities"
+https://onlinelibrary.wiley.com/feed/14680262/most-recent "~Econometrica"
+https://www.cambridge.org/core/rss/product/id/B5D4296480440438DA66419338B16C88 "~Economics & Philosophy"
+https://www.cambridge.org/core/rss/product/id/71889765CB94C81977C512106F267CD1 "~Episteme"
+https://culturalanalytics.org/feed "~Cultural Analytics"
+https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=10824&query= "~Journal of Cultural Economics"
+https://www.tandfonline.com/feed/rss/rjec20 "~Journal of Economic Methodology"
+https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=jpe "~Journal of Political Economy"
+https://www.jstatsoft.org/rss "~Journal of Statistical Software"
+https://www.tandfonline.com/feed/rss/uasa20 "~Journal of the American Statistical Association"
+https://rss.onlinelibrary.wiley.com/action/showFeed?jc=14679868&type=etoc&feed=rss "~Statistical Methodology"
+https://academic.oup.com/rss/site_5489/3350.xml "~Mind"
+https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=11023&query= "~Minds and Machines"
+https://muse.jhu.edu/feeds/latest_articles?jid=129 "~MLQ"
+https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=mp "~Modern Philology"
+https://muse.jhu.edu/feeds/latest_articles?jid=144 "~New Literary History"
+https://onlinelibrary.wiley.com/feed/14680068/most-recent "~Noûs"
+https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=11098&query= "~Philosophical Studies"
+https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=13347&query= "~Philosophy & Technology"
+https://onlinelibrary.wiley.com/feed/19331592/most-recent "~Philosophy and Phenomenological Research"
+https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=phos "~Philosophy of Science"
+https://www.mitpressjournals.org/action/showFeed?jc=rest&type=etoc&feed=rss "~Review of Economics & Statistics"
+https://www.cambridge.org/core/rss/product/id/CB16016004606AC7E72B9596447615F1 "~Science in Context"
+https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=sssb&type=etoc&feed=rss "~Social Studies of Science"
+https://projecteuclid.org/feeds/euclid.ss_article_rss.xml "~Statistical Science"
+https://www.pdcnet.org/pdc/bvdb.nsf/getrssxml?openagent&synonym=techne "~Techné"
+https://www.tandfonline.com/feed/rss/utch20 "~Technometrics"
+https://projecteuclid.org/feeds/euclid.aoap_article_rss.xml "~Annals of Applied Probability"
+https://projecteuclid.org/feeds/euclid.aoas_article_rss.xml "~Annals of Applied Statistics"
+https://projecteuclid.org/feeds/euclid.aop_article_rss.xml "~Annals of Probability"
+https://projecteuclid.org/feeds/euclid.aos_article_rss.xml "~Annals of Statistics"
+https://academic.oup.com/rss/site_5434/3295.xml "~British Journal for the Philosophy of Science"
+https://www.pdcnet.org/pdc/bvdb.nsf/getrssxml?openagent&synonym=jphil "~Journal of Philosophy"
+https://academic.oup.com/rss/site_5504/3365.xml "~Quarterly Journal of Economics"
+https://journal.r-project.org/rss.atom "~R Journal"
+https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=tcsa&type=etoc&feed=rss "~Theory, Culture & Society"
+https://link.springer.com/search.rss?search-within=Journal&facet-journal-id=11245&query= "~Topoi"
+https://www.cambridge.org/core/rss/product/id/56ED3BA46977662562A26BC04DD604FD "~Journal of Symbolic Logic"
+https://www.journals.uchicago.edu/action/showFeed?type=etoc&feed=rss&jc=phos "~Philosophy of Science"
+https://www.tandfonline.com/feed/rss/rics20 "~Information, Communication & Society"
+https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=nms&type=etoc&feed=rss "~New Media & Society"
+https://www.mlajournals.org/action/showFeed?ui=0&mi=5y6r9j&ai=rs&jc=pmla&type=etoc&feed=rss "~PMLA"
+http://feeds.bbci.co.uk/news/world/rss.xml "~BBC"
+https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/section/world/rss.xml "~NY Times"
+https://www.buzzfeed.com/world.xml "~Buzzfeed News"
+http://www.aljazeera.com/xml/rss/all.xml "~Al Jazeera"
+https://www.thecipherbrief.com/feed "~The Cipher Brief"
+http://rss.cnn.com/rss/edition_world.rss "~CNN"
+https://www.theguardian.com/world/rss "~The Guardian"
+http://feeds.washingtonpost.com/rss/world "~The Washington Post"
+http://feeds.reuters.com/Reuters/worldNews "~Reuters"
+http://www.independent.co.uk/news/world/rss "~Independent"
+https://blog.ap.org/feed.rss "~AP"
+https://www.abc.net.au/news/feed/52278/rss.xml "~ABC"
+https://api.quantamagazine.org/feed/ "~Quanta"
+http://feeds.kottke.org/main "~Kottke"
+https://pluralistic.net/feed/ "~Pluralistic"
+https://feeds.feedburner.com/marginalrevolution/feed "~Marginal Revolution"
+https://daringfireball.net/feeds/articles "~Daring Fireball"

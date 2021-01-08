@@ -1,6 +1,6 @@
 # basics
 alias c="clear; ls"
-alias vi="vim"
+alias vi="nvim"
 
 # adding color to the usuals
 alias l="ls -lah --color=auto"
@@ -67,8 +67,8 @@ alias fuz="fuzzy_find_and_vim"
 
 # Open the most recently edited thesis file
 function start_thesis_writing() {
-    code ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
     /usr/local/bin/toggl start -o 'Thesis' -a 'thesis, study, writing' "Writing `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
+    vi ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
 }
 alias thesis="start_thesis_writing"
 

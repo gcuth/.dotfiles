@@ -1,4 +1,7 @@
-" Generic
+" Generic (HIINRN)
+set hls ic is nu rnu noswf
+
+
 set nocompatible
 filetype off
 
@@ -28,14 +31,7 @@ Plug 'junegunn/fzf.vim'
 
 call plug#end()
 
-" sensible search highlighting
-set incsearch
-set nohlsearch
-set smartcase
-
 set backspace=2 "make backspace work like other text editors
-
-set relativenumber "set relative line numbers
 
 set visualbell "flash screen in error instead of sounding a beep
 

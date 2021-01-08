@@ -45,6 +45,8 @@
       path: newsboatrc
     ~/.config/kitty/kitty.conf:
       path: kitty.conf
+    ~/.config/nvim/init.vim:
+      path: nvim_init
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -162,5 +164,8 @@
 # Install some snaps
 - shell:
     - sudo snap install todoist
-    - sudo snap install codium
     - sudo snap install --edge 1password
+
+# Install regolith (for easy i3)
+- shell:
+    - sudo add-apt-repository -y ppa:regolith-linux/release; sudo apt install -y regolith-desktop-standard

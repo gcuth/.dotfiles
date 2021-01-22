@@ -5,31 +5,36 @@ priority -45
 #######################################################################
 
 snippet hhj "Journal Post Header" b
+---
 title: Morning Pages (`!v strftime("%Y-%m-%d")`)
 layout: post
 permalink: /j/`!v strftime("%Y-%m-%d")`
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
-categories: journal
+categories: ['journal']
 published: false
+---
 
 $0
 endsnippet
 
 snippet hhn "Note Post Header" b
+---
 title: $1
 layout: post
 permalink: /${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
-categories: note
+categories: ['note']
 published: false
+---
 
 $0
 endsnippet
 
 snippet hhr "Reading Post Header" b
+---
 title: $2's '$1'
 layout: post
-permalink: /r/$3
+permalink: /r/${2/\s+/-/g}-${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
 reading_title: ${1}
 reading_author: ${2}
@@ -38,30 +43,50 @@ reading_started_date: `!v strftime("%Y-%m-%d %H:%M:S %z")`
 doi: ""
 reading_link: ""
 reading_rating: $4/5
-categories: review
+categories: ['review']
 published: false
+---
 
 $0
 endsnippet
 
 snippet hhm "Meeting Post Header" b
+---
 title: $1
 layout: post
 permalink: /m/`!v strftime("%Y-%m-%d")`-${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
-categories: meeting
+categories: ['meeting']
 published: false
+---
 
 $0
 endsnippet
 
 snippet hhl "Lecture Post Header" b
+---
 title: $1
 layout: post
 permalink: /l/`!v strftime("%Y-%m-%d")`-${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
-categories: lecture
+categories: ['lecture']
 published: false
+---
 
+$0
+endsnippet
+
+snippet qqns "Questions Content (for a yaml blog header)" b
+questions:
+	- question:
+		question: "$1"
+		answer: "$2"
+$0
+endsnippet
+
+snippet qqn "Individual Question Content (for a yaml blog header)" b
+	- question:
+		question: "$1"
+		answer: "$2"
 $0
 endsnippet

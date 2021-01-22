@@ -15,6 +15,12 @@ if [ -f ~/.aliases ]; then
     . ~/.aliases
 fi
 
+# Set nvim as default
+if [ -f /usr/bin/nvim ]; then
+    export EDITOR="/usr/bin/nvim"
+    export VISUAL="/usr/bin/nvim"
+fi
+
 CASE_SENSITIVE="false"
 
 plugins=(

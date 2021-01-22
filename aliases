@@ -50,36 +50,45 @@ alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
 
 # notetaking/filemaking shortcuts
 function take_note() {
-    code ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
+    $EDITOR ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias note="take_note"
 
+function take_meeting_notes() {
+    $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
+}
+alias meet="take_meeting_notes"
+
 function start_journal_writing() {
-    code ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
     /usr/local/bin/toggl start -o 'Blog' -a 'writing' "Writing morning pages."
+    $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
 }
 alias journal="start_journal_writing"
 
-function fuzzy_find_and_vim() {
-    vim `fzf --preview="cat {}" --preview-window=right:70%:wrap`
+function fuzzy_find_and_edit() {
+    $EDITOR `fzf --preview="cat {}" --preview-window=right:70%:wrap`
 }
-alias fuz="fuzzy_find_and_vim"
+alias fuz="fuzzy_find_and_edit"
 
 # Open the most recently edited thesis file
 function start_thesis_writing() {
     /usr/local/bin/toggl start -o 'Thesis' -a 'thesis, study, writing' "Writing `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
-    vi ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
+    $EDITOR ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
 }
 alias thesis="start_thesis_writing"
 
 # cookie cut a (python) Data Science project
 alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science"
 
-
 # record
 # alias record="ffmpeg -f pulse -i default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav"
 
 # Uni Convenience
-alias anuconnect="globalprotect connect --portal staff-access.anu.edu.au"
-alias anudisconnect="globalprotect disconnect"
-alias anustatus="globalprotect show --status"
+alias anuc="globalprotect connect --portal staff-access.anu.edu.au"
+alias anud="globalprotect disconnect"
+alias anus="globalprotect show --status"
+
+# ProtonVPN Convenience
+alias pvc="sudo protonvpn c -f"
+alias pvd="sudo protonvpn d"
+

@@ -11,7 +11,7 @@ if (( $# != 0 )); then
             rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg cloudstor:/backups/ --progress
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg gdrive:/backups/ --progress
-            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
+            # rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
             # rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg aws:/backups/ --progress
             if $(lsblk | grep /media | grep -oP "sd[a-z]" | awk '{print "/dev/"$1}' | sort | uniq | wc -l); then
                 for EXTMEDIA in `ls /media/$(whoami)`; do
@@ -32,7 +32,7 @@ else
             rm ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg cloudstor:/backups/ --progress
             rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg gdrive:/backups/ --progress
-            rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
+            # rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg dropbox:/backups/ --progress
             # rclone copy ./$(hostname)-$(whoami)-$BASEFOLDER-$now.tar.gz.gpg aws:/backups/ --progress
             if $(lsblk | grep /media | grep -oP "sd[a-z]" | awk '{print "/dev/"$1}' | sort | uniq | wc -l); then
                 for EXTMEDIA in `ls /media/$(whoami)`; do

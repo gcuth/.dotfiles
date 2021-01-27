@@ -9,12 +9,12 @@ show-read-articles no
 ignore-mode "display"
 download-full-page yes
 prepopulate-query-feeds yes
+display-article-progress yes
 
 # navigation ------------------------------------------------------------------
 
 goto-next-feed yes
 goto-first-unread yes
-
 bind-key j down feedlist
 bind-key k up feedlist
 bind-key j next articlelist
@@ -33,6 +33,13 @@ bind-key O open-in-browser
 
 cleanup-on-quit yes
 confirm-exit no
+
+# bookmarking action ----------------------------------------------------------
+bookmark-autopilot yes
+bookmark-cmd "/home/g/.dotfiles/scripts/bookmark.sh"
+unbind-key s # nobody really needs "save"
+bind-key s bookmark
+
 
 # styling ---------------------------------------------------------------------
 

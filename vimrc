@@ -109,6 +109,11 @@ function! WritingMode()
     Limelight
 endfunction
 
+function! CodingMode()
+    match Error /\%81v.\+/ " Match lines longer than 80 char as errors
+endfunction
+
+au BufNewFile,BufRead *.{py,R} call CodingMode()
 
 " Clojure Mode for clj
 au BufNewFile,BufRead *.{clj,cljs,cljc,cljx} call ClojureMode()
@@ -118,8 +123,10 @@ function! ClojureMode()
     RainbowParenthesesLoadRound
     RainbowParenthesesLoadSquare
     RainbowParenthesesLoadBraces
-    match Error /\%81v.\+/ " Match lines longer than 80 char as errors
+    call CodingMode()
 endfunction
+
+
 
 " Quick Call to a Toggl-Starting Script
 

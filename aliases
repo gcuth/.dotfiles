@@ -91,4 +91,5 @@ alias anus="globalprotect show --status"
 # ProtonVPN Convenience
 alias pvc="sudo protonvpn c -f"
 alias pvd="sudo protonvpn d"
+alias pvs="sudo protonvpn s"
 

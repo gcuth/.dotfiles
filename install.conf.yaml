@@ -159,6 +159,13 @@
     - rm -rf $HOME/Downloads/aws/
     - rm $HOME/Downloads/awscliv2.zip
 
+# INSTALL GITHUB CLI
+- shell:
+    - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+    - sudo apt-add-repository https://cli.github.com/packages
+    - sudo apt update
+    - sudo apt install gh
+
 # Add thesis post-commit hook
 - link:
     /home/g/Documents/thesis/.git/hooks/post-commit:

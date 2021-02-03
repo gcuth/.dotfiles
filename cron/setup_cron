@@ -2,11 +2,19 @@
 #
 # a script to install my 'standard' cron jobs
 
+MY_PATH="`dirname \"$0\"`"              # relative
+MY_PATH="`( cd \"$MY_PATH\" && pwd )`"  # absolutized and normalized
+if [ -z "$MY_PATH" ] ; then
+  # error; for some reason, the path is not accessible
+  # to the script (e.g. permissions re-evaled after suid)
+  exit 1  # fail
+fi
+
 # write out the current crontab
 crontab -l > temp_cron
 
 # add the contents of my standard crons
-cat ./standard-cron-jobs >> temp_cron
+cat $MY_PATH/standard-cron-jobs >> temp_cron
 
 # make sure there aren't any duplicates
 sort temp_cron | uniq > temp_dedupe_cron

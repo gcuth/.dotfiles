@@ -155,7 +155,7 @@
 
 # install my favourite cron jobs
 - shell:
-    - ./setup_cron
+    - ./cron/setup_cron
 
 # tweak the standard desktop
 - shell:

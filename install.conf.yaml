@@ -140,6 +140,13 @@
     - sudo add-apt-repository 'deb https://repo.protonvpn.com/debian unstable main'
     - sudo apt-get update && sudo apt-get install -y protonvpn
 
+# INSTALL RESCUETIME
+- shell:
+    - wget -O $HOME/Downloads/rescuetime_current_amd64.deb "https://www.rescuetime.com/installers/rescuetime_current_amd64.deb"
+    - sudo apt install -y $HOME/Downloads/rescuetime_current_amd64.deb
+    - rm $HOME/Downloads/rescuetime_current_amd64.deb
+
+
 # INSTALL BABASHKA
 - shell:
     - curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install -o install-babashka; chmod +x install-babashka && sudo ./install-babashka; rm ./install-babashka
@@ -166,4 +173,5 @@
 - shell:
     - sudo snap install todoist
     - sudo snap install --edge 1password
+    - sudo snap install signal-desktop
 

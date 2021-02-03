@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec /usr/bin/python3 /home/g/Documents/blog/crypto.py >> /home/g/Documents/blog/data/logs/crypto.csv
+exec git add /home/g/Documents/blog/data/logs/crypto.csv

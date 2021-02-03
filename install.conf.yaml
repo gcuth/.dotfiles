@@ -175,12 +175,14 @@
 # Add thesis post-commit hook
 - link:
     /home/g/Documents/thesis/.git/hooks/post-commit:
-      path: thesis-post-commit
+      path: hooks/thesis-post-commit
 
-# Add blog post-commit hook
+# Add blog commit hooks
 - link:
     /home/g/Documents/blog/.git/hooks/post-commit:
-      path: blog-post-commit
+      path: hooks/blog-post-commit
+    /home/g/Documents/blog/.git/hooks/pre-commit:
+      path: hooks/blog-pre-commit
 
 # install my favourite cron jobs
 - shell:

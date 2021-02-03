@@ -47,6 +47,10 @@
       path: kitty.conf
     ~/.config/nvim/init.vim:
       path: nvim_init
+    ~/.config/i3/config:
+      path: i3
+    ~/.config/i3blocks:
+      path: i3blocks
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -124,6 +128,8 @@
     - sudo pip3 install cookiecutter
     - sudo apt install -y newsboat
     - sudo apt install -y kitty
+    - sudo apt install -y i3
+    - sudo apt install -y i3blocks
 
 # INSTALL ZOTERO
 - shell:

@@ -146,10 +146,17 @@
     - sudo apt install -y $HOME/Downloads/rescuetime_current_amd64.deb
     - rm $HOME/Downloads/rescuetime_current_amd64.deb
 
-
 # INSTALL BABASHKA
 - shell:
     - curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install -o install-babashka; chmod +x install-babashka && sudo ./install-babashka; rm ./install-babashka
+
+# INSTALL AWS CLI
+- shell:
+    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o $HOME/Downloads/awscliv2.zip
+    - unzip $HOME/Downloads/awscliv2.zip -d $HOME/Downloads/
+    - sudo $HOME/Downloads/aws/install
+    - rm -rf $HOME/Downloads/aws/
+    - rm $HOME/Downloads/awscliv2.zip
 
 # Add thesis post-commit hook
 - link:

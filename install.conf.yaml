@@ -159,7 +159,7 @@
 
 # INSTALL AWS CLI
 - shell:
-    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o $HOME/Downloads/awscliv2.zip
+    - wget -O $HOME/Downloads/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
     - unzip $HOME/Downloads/awscliv2.zip -d $HOME/Downloads/
     - sudo $HOME/Downloads/aws/install
     - rm -rf $HOME/Downloads/aws/
@@ -170,7 +170,19 @@
     - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
     - sudo apt-add-repository https://cli.github.com/packages
     - sudo apt update
-    - sudo apt install gh
+    - sudo apt install -y gh
+
+# INSTALL ZOOM (EUGH)
+- shell:
+    - wget -O $HOME/Downloads/zoom_amd64.deb "https://zoom.us/client/latest/zoom_amd64.deb"
+    - sudo apt install -y $HOME/Downloads/zoom_amd64.deb
+    - rm $HOME/Downloads/zoom_amd64.deb
+
+# INSTALL ANACONDA
+- shell:
+    - wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" -O ~/miniconda.sh
+    - bash ~/miniconda.sh -b -p $HOME/miniconda
+    - rm ~/miniconda.sh
 
 # Add thesis post-commit hook
 - link:

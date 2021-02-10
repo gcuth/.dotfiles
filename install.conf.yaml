@@ -209,4 +209,5 @@
     - sudo snap install todoist
     - sudo snap install --edge 1password
     - sudo snap install signal-desktop
+    - sudo snap install chromium
 

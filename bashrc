@@ -22,8 +22,15 @@ if [ -f /usr/bin/nvim ]; then
     export VISUAL="/usr/bin/nvim"
 fi
 
+# Add conda to path
+export PATH=$PATH:/home/g/miniconda/bin
+
+# Fix term
+export TERM=xterm-256color
+
 CASE_SENSITIVE="false"
 
 eval "$(starship init bash)"
 
 # [[ -s "/etc/profile.d/grc.bashrc" ]] && source /etc/profile.d/grc.bashrc
+

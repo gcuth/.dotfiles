@@ -7,8 +7,6 @@
 
 # VERY BASIC GLOBAL SETTINGS:
 - link:
-    ~/.bash_profile:
-      path: bash_profile
     ~/.bashrc:
       path: bashrc
       create: true

@@ -31,9 +31,6 @@ alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+)
 # those pesky permissions
 alias ax='chmod a+x'
 
-# Print argument right aligned
-alias right="printf '%*s' $(tput cols)"
-
 # Get current external IP
 alias myip="curl icanhazip.com"
 

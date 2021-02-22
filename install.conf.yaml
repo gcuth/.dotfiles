@@ -122,12 +122,13 @@
     - sudo apt install -y dialog
     - sudo apt install -y jq
     - sudo apt install -y neovim
-    - sudo pip3 install togglcli
-    - sudo pip3 install cookiecutter
+    - sudo apt install -y ranger
     - sudo apt install -y newsboat
     - sudo apt install -y kitty
     - sudo apt install -y i3
     - sudo apt install -y i3blocks
+    - sudo pip3 install togglcli
+    - sudo pip3 install cookiecutter
 
 # INSTALL ZOTERO
 - shell:

@@ -21,11 +21,12 @@ default_border none
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:monospace 8
+# font pango:monospace 8
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-#font pango:DejaVu Sans Mono 8
+# font pango:DejaVu Sans Mono 8
+font pango:Fira Code 10
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
@@ -50,6 +51,9 @@ floating_modifier $mod
 
 # start a terminal
 bindsym $mod+Return exec /usr/bin/kitty
+
+# start a browser
+bindsym $mod+Shift+Return exec /usr/bin/firefox
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -187,4 +191,15 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3blocks
+        i3bar_command i3bar -t 0.1
+        separator_symbol " > "
+        position bottom
+        colors {
+            background #000000
+            statusline #ffffff
+            separator #666666
+        }
 }
+
+# toggle i3 bar
+bindsym $mod+b bar mode toggle

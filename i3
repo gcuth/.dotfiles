@@ -27,6 +27,7 @@ default_border none
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 # font pango:DejaVu Sans Mono 8
 font pango:Fira Code 10
+# font xft:Inconsolata for Powerline Medium 18
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
@@ -38,6 +39,14 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
+
+# DAEMONS
+exec --no-startup-id /usr/bin/rescuetime
+
+# STARTUP
+exec --no-startup-id i3-msg 'workspace $ws1; exec /usr/bin/kitty'
+exec --no-startup-id i3-msg 'workspace $ws2; exec /snap/bin/signal-desktop'
+exec --no-startup-id i3-msg 'workspace $ws3; exec /usr/bin/anki'
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -190,14 +199,19 @@ bindsym $mod+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3blocks
+        status_command SCRIPT_DIR=~/.config/i3blocks/blocklets i3blocks
         i3bar_command i3bar -t 0.1
-        separator_symbol " > "
+        separator_symbol " "
         position bottom
+        tray_output none
         colors {
             background #000000
             statusline #ffffff
             separator #666666
+            focused_workspace #000000 #000000 #ffffff
+            active_workspace #000000 #000000 #ffffff
+            inactive_workspace #000000 #000000 #666666
+            urgent_workspace #000000 #000000 #ff0000
         }
 }
 

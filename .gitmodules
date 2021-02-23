@@ -2,6 +2,6 @@
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot
 	ignore = dirty
-[submodule "i3blocks-contrib"]
+[submodule "i3blocks/blocklets"]
 	path = i3blocks/blocklets
-	url = https://github.com/vivien/i3blocks-contrib
+	url = https://github.com/vivien/i3blocks-contrib.git

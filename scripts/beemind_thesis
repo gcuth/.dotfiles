@@ -21,4 +21,4 @@ if [ "$CURRENT_TOTAL" -ne "$CURRENT_BEE_VALUE" ]; then
 fi
 
 # Append to a local log just in case
-echo $(echo -n $(date +%s); echo -n ", "; echo -n "$CURRENT_TOTAL") >> ~/.dotfiles/secrets/logs/thesis_chapter_words.log
+echo $(echo -n $(date '+%Y-%m-%d %H:%M:%S %z'); echo -n ", "; echo -n "$CURRENT_TOTAL") >> ~/Documents/blog/data/logs/thesis_chapter_words.csv

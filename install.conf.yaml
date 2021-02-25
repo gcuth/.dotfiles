@@ -49,6 +49,10 @@
       path: i3
     ~/.config/i3blocks:
       path: i3blocks
+    ~/.local/bin/:
+      path: scripts/*
+      glob: true
+      create: true
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -71,6 +75,7 @@
     - sudo apt install -y cmake
     - sudo apt install -y exfat-utils
     - sudo apt install -y file
+    - sudo apt install -y feh
     - sudo apt install -y git
     - sudo apt install -y htop
     - sudo apt install -y nmap

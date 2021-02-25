@@ -12,8 +12,10 @@ alias diff='diff --color=auto'
 alias gs="git status -bs"
 alias gd="git diff"
 alias ga="git add"
-alias gc="git commit -S -m" # sign using -S by default!
-alias gcam="git commit -a -S -m" # sign using -S by default!
+# alias gc="git commit -S -m" # sign using -S by default!
+# alias gcam="git commit -a -S -m" # sign using -S by default!
+alias gc="git commit -m"
+alias gcam="git commit -a -m"
 alias gp="git pull"
 alias gpom="git push origin master"
 # jump to top level of git repo

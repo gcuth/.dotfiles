@@ -15,6 +15,12 @@
     (if (and (.exists (io/file inpath)) (not (.exists (io/file outpath))))
       (io/copy (io/file inpath) (io/file outpath)))))
 
+(defn move-files "Move a file from inpath to outpath-dir (retaining fname)."
+  [inpath outpath-dir]
+  (let [outpath (io/file outpath-dir (.getName (io/file inpath)))]
+    (if (and (.exists (io/file inpath)) (not (.exists (io/file outpath))))
+      (.renameTo (io/file inpath) (io/file outpath)))))
+
 (defn remove-files "Remove a file from inpath if a dupe exists in outpath-dir"
   [inpath outpath-dir]
   (let [outpath (io/file outpath-dir (.getName (io/file inpath)))]
@@ -62,8 +68,6 @@
 
 
 
-
-(map copy-files epubs (repeat (io/file readings-dir))) ; copy all the epubs
-(map remove-files epubs (repeat (io/file readings-dir))) ; now delete them!
+(map move-files epubs (repeat (io/file readings-dir))) ; move all the epubs
 (map io/delete-file old-files) ; delete the month-old files
 (map delete-recursively old-dirs) ; and the month-old dirs

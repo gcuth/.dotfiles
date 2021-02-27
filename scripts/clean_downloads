@@ -1,0 +1,69 @@
+#!/usr/bin/env bb
+; Walk the downloads directory and sort into folders / delete where possible
+
+(def downloads-dir "/home/g/Downloads/") ; the downloads folder
+(def readings-dir "/home/g/Readings/") ; the place for stuff to read
+
+
+
+(defn file-extension "Get the extension of a filename" [s]
+  (second (re-find #"(\.[a-zA-Z0-9]+)$" s)))
+
+(defn copy-files "Copy a file from inpath to outpath-dir (retaining fname)."
+  [inpath outpath-dir]
+  (let [outpath (io/file outpath-dir (.getName (io/file inpath)))]
+    (if (and (.exists (io/file inpath)) (not (.exists (io/file outpath))))
+      (io/copy (io/file inpath) (io/file outpath)))))
+
+(defn remove-files "Remove a file from inpath if a dupe exists in outpath-dir"
+  [inpath outpath-dir]
+  (let [outpath (io/file outpath-dir (.getName (io/file inpath)))]
+    (if (and (.exists (io/file inpath)) (.exists (io/file outpath)))
+      (io/delete-file (io/file inpath)))))
+
+(defn delete-recursively [fname] "Recursively delete a directory."
+  (let [func (fn [func f]
+               (when (.isDirectory f)
+                 (doseq [f2 (.listFiles f)]
+                   (func func f2)))
+               (clojure.java.io/delete-file f))]
+    (func func (clojure.java.io/file fname))))
+
+(defn is-old "Check if the last modified date of a file f is > s seconds ago."
+  ([f] (let [s 2419200]
+         (> (/ (- (.getTime (java.util.Date.)) (.lastModified (io/file f))) 1000) s)))
+  ([f s] (> (/ (- (.getTime (java.util.Date.)) (.lastModified (io/file f))) 1000) s)))
+
+
+
+(def epubs (->> downloads-dir
+                (io/file)
+                (file-seq)
+                (filter #(.isFile %))
+                (filter #(= ".epub" (file-extension (.getName %))))))
+
+(def pdfs (->> downloads-dir
+               (io/file)
+               (file-seq)
+               (filter #(.isFile %))
+               (filter #(= ".pdf" (file-extension (.getName %))))))
+
+(def old-files (->> downloads-dir
+                    (io/file)
+                    (.listFiles)
+                    (filter #(.isFile %))
+                    (filter #(is-old %))))
+
+(def old-dirs (->> downloads-dir
+                   (io/file)
+                   (.listFiles)
+                   (remove #(.isFile %))
+                   (filter #(is-old %))))
+
+
+
+
+(map copy-files epubs (repeat (io/file readings-dir))) ; copy all the epubs
+(map remove-files epubs (repeat (io/file readings-dir))) ; now delete them!
+(map io/delete-file old-files) ; delete the month-old files
+(map delete-recursively old-dirs) ; and the month-old dirs

@@ -108,6 +108,11 @@ bindsym $mod+Shift+Right move right
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
+#interactive screenshot by pressing printscreen
+bindsym Print exec gnome-screenshot -i 
+#crop-area screenshot by pressing Mod + printscreen
+bindsym $mod+Print exec gnome-screenshot -a
+
 # change container layout (stacked, tabbed, toggle split)
 # bindsym $mod+o layout stacking
 bindsym $mod+comma layout tabbed

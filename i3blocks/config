@@ -1,7 +1,11 @@
-[time]
-command=date '+%Y-%m-%d %H:%M:%S %z'
-interval=1
+[todoist]
+command=/usr/local/bin/todoist list --filter '(overdue | today)' -p | sed -E 's/^.+  //g' | head -n 1 | tr -d '\n'; /usr/local/bin/todoist sync
+interval=60
 
 [battery]
 command=$SCRIPT_DIR/battery/battery
 interval=60
+
+[time]
+command=date '+%Y-%m-%d %H:%M:%S %z'
+interval=1

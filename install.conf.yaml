@@ -49,6 +49,8 @@
       path: i3
     ~/.config/i3blocks:
       path: i3blocks
+    ~/.config/redshift.conf:
+      path: redshift.conf
     ~/.local/bin/:
       path: scripts/*
       glob: true
@@ -56,8 +58,9 @@
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
-    - /home/g/Code/
-    - /home/g/Recordings/
+    - ~/Code/
+    - ~/Recordings/
+    - ~/Readings/
 
 # install starship for enlivening the prompt a little
 - shell:
@@ -132,6 +135,7 @@
     - sudo apt install -y kitty
     - sudo apt install -y i3
     - sudo apt install -y i3blocks
+    - sudo apt install -y redshift
     - sudo pip3 install togglcli
     - sudo pip3 install cookiecutter
 
@@ -214,4 +218,5 @@
     - sudo snap install --edge 1password
     - sudo snap install signal-desktop
     - sudo snap install chromium
+    - sudo snap install docker
 

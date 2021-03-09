@@ -42,6 +42,7 @@ exec --no-startup-id nm-applet
 
 # DAEMONS
 exec --no-startup-id /usr/bin/rescuetime
+exec --no-startup-id redshift-gtk
 
 # STARTUP
 exec --no-startup-id i3-msg 'workspace $ws1; exec /usr/bin/kitty'

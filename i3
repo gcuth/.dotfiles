@@ -45,8 +45,6 @@ exec --no-startup-id /usr/bin/rescuetime
 
 # STARTUP
 exec --no-startup-id i3-msg 'workspace $ws1; exec /usr/bin/kitty'
-exec --no-startup-id i3-msg 'workspace $ws2; exec /snap/bin/signal-desktop'
-exec --no-startup-id i3-msg 'workspace $ws3; exec /usr/bin/anki'
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status

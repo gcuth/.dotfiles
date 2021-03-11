@@ -67,7 +67,6 @@
                    (filter #(is-old %))))
 
 
-
-(map move-files epubs (repeat (io/file readings-dir))) ; move all the epubs
-(map io/delete-file old-files) ; delete the month-old files
+(map move-files epubs (repeat readings-dir)) ; move all the epubs
 (map delete-recursively old-dirs) ; and the month-old dirs
+(map io/delete-file old-files) ; delete the month-old files

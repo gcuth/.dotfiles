@@ -1,0 +1,14 @@
+#!/usr/bin/env bb
+; check toggl-cli to see if there's a project running; print description if so.
+
+(require '[clojure.java.shell :refer [sh]])
+
+(def task (-> (sh "/usr/local/bin/toggl" "now")
+              (:out)
+              (str/split #"#")
+              (first)
+              (str/trim)
+              (str/trim-newline)))
+
+(if (> (count task) 1)
+  (print (str/join ["(" task ")"])))

@@ -40,6 +40,9 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
+# Give back control of the screen brightness via fn keys:
+exec --no-startup-id /usr/bin/xfce4-power-manager
+
 # DAEMONS
 exec --no-startup-id /usr/bin/rescuetime
 exec --no-startup-id /usr/bin/redshift

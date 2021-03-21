@@ -136,6 +136,7 @@
     - sudo apt install -y i3
     - sudo apt install -y i3blocks
     - sudo apt install -y redshift
+    - sudo apt install -y xfce4-power-manager
     - sudo pip3 install togglcli
     - sudo pip3 install cookiecutter
 

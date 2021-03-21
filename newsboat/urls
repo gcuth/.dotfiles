@@ -1,5 +1,5 @@
-
 "query:Unread Articles:unread = \"yes\""
+"query:Modeling Articles:title =~\"(M|m)odel\" or content =~\"(M|m)odel\" or title =~\"(E|e)pistem\" or content =~\"(E|e)pistem\" or title =~\"(R|r)epresent\" or content =~\"(R|r)epresent\""
 
 https://www.tandfonline.com/feed/rss/rajp20 "~Australasian Journal of Philosophy"
 https://projecteuclid.org/feeds/euclid.ba_article_rss.xml "~Bayesian Analysis"
@@ -86,3 +86,9 @@ https://www.annualreviews.org/action/showFeed?ui=45mu4&mi=3fndc3&ai=sz&jc=anthro
 https://www.annualreviews.org/action/showFeed?ui=45mu4&mi=3fndc3&ai=t0&jc=soc&type=etoc&feed=atom "~Annual Review of Sociology"
 https://www.annualreviews.org/action/showFeed?ui=45mu4&mi=3fndc3&ai=6690&jc=statistics&type=etoc&feed=atom "~Annual Review of Statistics and its Application"
 https://www.annualreviews.org/action/showFeed?ui=45mu4&mi=3fndc3&ai=67b7&jc=economics&type=etoc&feed=atom "~Annual Review of Economics"
+https://smallwarsjournal.com/rss/articles "~Small Wars"
+https://www.tandfonline.com/feed/rss/fjss20 "~Journal of Strategic Studies"
+https://www.tandfonline.com/feed/rss/tsur20 "~Survival"
+https://www.tandfonline.com/feed/rss/ucst20 "~Comparative Strategy"
+https://muse.jhu.edu/feeds/latest_articles?jid=610 "~Philosophical Topics"
+https://www.cambridge.org/core/rss/product/id/6105F288191A4492745CEC41BAFD283A "~Review of Symbolic Logic"

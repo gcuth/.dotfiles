@@ -22,8 +22,10 @@ if [ -f /usr/bin/nvim ]; then
     export VISUAL="/usr/bin/nvim"
 fi
 
-# Add conda to path
-export PATH=$PATH:/home/g/miniconda/bin
+# Add pyenv to path
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 # Fix term
 export TERM=xterm-256color

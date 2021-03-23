@@ -21,8 +21,14 @@ if [ -f /usr/bin/nvim ]; then
     export VISUAL="/usr/bin/nvim"
 fi
 
-# Add conda to path
-export PATH=/home/g/miniconda/bin:$PATH
+# Add pyenv to path
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+# Add poetry to path
+export PATH="$HOME/.poetry/bin:$PATH"
+
 
 # Fix term
 export TERM=xterm-256color
@@ -37,19 +43,3 @@ DISABLE_LS_COLORS="false"
 
 # use starship if it's available
 eval "$(starship init zsh)"
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/g/miniconda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/g/miniconda/etc/profile.d/conda.sh" ]; then
-        . "/home/g/miniconda/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/g/miniconda/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-

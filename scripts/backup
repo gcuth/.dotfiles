@@ -23,7 +23,7 @@ if (( $# != 0 )); then
     done
 else
     cd ~
-    for BASEFOLDER in Documents Code Zotero Videos Pictures Music Recordings; do
+    for BASEFOLDER in Documents Code Zotero Videos Pictures Music Recordings Readings Desktop; do
         if [ -d $BASEFOLDER ] && [ $(ls $BASEFOLDER | wc -l) -gt 0 ]; then
             now=$(date +%Y-%m-%d-%H-%M-%S)
             echo "Backing up '$BASEFOLDER' ... "

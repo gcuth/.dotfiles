@@ -1,10 +1,8 @@
 " Generic (HIINRN)
 set hls ic is nu rnu noswf
 
-
 set nocompatible
 filetype off
-
 
 "  -------
 "  PLUGINS
@@ -21,9 +19,13 @@ call plug#begin()
 
 Plug 'SirVer/ultisnips' " snippet engine of choice
 Plug 'honza/vim-snippets' " default snippets
+Plug 'vim-airline/vim-airline' " a nicer statusline
+Plug 'vim-airline/vim-airline-themes' " a nicer set of statusline themes
 Plug 'tpope/vim-commentary' " sensible commenting
+Plug 'tpope/vim-surround' " sensible paren management
+Plug 'vim-scripts/paredit.vim' " paren slurping and burping
 Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's greatest programming language
-Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } 
+Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } " sensible paren colouring
 Plug 'junegunn/goyo.vim' " a (*dry-retch*) 'distraction-free' writing environment
 Plug 'junegunn/limelight.vim' " ... that greys all non-focus grafs
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -62,6 +64,9 @@ syntax enable
 highlight LineNr ctermfg=darkgrey
 highlight Search ctermbg=white
 highlight Search ctermfg=black
+
+" A statusline theme
+let g:airline_theme = 'minimalist'
 
 " Color name (:help cterm-colors) or ANSI code
 let g:limelight_conceal_ctermfg = 'gray'

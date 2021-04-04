@@ -30,6 +30,11 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # Use ack to locate TOD* and FIXM* lines in current folder tree
 alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+):.*((TODO|FIXME):.*)/\2 :>> \1/"|grep -E --color=always ":>>.*:\d+"'
 
+# switching kitty styling on the fly
+alias llight='kitty @ set-colors -a background=white foreground=black'
+alias ddark='kitty @ set-colors -a foreground=white background=black'
+alias llig='kitty @ disable-ligatures -a always'
+
 # those pesky permissions
 alias ax='chmod a+x'
 
@@ -59,7 +64,7 @@ function take_meeting_notes() {
 alias meet="take_meeting_notes"
 
 function start_journal_writing() {
-    /usr/local/bin/toggl start -o 'Blog' -a 'writing' "Writing morning pages."
+    /usr/local/bin/toggl start -o 'Blog' -a 'writing' "Write morning pages."
     $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
 }
 alias journal="start_journal_writing"
@@ -71,7 +76,7 @@ alias fuz="fuzzy_find_and_edit"
 
 # Open the most recently edited thesis file
 function start_thesis_writing() {
-    /usr/local/bin/toggl start -o 'Thesis' -a 'thesis, study, writing' "Writing `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
+    /usr/local/bin/toggl start -o 'Thesis' -a 'thesis, study, writing' "Write `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
     $EDITOR ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
 }
 alias thesis="start_thesis_writing"

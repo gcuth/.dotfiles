@@ -47,8 +47,11 @@ exec --no-startup-id /usr/bin/xfce4-power-manager
 exec --no-startup-id /usr/bin/rescuetime
 exec --no-startup-id /usr/bin/redshift
 
+# BACKGROUND
+exec --no-startup-id xsetroot -solid "#000000"
+
 # STARTUP
-exec --no-startup-id i3-msg 'workspace $ws1; exec /usr/bin/kitty'
+exec --no-startup-id i3-msg 'workspace $ws1; exec /usr/bin/kitty newsboat'
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -106,6 +109,10 @@ bindsym $mod+Shift+Right move right
 
 # split in vertical orientation
 # bindsym $mod+k split v
+
+## Modify // Toggle Window Orientation // <> Backspace ##
+set_from_resource $i3-wm.binding.orientation_toggle i3-wm.binding.orientation_toggle BackSpace
+bindsym $mod+$i3-wm.binding.orientation_toggle split toggle
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle

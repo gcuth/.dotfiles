@@ -33,7 +33,6 @@ alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+)
 # switching kitty styling on the fly
 alias llight='kitty @ set-colors -a background=white foreground=black'
 alias ddark='kitty @ set-colors -a foreground=white background=black'
-alias llig='kitty @ disable-ligatures -a always'
 
 # those pesky permissions
 alias ax='chmod a+x'

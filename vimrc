@@ -19,8 +19,9 @@ call plug#begin()
 
 Plug 'SirVer/ultisnips' " snippet engine of choice
 Plug 'honza/vim-snippets' " default snippets
-Plug 'vim-airline/vim-airline' " a nicer statusline
-Plug 'vim-airline/vim-airline-themes' " a nicer set of statusline themes
+" Plug 'neoclide/coc.nvim', {'branch': 'release'} " code completion engine to live in the modern world
+" Plug 'vim-airline/vim-airline' " a nicer statusline
+" Plug 'vim-airline/vim-airline-themes' " a nicer set of statusline themes
 Plug 'tpope/vim-commentary' " sensible commenting
 Plug 'tpope/vim-surround' " sensible paren management
 Plug 'vim-scripts/paredit.vim' " paren slurping and burping
@@ -131,8 +132,6 @@ function! ClojureMode()
     call CodingMode()
 endfunction
 
-
-
 " Quick Call to a Toggl-Starting Script
 
 function! Toggl()
@@ -142,3 +141,16 @@ function! Toggl()
     :execute toggl_call
     :redraw!
 endfunction
+
+
+" COC Interfacing
+" inoremap <silent><expr> <TAB>
+"       \ pumvisible() ? "\<C-n>" :
+"       \ <SID>check_back_space() ? "\<TAB>" :
+"       \ coc#refresh()
+" inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+" function! s:check_back_space() abort
+"   let col = col('.') - 1
+"   return !col || getline('.')[col - 1]  =~# '\s'
+" endfunction

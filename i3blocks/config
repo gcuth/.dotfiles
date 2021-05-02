@@ -2,9 +2,9 @@
 command=/home/g/.dotfiles/scripts/togglstatus
 interval=60
 
-# [todoist]
-# command=/usr/local/bin/todoist list --filter '(overdue | today)' -p | sed -E 's/^.+  //g' | head -n 1 | tr -d '\n'; /usr/local/bin/todoist sync
-# interval=60
+[todoist]
+command=/usr/local/bin/todoist list --filter '(overdue | today)' -p | sed -E 's/^.+  //g' | head -n 1 | tr -d '\n'; /usr/local/bin/todoist sync
+interval=60
 
 [battery]
 command=$SCRIPT_DIR/battery/battery

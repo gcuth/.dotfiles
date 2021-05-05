@@ -1,6 +1,7 @@
 #!/bin/zsh
 # HISTORY
 # don't add duplicate lines (or lines beginning with spaces) into the history
+setopt inc_append_history
 HISTCONTROL=ignoreboth
 # set sensible lengths
 HISTSIZE=5000

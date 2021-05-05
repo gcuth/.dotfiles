@@ -37,6 +37,10 @@
       path: vscode-settings.json
     ~/.config/Code/User/headers.code-snippets:
       path: snippets/global-vscode-headers.code-snippets
+    ~/.config/VSCodium/User/settings.json:
+      path: vscode-settings.json
+    ~/.config/VSCodium/User/headers.code-snippets:
+      path: snippets/global-vscode-headers.code-snippets
     ~/.newsboat/urls:
       path: newsboat/urls
     ~/.newsboat/config:
@@ -228,5 +232,6 @@
     - sudo snap install --edge 1password
     - sudo snap install signal-desktop
     - sudo snap install chromium
+    - sudo snap install codium --classic
     - sudo snap install docker
 

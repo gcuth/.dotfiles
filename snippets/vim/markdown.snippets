@@ -10,6 +10,7 @@ title: Morning Pages (`!v strftime("%Y-%m-%d")`)
 layout: post
 permalink: /j/`!v strftime("%Y-%m-%d")`
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+location: `curl -s ipinfo.io | jq '.loc'`
 categories: ['journal']
 published: false
 ---
@@ -23,6 +24,7 @@ title: $1
 layout: post
 permalink: /${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+location: `curl -s ipinfo.io | jq '.loc'`
 categories: ['note']
 published: false
 epistemicstatus: "$2"
@@ -37,6 +39,7 @@ title: $2's '$1'
 layout: post
 permalink: /r/${2/\s+/-/g}-${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+location: `curl -s ipinfo.io | jq '.loc'`
 reading_title: ${1}
 reading_author: ${2}
 reading_completed_date: `!v strftime("%Y-%m-%d %H:%M:S %z")`
@@ -57,6 +60,7 @@ title: $1
 layout: post
 permalink: /m/`!v strftime("%Y-%m-%d")`-${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+location: `curl -s ipinfo.io | jq '.loc'`
 categories: ['meeting']
 published: false
 ---
@@ -70,6 +74,7 @@ title: $1
 layout: post
 permalink: /l/`!v strftime("%Y-%m-%d")`-${1/\s+/-/g}
 date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+location: `curl -s ipinfo.io | jq '.loc'`
 categories: ['lecture']
 published: false
 ---

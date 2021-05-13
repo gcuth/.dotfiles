@@ -43,6 +43,8 @@ exec --no-startup-id /usr/bin/redshift
 # BACKGROUND
 exec --no-startup-id xsetroot -solid "#000000"
 
+exec --no-startup-id xrandr | grep -E 'HDMI-. connected' && xrandr --output eDP-1 --auto --output HDMI-1 --same-as eDP-1 --output HDMI-2 --same-as eDP-1
+
 # STARTUP
 exec --no-startup-id i3-msg 'workspace $ws1; exec /usr/bin/kitty --single-instance newsboat'
 

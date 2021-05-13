@@ -34,6 +34,9 @@ alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+)
 alias llight='kitty @ set-colors -a background=white foreground=black'
 alias ddark='kitty @ set-colors -a foreground=white background=black'
 
+# display management
+alias mirror='xrandr | grep -E "HDMI-2 connected" && xrandr --output eDP-1 --auto --output HDMI-2 --auto --same-as eDP-1; xrandr | grep -E "HDMI-1 connected" && xrandr --output eDP-1 --auto --output HDMI-1 --auto --same-as eDP-1'
+
 # those pesky permissions
 alias ax='chmod a+x'
 

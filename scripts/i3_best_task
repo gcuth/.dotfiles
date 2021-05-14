@@ -1,0 +1,113 @@
+#!/usr/bin/env bb
+; show best todoist task (to do) by calling todoist-cli, or current toggl status
+; if there's an active toggl project/task (checks both)
+
+(require '[clojure.java.shell :refer [sh]])
+
+
+; TODOIST INFO
+(defn csv-data->maps [csv-data]
+  (map zipmap
+       (->> (first csv-data) ;; First row is the header
+            (map keyword) ;; Drop if you want string keys instead
+            repeat)
+	  (rest csv-data)))
+
+(defn get-sorted-tasks [todoist-results]
+  (sort-by :Priority (into [] (-> todoist-results
+                                  (:out)
+                                  (csv/read-csv)
+                                  (csv-data->maps)))))
+
+(def overdue (get-sorted-tasks (sh "/usr/local/bin/todoist"
+                                   "--csv" "--header"
+                                   "list" "--filter" "(overdue)")))
+
+(def today (get-sorted-tasks (sh "/usr/local/bin/todoist"
+                                   "--csv" "--header"
+                                   "list" "--filter" "(today)")))
+
+(def other-tasks (get-sorted-tasks (sh "/usr/local/bin/todoist"
+                                       "--csv" "--header" "list")))
+
+(def has-due (remove #(str/blank? (:Date %)) other-tasks))
+
+(def best-task (first (remove nil? (conj [] (first overdue)
+                                            (first today)
+                                            (first other-tasks)
+                                            (first has-due)))))
+
+
+; TOGGL INFO
+(def toggl-now (sh "/usr/local/bin/toggl" "now"))
+
+(def current-toggl-task (-> toggl-now
+                            (:out)
+                            (str/split #"#")
+                            (first)
+                            (str/trim)
+                            (str/trim-newline)))
+
+(defn active-toggl? [] (not (= current-toggl-task "There is no time entry running!")))
+
+
+
+
+
+
+; TARGETS FOR MANAGING START/STOP/SYNC/COMPLETE
+(defn start-toggl-for-task [task]
+  "Start toggl tracker for some todoist task"
+  (let [project (str/replace (:Project task) "#" "")
+        task (:Content task)]
+    (sh "/usr/local/bin/toggl" "start" "-o" project task)))
+
+(defn stop-toggl []
+  "Stop toggl tracker by calling cli"
+  (sh "/usr/local/bin/toggl" "stop"))
+
+(defn sync-todoist []
+  "Sync current todoist data with remote"
+  (sh "/usr/local/bin/todoist" "sync"))
+
+(defn mark-a-task-done [task]
+  "Mark some todoist task done"
+  (sh "/usr/local/bin/todoist" "close" (:ID task)))
+
+(defn mark-current-done []
+  "If it's actively tracking on todoist, mark the current todoist
+   'best task' done (& stop toggl & sync todoist)"
+  (if (= current-toggl-task (:Content best-task))
+    (do (mark-a-task-done best-task)
+        (stop-toggl)
+        (sync-todoist))))
+
+(defn in? 
+  "true if coll contains elm"
+  [coll elm]  
+  (some #(= elm %) coll))
+
+
+
+
+; DISPLAY
+(defn display-status []
+  (if (active-toggl?)
+    (str/join "" ["[~] " current-toggl-task])
+    (str/join "" ["[ ] " (:Content best-task)])))
+
+(def unique-inputs (dedupe *command-line-args*))
+
+
+
+; MAIN
+(let [inputs unique-inputs]
+  (cond (in? inputs "stop") (do (stop-toggl)
+                                (println "¶"))
+        (in? inputs "start") (do (start-toggl-for-task best-task)
+                                 (println "§"))
+        (in? inputs "complete") (if (and (active-toggl?) (= current-toggl-task (:Content best-task)))
+                                  (do (mark-current-done)
+                                      (println "✓")))
+        (in? inputs "status") (println (display-status))
+        :else (println (display-status)))) ; display status by default

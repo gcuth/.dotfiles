@@ -215,7 +215,7 @@ bar {
         status_command SCRIPT_DIR=~/.config/i3blocks/blocklets i3blocks
         i3bar_command i3bar -t 0.1
         separator_symbol " "
-        position top
+        position bottom
         tray_output none
         colors {
             background #000000

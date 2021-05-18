@@ -55,6 +55,8 @@
       path: i3blocks
     ~/.config/redshift.conf:
       path: redshift.conf
+    ~/.config/dunst/dunstrc:
+      path: dunstrc
     ~/.local/bin/:
       path: scripts/*
       glob: true

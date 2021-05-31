@@ -1,3 +1,11 @@
+[word-count]
+command=cat /home/g/Documents/thesis/chapters/sustainability.md | wc -w
+interval=10
+
+[separator]
+full_text=|
+color=#666666
+
 [best-task]
 command=/home/g/.dotfiles/scripts/i3_best_task
 signal=10
@@ -25,8 +33,16 @@ command=/home/g/.dotfiles/scripts/i3_best_task complete >/dev/null; pkill -SIGRT
 
 [sync-and-show-task]
 full_text=??
-command=/home/g/.dotfiles/scripts/i3_best_task sync >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
+command=pkill -SIGRTMIN+10 i3blocks >/dev/null; /home/g/.dotfiles/scripts/i3_best_task sync >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
 
+
+[separator]
+full_text=|
+color=#666666
+
+[disk]
+command=$SCRIPT_DIR/disk/disk
+interval=300
 
 [separator]
 full_text=|
@@ -46,7 +62,7 @@ color=#666666
 
 [loc]
 command=curl -s ipinfo.io | jq '.loc' | sed 's/"//g'
-interval=60
+interval=300
 color=#999999
 
 [separator]

@@ -1,0 +1,273 @@
+#!/usr/bin/env bb
+;
+; Interface with todoist & toggl to display, generate, and manage best tasks.
+; 
+; show best todoist task (to do) by calling todoist-cli, or current toggl status
+; if there's an active toggl project/task (checks both)
+
+(require '[clojure.java.shell :refer [sh]])
+
+(def unique-inputs (dedupe *command-line-args*))
+
+
+; UTILITY FUNCTIONS
+(defn csv-data->maps [csv-data]
+  (map zipmap
+       (->> (first csv-data) ;; First row is the header
+            (map keyword) ;; Drop if you want string keys instead
+            repeat)
+	  (rest csv-data)))
+
+(defn mean [coll]
+  (let [sum (apply + coll)
+        count (count coll)]
+    (if (pos? count)
+      (/ sum count)
+      0)))
+
+(defn in? 
+  "true if coll contains elm"
+  [coll elm]  
+  (some #(= elm %) coll))
+
+
+; CURRENT ENVIRONMENT/SITUATION
+(def work-hours?
+  (let [now (Integer/parseInt (str/trim (:out (sh "date" "+%H"))))]
+    (<= 9 now 17)))
+
+(def active-hours?
+  (let [now (Integer/parseInt (str/trim (:out (sh "date" "+%H"))))]
+    (<= 5 now 21)))
+
+(def morning-hours?
+  (let [now (Integer/parseInt (str/trim (:out (sh "date" "+%H"))))]
+    (<= 5 now 9)))
+
+
+; TODOIST FUNCTIONS
+(defn get-sorted-tasks [todoist-results]
+  (sort-by :Priority (into [] (-> todoist-results
+                                  (:out)
+                                  (csv/read-csv)
+                                  (csv-data->maps)))))
+
+(defn is-work-project? "Check whether a project is a work task" [project]
+  (or (some? (re-find (re-pattern "Thesis") project))
+      (some? (re-find (re-pattern "Work") project))
+      (some? (re-find (re-pattern "Read All About It") project))
+      (some? (re-find (re-pattern "Antarctic Treaty Papers") project))
+      (some? (re-find (re-pattern "Reading at the Interface") project))
+      (some? (re-find (re-pattern "Digital Literary Literacy") project))))
+
+(defn has-work-label? "Check a list of labels for 'work'" [labels]
+  (not= 0 (count (remove nil?
+                         (into []
+                               (map #(re-find (re-pattern "work") %)
+                                    labels))))))
+
+(defn is-work-task? "Check whether a task is a work task" [task]
+  (or (is-work-project? (:Project task))
+      (has-work-label? (:Labels task))))
+
+(defn remove-work-tasks "Remove all tasks from work projects" [tasks]
+  (remove is-work-task? tasks))
+
+
+
+; CURRENT TODOIST
+(def overdue (get-sorted-tasks (sh "/usr/local/bin/todoist"
+                                   "--csv" "--header"
+                                   "list" "--filter" "(overdue)")))
+
+(def today (get-sorted-tasks (sh "/usr/local/bin/todoist"
+                                   "--csv" "--header"
+                                   "list" "--filter" "(today)")))
+
+(def other-tasks (get-sorted-tasks (sh "/usr/local/bin/todoist"
+                                       "--csv" "--header" "list")))
+
+(def has-due (remove #(str/blank? (:Date %)) other-tasks))
+
+(def completed (sort-by :CompletedDate (into [] (-> (sh "/usr/local/bin/todoist"
+                                                        "--csv" "--header"
+                                                        "completed-list")
+                                                    (:out)
+                                                    (csv/read-csv)
+                                                    (csv-data->maps)))))
+
+(def completed-today (sort-by :CompletedDate (into [] (-> (sh "/usr/local/bin/todoist"
+                                                        "--csv" "--header"
+                                                        "completed-list"
+                                                        "--filter" "(today)")
+                                                    (:out)
+                                                    (csv/read-csv)
+                                                    (csv-data->maps)))))
+
+(def best-task (first (remove nil? (conj [] (first overdue)
+                                            (first today)
+                                            (first other-tasks)
+                                            (first has-due)))))
+
+
+
+
+; CURRENT TOGGL INFO
+(def toggl-now (sh "/usr/local/bin/toggl" "now"))
+
+(def current-toggl-task (-> toggl-now
+                            (:out)
+                            (str/split #"#")
+                            (first)
+                            (str/trim)
+                            (str/trim-newline)))
+
+(defn active-toggl? [] (not (= current-toggl-task "There is no time entry running!")))
+
+
+
+; TASK CONDITIONS (BASED ON TODOIST & TOGGL)
+
+(def do-pushups?
+  (and active-hours?
+       (= 0 (count (filter #(re-find #"pushups" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"pushups" (:Content %)) overdue)))
+       (> 10 (count (filter #(re-find #"pushups" (:Content %)) completed-today)))))
+
+(def do-pullups?
+  (and (not work-hours?)
+       active-hours?
+       (= 0 (count (filter #(re-find #"pullups" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"pullups" (:Content %)) overdue)))
+       (> 5 (count (filter #(re-find #"pullups" (:Content %)) completed-today)))))
+
+(def do-anki?
+  (and (= 0 (count (filter #(= "Anki" (:Project %)) completed-today)))
+       (= 0 (count (filter #(= "Anki" (:Project %)) today)))
+       (> 0 (count (filter #(= "Anki" (:Project %)) overdue)))))
+
+(def do-journal?
+  (and (not work-hours?)
+       morning-hours?
+       (= 0 (count (filter #(= "Blog" (:Project %)) today)))
+       (= 0 (count (filter #(= "Blog" (:Project %)) completed-today)))))
+
+(def do-forecast?
+  (and (not work-hours?)
+       (= 0 (count (filter #(= "Predict" (:Project %)) today)))
+       (= 0 (count (filter #(= "Predict" (:Project %)) completed-today)))))
+
+
+; TASK VARIABLES
+
+(def average-pushups
+  (->> completed
+       (filter #(re-find #"pushups" (:Content %)))
+       (map #(re-find #"\d+" (:Content %)))
+       (concat)
+       (remove nil?)
+       (map #(Integer/parseInt %))
+       (mean)
+       (float)
+       (Math/round)))
+
+(def average-pullups
+  (->> completed
+       (filter #(re-find #"pullups" (:Content %)))
+       (map #(re-find #"\d+" (:Content %)))
+       (concat)
+       (remove nil?)
+       (map #(Integer/parseInt %))
+       (mean)
+       (float)
+       (Math/round)
+       (int)))
+
+(def best-pullups
+  (rand-nth (list (max 2 (min 20 (+ 1 average-pullups)))
+                  (+ 1 (rand-int 6))
+                  2)))
+
+(def best-pushups
+  (rand-nth (list (* 5 (Math/round (float (/ average-pushups 5))))
+                  (min 100 (* 5 (Math/round (float (/ (+ 2.5 average-pushups) 5)))))
+                  10)))
+
+
+
+
+
+; TARGETS FOR MANAGING TODOIST STOP & TOGGL SYNC
+(defn stop-toggl []
+  "Stop toggl tracker by calling cli"
+  (sh "/usr/local/bin/toggl" "stop"))
+
+(defn sync-todoist []
+  "Sync current todoist data with remote"
+  (sh "/usr/local/bin/todoist" "sync"))
+
+; COMPLETE TODOIST TASK ASSOCIATED WITH CURRENT TOGGL
+(defn mark-a-task-done [task]
+  "Mark some todoist task done"
+  (sh "/usr/local/bin/todoist" "close" (:ID task)))
+
+(defn mark-current-done []
+  "If it's actively tracking on todoist, mark the current todoist
+   'best task' done (& stop toggl & sync todoist)"
+  (if (= current-toggl-task (:Content best-task))
+    (do (mark-a-task-done best-task)
+        (stop-toggl)
+        (sync-todoist))))
+
+; START CURRENT BEST TASK AS TOGGL
+(defn start-toggl-for-task [task]
+  "Start toggl tracker for some todoist task"
+  (let [project (first (str/split (str/replace (:Project task) "#" "") #"\/"))
+        task (:Content task)]
+    (sh "/usr/local/bin/toggl" "start" "-o" project task)))
+
+; DISPLAY STATUS
+(defn display-status []
+    (let [status (if (active-toggl?)
+                     (str/join "" ["[~] " current-toggl-task])
+                     (str/join "" ["[ ] " (:Content best-task)]))]
+     (if (not (active-toggl?))
+         (do (println status)
+             (println status)
+             (println "#FF0000"))
+         (println status))))
+
+; GENERATE
+(defn add-task "Send a system call to add a task to todoist"
+  [task project-name date priority]
+  (sh "/usr/local/bin/todoist" "add"
+      "--priority" (str priority)
+      "--date" date
+      "--project-name" project-name
+      task))
+
+(defn add-best-task []
+  (cond (true? do-journal?) (add-task "Write morning pages"
+                                      "Blog" "today" 1)
+        (true? do-pullups?) (add-task (str/join " " ["Do"
+                                                     (str best-pullups)
+                                                     "pullups"])
+                                      "Exercise" "today" 1)
+        (true? do-pushups?) (add-task (str/join " " ["Do"
+                                                     (str best-pushups)
+                                                     "pushups"])
+                                      "Exercise" "today" 1)
+        (true? do-anki?) (add-task "Complete all anki decks"
+                                   "Anki" "today" 1)))
+
+; MAIN
+(let [inputs unique-inputs]
+  (cond (in? inputs "stop") (do (stop-toggl))
+        (in? inputs "sync") (do (sync-todoist))
+        (in? inputs "start") (do (start-toggl-for-task best-task))
+        (in? inputs "complete") (if (and (active-toggl?)
+                                         (= current-toggl-task (:Content best-task)))
+                                  (do (mark-current-done)))
+        (in? inputs "status") (display-status)
+        (in? inputs "generate") (add-best-task)
+        :else (display-status))) ; display status by default

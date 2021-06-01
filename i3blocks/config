@@ -7,7 +7,7 @@ full_text=|
 color=#666666
 
 [best-task]
-command=/home/g/.dotfiles/scripts/i3_best_task
+command=/home/g/.dotfiles/scripts/tasker
 signal=10
 
 # [separator]
@@ -17,23 +17,23 @@ signal=10
 [start-toggl-for-task]
 # full_text=§
 full_text=|>
-command=/home/g/.dotfiles/scripts/i3_best_task start >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
+command=/home/g/.dotfiles/scripts/tasker start >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
 color=#A8FF00
 
 [stop-toggl]
 # full_text=¶
 full_text=!!
-command=/home/g/.dotfiles/scripts/i3_best_task stop >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
+command=/home/g/.dotfiles/scripts/tasker stop >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
 color=#FF0000
 
 [mark-current-task-complete]
 # full_text=✓
 full_text=✓✓
-command=/home/g/.dotfiles/scripts/i3_best_task complete >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
+command=/home/g/.dotfiles/scripts/tasker complete >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
 
 [sync-and-show-task]
 full_text=??
-command=pkill -SIGRTMIN+10 i3blocks >/dev/null; /home/g/.dotfiles/scripts/i3_best_task sync >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
+command=pkill -SIGRTMIN+10 i3blocks >/dev/null; /home/g/.dotfiles/scripts/tasker sync >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
 
 
 [separator]

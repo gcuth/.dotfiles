@@ -298,7 +298,7 @@
                                   "Log" "today" 1)
         ))
 
-MAIN
+; MAIN
 (let [inputs unique-inputs]
   (cond (in? inputs "stop") (do (stop-toggl))
         (in? inputs "sync") (do (sync-todoist))

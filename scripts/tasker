@@ -294,6 +294,8 @@
                                       "Exercise" "today" 1)
         (true? do-anki?) (add-task "Complete all anki decks"
                                    "Anki" "today" 1)
+        (true? do-forecast?) (add-task "Update metaculus forecasts"
+                                       "Predict" "today" 1)
         (true? log-bp?) (add-task "Log blood pressure"
                                   "Log" "today" 1)
         ))

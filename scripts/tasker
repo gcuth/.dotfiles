@@ -298,16 +298,14 @@
                                   "Log" "today" 1)
         ))
 
-; MAIN
-; (let [inputs unique-inputs]
-;   (cond (in? inputs "stop") (do (stop-toggl))
-;         (in? inputs "sync") (do (sync-todoist))
-;         (in? inputs "start") (do (start-toggl-for-task best-task))
-;         (in? inputs "complete") (if (and (active-toggl?)
-;                                          (= current-toggl-task (:Content best-task)))
-;                                   (do (mark-current-done)))
-;         (in? inputs "status") (display-status)
-;         (in? inputs "generate") (add-best-task)
-;         :else (display-status))) ; display status by default
-
-(println (count completed-today))
+MAIN
+(let [inputs unique-inputs]
+  (cond (in? inputs "stop") (do (stop-toggl))
+        (in? inputs "sync") (do (sync-todoist))
+        (in? inputs "start") (do (start-toggl-for-task best-task))
+        (in? inputs "complete") (if (and (active-toggl?)
+                                         (= current-toggl-task (:Content best-task)))
+                                  (do (mark-current-done)))
+        (in? inputs "status") (display-status)
+        (in? inputs "generate") (add-best-task)
+        :else (display-status))) ; display status by default

@@ -9,6 +9,9 @@
 
 (def unique-inputs (dedupe *command-line-args*))
 
+(def bp-log-path "/home/g/Documents/blog/data/logs/bp.csv")
+(def mood-log-path "/home/g/Documents/blog/data/logs/mood.csv")
+
 
 ; UTILITY FUNCTIONS
 (defn csv-data->maps [csv-data]
@@ -34,7 +37,7 @@
 ; CURRENT ENVIRONMENT/SITUATION
 (def work-hours?
   (let [now (Integer/parseInt (str/trim (:out (sh "date" "+%H"))))]
-    (<= 9 now 17)))
+    (<= 8 now 16)))
 
 (def active-hours?
   (let [now (Integer/parseInt (str/trim (:out (sh "date" "+%H"))))]
@@ -43,6 +46,20 @@
 (def morning-hours?
   (let [now (Integer/parseInt (str/trim (:out (sh "date" "+%H"))))]
     (<= 5 now 9)))
+
+(def hours-since-bp-log ; checks the last datetime of a blood pressure log
+  (if (.exists (io/file bp-log-path))
+    (int (/ (- (.getTime (java.util.Date.)) 
+               (.lastModified (java.io.File. bp-log-path)))
+            1000 60 60))
+    24))
+
+(def hours-since-mood-log ; checks the last datetime of a mood log
+  (if (.exists (io/file mood-log-path))
+    (int (/ (- (.getTime (java.util.Date.)) 
+               (.lastModified (java.io.File. mood-log-path)))
+            1000 60 60))
+    24))
 
 
 ; TODOIST FUNCTIONS
@@ -104,10 +121,18 @@
                                                     (csv/read-csv)
                                                     (csv-data->maps)))))
 
-(def best-task (first (remove nil? (conj [] (first overdue)
-                                            (first today)
-                                            (first other-tasks)
-                                            (first has-due)))))
+(def best-task
+  (if (and work-hours? (> (count completed-today) 3))
+    (first (remove nil? (conj []
+                              (first overdue)
+                              (first today)
+                              (first other-tasks)
+                              (first has-due))))
+    (first (remove nil? (conj []
+                              (first (remove-work-tasks overdue))
+                              (first (remove-work-tasks today))
+                              (first (remove-work-tasks other-tasks))
+                              (first (remove-work-tasks has-due)))))))
 
 
 
@@ -156,6 +181,14 @@
   (and (not work-hours?)
        (= 0 (count (filter #(= "Predict" (:Project %)) today)))
        (= 0 (count (filter #(= "Predict" (:Project %)) completed-today)))))
+
+(def log-bp?
+  (and (> hours-since-bp-log 4)
+       (= 0 (count (filter #(= "Log" (:Project %)) today)))))
+
+(def log-mood?
+  (and (> hours-since-mood-log 3)
+       (= 0 (count (filter #(= "Log" (:Project %)) today)))))
 
 
 ; TASK VARIABLES
@@ -249,6 +282,8 @@
 (defn add-best-task []
   (cond (true? do-journal?) (add-task "Write morning pages"
                                       "Blog" "today" 1)
+        (true? log-mood?) (add-task "Log mood"
+                                    "Log" "today" 1)
         (true? do-pullups?) (add-task (str/join " " ["Do"
                                                      (str best-pullups)
                                                      "pullups"])
@@ -258,16 +293,21 @@
                                                      "pushups"])
                                       "Exercise" "today" 1)
         (true? do-anki?) (add-task "Complete all anki decks"
-                                   "Anki" "today" 1)))
+                                   "Anki" "today" 1)
+        (true? log-bp?) (add-task "Log blood pressure"
+                                  "Log" "today" 1)
+        ))
 
 ; MAIN
-(let [inputs unique-inputs]
-  (cond (in? inputs "stop") (do (stop-toggl))
-        (in? inputs "sync") (do (sync-todoist))
-        (in? inputs "start") (do (start-toggl-for-task best-task))
-        (in? inputs "complete") (if (and (active-toggl?)
-                                         (= current-toggl-task (:Content best-task)))
-                                  (do (mark-current-done)))
-        (in? inputs "status") (display-status)
-        (in? inputs "generate") (add-best-task)
-        :else (display-status))) ; display status by default
+; (let [inputs unique-inputs]
+;   (cond (in? inputs "stop") (do (stop-toggl))
+;         (in? inputs "sync") (do (sync-todoist))
+;         (in? inputs "start") (do (start-toggl-for-task best-task))
+;         (in? inputs "complete") (if (and (active-toggl?)
+;                                          (= current-toggl-task (:Content best-task)))
+;                                   (do (mark-current-done)))
+;         (in? inputs "status") (display-status)
+;         (in? inputs "generate") (add-best-task)
+;         :else (display-status))) ; display status by default
+
+(println (count completed-today))

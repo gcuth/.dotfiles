@@ -17,5 +17,6 @@
     "editor.fontLigatures": true,
     "breadcrumbs.enabled": true,
     "git.confirmSync": false,
-    "git.autofetch": true
+    "git.autofetch": true,
+    "tabnine.experimentalAutoImports": true
 }

@@ -12,6 +12,8 @@
 (def bp-log-path "/home/g/Documents/blog/data/logs/bp.csv")
 (def mood-log-path "/home/g/Documents/blog/data/logs/mood.csv")
 
+(def work-late? false) ; a switch for whether to care about hours in best-task etc
+
 
 ; UTILITY FUNCTIONS
 (defn csv-data->maps [csv-data]
@@ -122,17 +124,19 @@
                                                     (csv-data->maps)))))
 
 (def best-task
-  (if (and work-hours? (> (count completed-today) 3))
+  (if (or (and work-hours? (> (count completed-today) 3)) work-late?)
     (first (remove nil? (conj []
                               (first overdue)
                               (first today)
                               (first other-tasks)
                               (first has-due))))
     (first (remove nil? (conj []
+                              (first (filter #(= "Thesis" (:Project %)) today))
                               (first (remove-work-tasks overdue))
                               (first (remove-work-tasks today))
                               (first (remove-work-tasks other-tasks))
-                              (first (remove-work-tasks has-due)))))))
+                              (first (remove-work-tasks has-due)))))
+                              ))
 
 
 
@@ -157,6 +161,7 @@
   (and active-hours?
        (= 0 (count (filter #(re-find #"pushups" (:Content %)) today)))
        (= 0 (count (filter #(re-find #"pushups" (:Content %)) overdue)))
+       (nil? (re-find #"pushups" (:Content (first completed-today))))
        (> 10 (count (filter #(re-find #"pushups" (:Content %)) completed-today)))))
 
 (def do-pullups?
@@ -164,30 +169,36 @@
        active-hours?
        (= 0 (count (filter #(re-find #"pullups" (:Content %)) today)))
        (= 0 (count (filter #(re-find #"pullups" (:Content %)) overdue)))
+       (nil? (re-find #"pullups" (:Content (first completed-today))))
        (> 5 (count (filter #(re-find #"pullups" (:Content %)) completed-today)))))
 
 (def do-anki?
-  (and (= 0 (count (filter #(= "Anki" (:Project %)) completed-today)))
-       (= 0 (count (filter #(= "Anki" (:Project %)) today)))
-       (> 0 (count (filter #(= "Anki" (:Project %)) overdue)))))
+  (and (= 0 (count (filter #(= "Anki" (:Project %)) today)))
+       (> 1 (count (filter #(re-find #"anki" (:Content %)) completed-today)))
+       (nil? (re-find #"anki" (:Content (first completed-today))))
+       (= 0 (count (filter #(= "Anki" (:Project %)) completed-today)))))
 
 (def do-journal?
   (and (not work-hours?)
        morning-hours?
        (= 0 (count (filter #(= "Blog" (:Project %)) today)))
+       (nil? (re-find #"pages" (:Content (first completed-today))))
        (= 0 (count (filter #(= "Blog" (:Project %)) completed-today)))))
 
 (def do-forecast?
   (and (not work-hours?)
        (= 0 (count (filter #(= "Predict" (:Project %)) today)))
+       (nil? (re-find #"forecast" (:Content (first completed-today))))
        (= 0 (count (filter #(= "Predict" (:Project %)) completed-today)))))
 
 (def log-bp?
   (and (> hours-since-bp-log 4)
+       (nil? (re-find #"blood pressure" (:Content (first completed-today))))
        (= 0 (count (filter #(= "Log" (:Project %)) today)))))
 
 (def log-mood?
   (and (> hours-since-mood-log 2)
+       (nil? (re-find #"mood" (:Content (first completed-today))))
        (= 0 (count (filter #(= "Log" (:Project %)) today)))))
 
 
@@ -307,7 +318,8 @@
         (in? inputs "start") (do (start-toggl-for-task best-task))
         (in? inputs "complete") (if (and (active-toggl?)
                                          (= current-toggl-task (:Content best-task)))
-                                  (do (mark-current-done)))
+                                  (do (mark-current-done)
+                                      (add-best-task)))
         (in? inputs "status") (display-status)
         (in? inputs "generate") (add-best-task)
         :else (display-status))) ; display status by default

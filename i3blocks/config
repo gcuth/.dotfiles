@@ -33,16 +33,8 @@ command=/home/g/.dotfiles/scripts/tasker complete >/dev/null; pkill -SIGRTMIN+10
 
 [sync-and-show-task]
 full_text=??
-command=pkill -SIGRTMIN+10 i3blocks >/dev/null; /home/g/.dotfiles/scripts/tasker sync >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
+command=/home/g/.dotfiles/scripts/tasker sync >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null
 
-
-[separator]
-full_text=|
-color=#666666
-
-[disk]
-command=$SCRIPT_DIR/disk/disk
-interval=300
 
 [separator]
 full_text=|
@@ -61,7 +53,7 @@ full_text=|
 color=#666666
 
 [loc]
-command=curl -s ipinfo.io | jq '.loc' | sed 's/"//g'
+command=curl -s ipinfo.io | jq '.timezone' | sed 's/"//g'
 interval=300
 color=#999999
 

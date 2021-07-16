@@ -87,7 +87,10 @@ alias thesis="start_thesis_writing"
 alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science"
 
 # record
-# alias record="ffmpeg -f pulse -i default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav"
+function default_record() {
+    arecord -f cd -D default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav
+}
+alias rrecord="default_record"
 
 # Uni Convenience
 alias anuc="globalprotect connect --portal staff-access.anu.edu.au"

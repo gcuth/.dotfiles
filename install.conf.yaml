@@ -78,6 +78,7 @@
 
 # INSTALL A TONNE OF STUFF
 - shell:
+    - sudo apt install -y emacs
     - sudo apt install -y wmctrl
     - sudo apt install -y curl
     - sudo apt install -y wget
@@ -136,6 +137,7 @@
     - sudo apt install -y dialog
     - sudo apt install -y jq
     - sudo apt install -y neovim
+    - sudo apt install -y speedtest-cli
     - sudo apt install -y ranger
     - sudo apt install -y newsboat
     - sudo apt install -y kitty

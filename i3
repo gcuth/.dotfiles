@@ -210,22 +210,21 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 
-# Custom keybindings for managing in-status-bar task display (Cmd+Alt+[s|t|d]
-# start a toggl timer for the currently-displayed task
+# WEIRD CUSTOM KEYBINDINGS FOR IN-STATUS-BAR TASK MANAGEMENT & FAST READ/WRITE/ETC PINGS
+# TASK: start a toggl timer for the currently-displayed task
 bindsym $mod+Mod1+s exec "/home/g/.dotfiles/scripts/tasker start >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null"
 
-# # stop the current timer (without completing it)
+# TASK: stop the current timer (without completing it)
 bindsym $mod+Mod1+t exec "/home/g/.dotfiles/scripts/tasker stop >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null"
 
-# mark the currently-running/timered/displayed task as done
+# TASK: mark the currently-running/timered/displayed task as done
 bindsym $mod+Mod1+d exec "/home/g/.dotfiles/scripts/tasker complete >/dev/null; /home/g/.dotfiles/scripts/tasker generate >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null"
 
-# generate a new task
-bindsym $mod+Mod1+g exec "/home/g/.dotfiles/scripts/tasker generate >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null"
-
-
-# Add whatever's on the clipboard to the 'toread' doc
+# READ: whatever's on the clipboard to the 'toread' doc
 bindsym $mod+Mod1+r exec "xclip -out -sel clip >> /home/g/Documents/blog/data/toread.txt; echo '' >> /home/g/Documents/blog/data/toread.txt"
+
+# WRITE: create a suitable note/quote/forecast file by calling the 'note.bb' babashka script & open the resulting file in the default editor for writing purposes
+bindsym $mod+Mod1+w exec "xclip -out -sel clip | bb /home/g/.dotfiles/scripts/note.bb
 
 
 # Start i3bar to display a workspace bar (plus the system information i3status

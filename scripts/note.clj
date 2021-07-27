@@ -14,7 +14,6 @@
 ;; - link -> 'review' with title generation
 ;; - passage -> 'quote' with viable/stable permalink & title generation
 ;; - note
-;; - citation questions
 
 (require '[clojure.java.shell :refer [sh]]
          '[clojure.java.io :as io]
@@ -23,6 +22,11 @@
 (def base-notes-directory "/home/g/Documents/blog/_posts/")
 (def input-lines (line-seq (io/reader *in*)))
 
+(defn get-current-location "TODO" []
+  (let [response (curl/get "https://ipinfo.io" {:throw false})]
+    (if (= (:status response) 200)
+      (:loc (json/parse-string (:body response) true))
+      nil)))
 
 (defn remove-nils
   "Remove nils from a map.
@@ -39,13 +43,14 @@
 (defn titlecase
   "Titlecase some string in a rough-and-ready sort of way."
   [s]
-  (let [exclude ["And" "As" "But" "For" "If" "Nor" "Or" "So" "Yet" "A" "An" "The" "At" "By" "In" "Of" "Off" "On" "Per" "To" "Up" "Via"]]
-  (->> (map str/capitalize (str/split s #" "))
-        (map (fn [word] (if-not (nil? (some #{word} exclude))
-                          (str/lower-case word)
-                          word)))
-
-        (str/join " "))))
+  (let [exclude ["And" "As" "But" "For" "If" "Nor" "Or" "So" "Yet" "A" "An" "The" "At" "By" "In" "Of" "Off" "On" "Per" "To" "Up" "Via"]
+        uppercase-first (fn [to-title] (str/join [(str/upper-case (subs to-title 0 1)) (subs to-title 1)]))]
+    (->> (map str/capitalize (str/split s #" "))
+         (map (fn [word] (if-not (nil? (some #{word} exclude))
+                           (str/lower-case word)
+                           word)))
+         (str/join " ")
+         (uppercase-first))))
 
 (defn get-datetime-now
   "Get a formatted datetime string for the current time."
@@ -156,7 +161,8 @@
                                                  (str/join [(if markdownify? "**" "") (:lastName second-author) (if markdownify? "**" "")])])))
             (= (count authors) 1)
             (str/join " " (into [] (remove nil? [(:firstName first-author)
-                                                 (str/join [(if markdownify? "**" "") (:lastName first-author)])])))
+                                                 (str/join [(if markdownify? "**" "") (:lastName first-author) (if markdownify? "**" "")
+                                                            ])])))
               :else nil))))
   ([citation-info]
    (get-clean-long-author-from-cite-info citation-info false)))
@@ -285,9 +291,71 @@
 
 
 (defn add-raw-authorship-question
-  "Append a raw question/answer pair about authorship"
-  [questions cite-map]
-  )
+  "Append a raw question/answer pair about authorship TODO"
+  ([questions cite-map markdownify?]
+   (if (> (count (into [] (filter #(= "author" (:creatorType %)) (:creators cite-map)))) 0)
+    (let [title-surround (cond (= "book" (:itemType cite-map)) "***"
+                                :else "'")]
+      (conj questions {:question (str/join [(if markdownify? "*Who*" "Who") " "
+                                            "wrote" " "
+                                            (if markdownify? title-surround "'")
+                                            (titlecase (shorten-title (get-clean-title-from-cite-info cite-map markdownify?)))
+                                            (if markdownify? title-surround "'")
+                                            "?"])
+                      :answer (get-clean-long-author-from-cite-info cite-map markdownify?)}))
+    questions))
+  ([questions cite-map]
+   (add-raw-authorship-question questions cite-map false)))
+
+
+(defn add-date-published-question
+  "Append a raw question/answer pair about date published TODO"
+  ([questions cite-map markdownify?]
+   (let [title-surround (cond (= "book" (:itemType cite-map)) "***"
+                              :else "'")
+         date (re-find #"\d{4}" (:date cite-map))]
+     (if (some? date)
+      (conj questions {:question (str/join [(if markdownify? "*When*" "When") " "
+                                            "was" " "
+                                            (get-clean-long-author-from-cite-info cite-map markdownify?)
+                                            "'s" " "
+                                            (if markdownify? title-surround "'")
+                                            (titlecase (shorten-title (get-clean-title-from-cite-info cite-map markdownify?)))
+                                            (if markdownify? title-surround "'")
+                                            " " "first" " "
+                                            (if markdownify? "*published*" "published")
+                                            "?"])
+                       :answer (str/join [(if markdownify? "**") date (if markdownify? "**")])})
+     questions)))
+  ([questions cite-map]
+   (add-date-published-question questions cite-map false)))
+
+
+(defn add-journal-publisher-question
+  "Append a raw question/answer pair about journal publisherTODO"
+  ([questions cite-map markdownify?]
+   (if (and (= "journalArticle" (:itemType cite-map))
+            (> (count (into [] (filter #(= "author" (:creatorType %)) (:creators cite-map)))) 0)
+            (some? (:publicationTitle cite-map)))
+     (conj questions {:question (str/join ["What" " "
+                                           (if markdownify? "*" "")
+                                           "journal"
+                                           (if markdownify? "*" "")
+                                           " " "first" " "
+                                           (if markdownify? "*" "")
+                                           "published"
+                                           (if markdownify? "*" "")
+                                           " "
+                                           (get-clean-long-author-from-cite-info cite-map markdownify?)
+                                            "'s" " " "'"
+                                            (titlecase (shorten-title (get-clean-title-from-cite-info cite-map markdownify?)))
+                                            "'"
+                                            "?"])
+                       :answer (str/join [(if markdownify? "*") (:publicationTitle cite-map) (if markdownify? "*")])})
+     questions))
+  ([questions cite-map]
+   (add-journal-publisher-question questions cite-map false)))
+
 
 (defn build-question-map "TODO" [question answer]
   {:question {:question question
@@ -296,28 +364,22 @@
 (defn citoid->questions
   "Take the (proccessed/map) returns from a citoid query and translate into a list of basic questions. TODO"
   [cite-map]
-  (let [long-author (get-clean-long-author-from-cite-info cite-map true)
-        short-author (get-clean-short-author-from-cite-info cite-map true)
-        title (shorten-title (get-clean-title-from-cite-info cite-map))]
-    ;; ((into [] (filter nil? [(build-authorship-question )])
-    ;; (-> []
-    ;;     (add-raw-authorship-question cite-map)
-    ;;     (add-date-published-question cite-map)
-    ;;     (add-journal-publisher-question cite-map)
-    ;;     (add-pages)
-    ;; )
-    (map (fn [x] (build-question-map (:question x) (:answer x))) [{:question "my test question?" :answer "a test answer"}])
-    ;; [{:question {:long-author long-author
-    ;;              :short-author short-author
-    ;;              :long-title long-title
-    ;;              :short-title short-title}}]
-    ))
+  (if (some? cite-map)
+    (into []
+          (map (fn [x] (build-question-map (:question x) (:answer x)))
+              (remove nil?
+                      (-> []
+                          (add-date-published-question cite-map true)
+                          (add-journal-publisher-question cite-map true)
+                          (add-raw-authorship-question cite-map true)))))
+    nil))
+
 
 (defn add-bibliographic-questions "TODO" [post-header]
   (if-let [clean-id (first (remove nil? [(:doi post-header) (:isbn post-header)]))]
     (let [citation-info (first (json/parse-string (query-and-clean-cite-data clean-id "zotero") true))]
       (-> post-header
-          (assoc :citation_info citation-info)
+          ;; (assoc :citation_info citation-info)
           (assoc :questions (citoid->questions citation-info))))
     post-header))
 
@@ -336,6 +398,8 @@
       (add-best-permalink)
       (add-best-title)
       (add-bibliographic-questions)
+      (assoc :epistemicstatus "TK")
+      (assoc :location (get-current-location))
       (remove-nils)))
 
 (defn extract-short-permalink "Take a permalink string and remove its prefix (and also datetime if that's what it appears to be)" [s]
@@ -361,11 +425,13 @@
   "Take a post-header and construct a valid string for it"
   [post-header]
   (let [categories (:category post-header)
-        clean-header (dissoc post-header :category :body)]
+        questions (:questions post-header)
+        clean-header (dissoc post-header :category :body :questions)]
     (str/join ["---" "\n"
-              (yaml/generate-string clean-header
-                                    :dumper-options {:flow-style :block})
-              (str/join ["categories: ['" categories "']\n"])
+               (yaml/generate-string clean-header
+                                     :dumper-options {:flow-style :block})
+               (str/join ["categories: ['" categories "']\n"])
+               (if (some? questions) (yaml/generate-string {:questions questions} :dumper-options {:flow-style :block}) "")
               "---" "\n" "\n"])))
 
 (defn build-full-file-string
@@ -388,12 +454,12 @@
 
 (defn safe-create-file-with-header "TODO" [base-path post-header]
   (let [outpath (generate-outpath base-path post-header)
-        header-string (build-yaml-header-string post-header)
+        file-text (build-full-file-string post-header)
         existing-paths (list-existing-matching-files base-path post-header)]
     (cond (not= 0 (count existing-paths)) ; if a matching path already exists, just print the first
             (println (first existing-paths))
           (and (= 0 (count existing-paths)) (some? (:title post-header))) ; if no path, and a valid title exists, print the header and outpath
-            (do (spit outpath header-string) (println outpath))
+            (do (spit outpath file-text) (println outpath))
           :else (println ""))))
 
 
@@ -406,20 +472,10 @@
 ;; (-main input-lines base-notes-directory)
 
 
-(println (titlecase "and so I went down to the ship, set keel to breakers"))
 
 (defn test-display-proposed-header "TODO" [input-lines notes-directory]
   (->> input-lines
        (construct-post-header)
-       (build-yaml-header-string)
+       (build-full-file-string)
        println))
 (test-display-proposed-header input-lines base-notes-directory)
-
-
-
-;; (let [post-header (construct-post-header input-lines)]
-;;   (if-let [clean-id (first (remove nil? [(:doi post-header) (:isbn post-header)]))
-;;            citation-info (first (json/parse-string (query-and-clean-cite-data clean-id "zotero") true))]
-;;     (println citation-info)
-;;     ""))
-

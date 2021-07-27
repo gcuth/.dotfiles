@@ -19,6 +19,8 @@
       force: true
     ~/.vimrc:
       path: vimrc
+    ~/.spacemacs:
+      path: spacemacs
     ~/.RProfile:
       path: RProfile
     ~/.aliases:

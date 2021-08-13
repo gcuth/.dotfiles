@@ -5,13 +5,19 @@
 ; show best todoist task (to do) by calling todoist-cli, or current toggl status
 ; if there's an active toggl project/task (checks both)
 
-(require '[clojure.java.shell :refer [sh]])
+(require '[clojure.java.shell :refer [sh]]
+         '[clojure.java.io :as io])
 
 (def unique-inputs (dedupe *command-line-args*))
 
 (def bp-log-path "/home/g/Documents/blog/data/logs/bp.csv")
 (def mood-log-path "/home/g/Documents/blog/data/logs/mood.csv")
+(def to-mail-path "/home/g/Documents/blog/data/tomail.txt")
+(def to-message-path "/home/g/Documents/blog/data/tomessage.txt")
+(def current-wifi (:out (sh "iwgetid" "-r"))) ; the name of the wifi I'm connected to
+(def home? (some? (re-find #"tell-my-wifi-love-her" current-wifi))) ; if connected to home wifi
 
+(def overload-threshold 5) ; if more than this many tasks due today, get worried
 (def work-late? false) ; a switch for whether to care about hours in best-task etc
 
 ; UTILITY FUNCTIONS
@@ -84,11 +90,26 @@
                                (map #(re-find (re-pattern "work") %)
                                     labels))))))
 
+(defn is-exercise-project? "Check whether a project is an exercise task" [project]
+  (or (some? (re-find (re-pattern "Run") project))
+      (some? (re-find (re-pattern "Exercise") project))))
+
+(defn has-exercise-label? "Check a list of labels for 'exercise'" [labels]
+  (not= 0 (count (remove nil?
+                         (into []
+                               (map #(re-find (re-pattern "exercise") %)
+                                    labels))))))
+
+
 (defn is-work-task? "Check whether a task is a work task" [task]
   (or (is-work-project? (:Project task))
       (has-work-label? (:Labels task))))
 
-(defn remove-work-tasks "Remove all tasks from work projects" [tasks]
+(defn is-exercise-task? "Check whether a task is an exercise task" [task]
+  (or (is-exercise-project? (:Project task))
+      (has-exercise-label? (:Labels task))))
+
+(defn remove-work-tasks "Remove all tasks that are work tasks from task list" [tasks]
   (remove is-work-task? tasks))
 
 (defn has-exercise-label? "Check a list of labels for 'exercise'" [labels]
@@ -109,13 +130,9 @@
   (remove is-exercise-task? tasks))
 
 ; CURRENT TODOIST
-(def overdue (get-sorted-tasks (sh "/usr/local/bin/todoist"
-                                   "--csv" "--header"
-                                   "list" "--filter" "(overdue)")))
-
 (def today (get-sorted-tasks (sh "/usr/local/bin/todoist"
                                    "--csv" "--header"
-                                   "list" "--filter" "(today)")))
+                                   "list" "--filter" "(today|overdue)")))
 
 (def other-tasks (get-sorted-tasks (sh "/usr/local/bin/todoist"
                                        "--csv" "--header" "list")))
@@ -145,6 +162,9 @@
 (def last-task-was-a-work-task?
   (is-work-task? (last completed)))
 
+(def last-task-was-exercise?
+  (is-exercise-task? (last completed)))
+
 (def best-task
   (let [overworked? (if work-hours?
                       (> current-work-task-percentage 2/5)
@@ -154,19 +174,21 @@
     (cond just-beginning?
             (first (remove nil? (conj []
                                       (first (filter #(= "Thesis" (:Project %)) has-due))
-                                      (first overdue)
                                       (first today)
                                       (first other-tasks))))
           (and (not overworked?) (not overwhelmed?) (not last-task-was-a-work-task?))
-            (first (remove nil? (conj []
-                                      (first overdue)
-                                      (first today)
-                                      (first has-due)
-                                      (first other-tasks))))
+            (if (not last-task-was-exercise?)
+              (first (remove nil? (conj []
+                                        (first today)
+                                        (first has-due)
+                                        (first other-tasks))))
+              (first (remove nil? (conj []
+                                        (first (remove-exercise-tasks today))
+                                        (first (remove-exercise-tasks has-due))
+                                        (first (remove-exercise-tasks other-tasks))))))
           :else
             (first (remove nil? (conj []
                                       (first (filter #(= "Thesis" (:Project %)) today))
-                                      (first (remove-work-tasks overdue))
                                       (first (remove-work-tasks today))
                                       (first (remove-work-tasks has-due))
                                       (first (remove-work-tasks other-tasks))))))))
@@ -193,14 +215,12 @@
 (def do-pushups?
   (and active-hours?
        (= 0 (count (filter #(re-find #"pushups" (:Content %)) today)))
-       (= 0 (count (filter #(re-find #"pushups" (:Content %)) overdue)))
        (> 10 (count (filter #(re-find #"pushups" (:Content %)) completed-today)))))
 
 (def do-pullups?
   (and (not work-hours?)
        active-hours?
        (= 0 (count (filter #(re-find #"pullups" (:Content %)) today)))
-       (= 0 (count (filter #(re-find #"pullups" (:Content %)) overdue)))
        (> 5 (count (filter #(re-find #"pullups" (:Content %)) completed-today)))))
 
 (def do-anki?
@@ -226,6 +246,41 @@
   (and (> hours-since-mood-log 2)
        (= 0 (count (filter #(re-find (re-pattern "Log") (:Project %)) today)))))
 
+(def run-roomba?
+  (and home?
+       active-hours?
+       (= 0 (count (filter #(re-find #"roomba" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"roomba" (:Content %)) completed-today)))))
+
+(def clean-kitchen?
+  (and home?
+       (= 0 (count (filter #(re-find #"kitchen" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"kitchen" (:Content %)) completed-today)))))
+
+(def cook-dinner?
+  (and home?
+       (not work-hours?)
+       active-hours?
+       (= 0 (count (filter #(re-find #"Cook dinner" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"Cook dinner" (:Content %)) completed-today)))))
+
+(def send-postcard?
+  (and active-hours?
+       (= 0 (count (filter #(re-find #"Send postcard" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"Send postcard" (:Content %)) completed-today)))))
+
+(def send-message?
+  (and active-hours?
+       (= 0 (count (filter #(re-find #"Send message" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"Send message" (:Content %)) completed-today)))))
+
+(def too-many-tasks?
+  (> (count today) overload-threshold))
+
+(def flag-too-many?
+  (and too-many-tasks?
+       (= 0 (count (filter #(re-find #"Restructure tasklist for today" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"Restructure tasklist for today" (:Content %)) completed-today)))))
 
 ; TASK VARIABLES
 
@@ -296,9 +351,10 @@
 
 ; DISPLAY STATUS
 (defn display-status []
-    (let [status (if (active-toggl?)
+  (let [n-left (count today)
+        status (if (active-toggl?)
                      (str/join "" ["[~] " current-toggl-task])
-                     (str/join "" ["[ ] " (:Content best-task)]))]
+                     (str/join "" ["(" n-left ") " "[ ] " (:Content best-task)]))]
      (if (not (active-toggl?))
          (do (println status)
              (println status)
@@ -315,24 +371,35 @@
       task))
 
 (defn add-best-task []
-  (cond (true? do-journal?) (add-task "Write morning pages"
-                                      "Blog" "today" 2)
+  (cond (true? flag-too-many?) (add-task "Restructure tasklist for today" "Life Admin" "today" 1)
+        (true? do-journal?) (add-task "Write morning pages"
+                                      "Blog" "today" 3)
         (true? log-mood?) (add-task "Log mood"
-                                    "Log" "today" 2)
+                                    "Log" "today" 3)
         (true? do-pullups?) (add-task (str/join " " ["Do"
                                                      (str best-pullups)
                                                      "pullups"])
-                                      "Exercise" "today" 2)
+                                      "Exercise" "today" 3)
         (true? do-pushups?) (add-task (str/join " " ["Do"
                                                      (str best-pushups)
                                                      "pushups"])
-                                      "Exercise" "today" 2)
+                                      "Exercise" "today" 3)
         (true? do-anki?) (add-task "Complete all anki decks"
-                                   "Anki" "today" 2)
+                                   "Anki" "today" 3)
         (true? do-forecast?) (add-task "Update metaculus forecasts"
-                                       "Predict" "today" 2)
+                                       "Predict" "today" 3)
         (true? log-bp?) (add-task "Log blood pressure"
-                                  "Log" "today" 2)
+                                  "Log" "today" 3)
+        (true? run-roomba?) (add-task "Turn on roomba" "Clean" "today" 3)
+        (true? clean-kitchen?) (add-task "Clean the kitchen" "Clean" "today" 3)
+        (true? cook-dinner?) (add-task "Cook dinner" "Cook" "today" 3)
+        (true? send-message?) (add-task (str/join ["Send message to "
+                                                   (rand-nth (line-seq (io/reader to-message-path)))])
+                                        "Social" "today" 3)
+        (true? send-postcard?) (add-task (str/join ["Send postcard to "
+                                                   (rand-nth (line-seq (io/reader to-mail-path)))])
+                                        "Social" "today" 3)
+        ;; (true? cut-hair?) (add-task "Cut hair" "Life Admin" "today" 3)
         ))
 
 ; MAIN
@@ -345,6 +412,5 @@
                                   (do (mark-current-done)))
         (in? inputs "status") (display-status)
         (in? inputs "generate") (add-best-task)
-        (in? inputs "test") (println
-                             (count (filter #(re-find (re-pattern "Log") (:Project %)) today)))
+        (in? inputs "test") (println flag-too-many?)
         :else (display-status))) ; display status by default

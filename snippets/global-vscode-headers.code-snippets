@@ -137,7 +137,7 @@
 	},
 	"Individual Question Content (for a yaml blog header)": {
 		"scope": "markdown,rmd,plaintext,yaml",
-		"prefix": "qqns",
+		"prefix": "qqq",
 		"body": [
 			"	- question:",
 			"		question: \"$1\"",
@@ -148,7 +148,7 @@
 	},
 	"Individual Question Content (for a yaml blog header)": {
 		"scope": "markdown,rmd,plaintext,yaml",
-		"prefix": "qqns",
+		"prefix": "qqf",
 		"body": [
 			"	- question:",
 			"		front: \"$1\"",

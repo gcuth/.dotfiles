@@ -1,6 +1,7 @@
 # basics
 alias c="clear; ls"
 alias vi="nvim"
+alias e="$EDITOR"
 
 # adding color to the usuals
 alias l="ls -lah --color=auto"

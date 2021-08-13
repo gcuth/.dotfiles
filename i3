@@ -113,7 +113,7 @@ bindsym $mod+$i3-wm.binding.orientation_toggle split toggle
 bindsym $mod+f fullscreen toggle
 
 #interactive screenshot by pressing printscreen
-bindsym Print exec gnome-screenshot -i 
+bindsym Print exec gnome-screenshot -i
 #crop-area screenshot by pressing Mod + printscreen
 bindsym $mod+Print exec gnome-screenshot -a
 
@@ -179,6 +179,9 @@ bindsym $mod+$i3-wm.binding.ws_next workspace next
 set_from_resource $i3-wm.binding.ws_prev i3-wm.binding.ws_prev Shift+Tab
 bindsym $mod+$i3-wm.binding.ws_prev workspace prev
 
+## Rename a workspace
+bindsym $mod+n exec i3-input -F 'rename workspace to "%s"' -P 'New name for this workspace:'
+
 
 # reload the configuration file
 bindsym $mod+Shift+r reload
@@ -221,10 +224,10 @@ bindsym $mod+Mod1+t exec "/home/g/.dotfiles/scripts/tasker stop >/dev/null; pkil
 bindsym $mod+Mod1+d exec "/home/g/.dotfiles/scripts/tasker complete >/dev/null; /home/g/.dotfiles/scripts/tasker generate >/dev/null; pkill -SIGRTMIN+10 i3blocks >/dev/null"
 
 # READ: whatever's on the clipboard to the 'toread' doc
-bindsym $mod+Mod1+r exec "xclip -out -sel clip >> /home/g/Documents/blog/data/toread.txt; echo '' >> /home/g/Documents/blog/data/toread.txt"
+bindsym $mod+Mod1+r exec "xclip -out -sel clip >> /home/g/Documents/blog/data/toread.txt; echo '' >> /home/g/Documents/blog/data/toread.txt; notify-send 'Reading Added' `tail -n 1 /home/g/Documents/blog/data/toread.txt`"
 
 # WRITE: create a suitable note/quote/forecast file by calling the 'note.bb' babashka script & open the resulting file in the default editor for writing purposes
-bindsym $mod+Mod1+w exec "xclip -out -sel clip | bb /home/g/.dotfiles/scripts/note.bb
+bindsym $mod+Mod1+w exec "$EDITOR `xclip -out -sel clip | bb /home/g/.dotfiles/scripts/note.clj`"
 
 
 # Start i3bar to display a workspace bar (plus the system information i3status

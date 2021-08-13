@@ -11,16 +11,32 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 # etc
 HIST_STAMPS="yyyy-mm-dd"
 
+# Set editor with a tonne of fallbacks
+if [ -f /snap/bin/codium ]; then
+    export EDITOR="/snap/bin/codium"
+    export VISUAL="/snap/bin/codium"
+elif [ -f /snap/bin/code ]; then
+    export EDITOR="/snap/bin/code"
+    export VISUAL="/snap/bin/code"
+elif [ -f /snap/bin/emacsclient ]; then
+    export EDITOR="/snap/bin/emacsclient"
+    export VISUAL="/snap/bin/emacsclient"
+elif [ -f /snap/bin/emacs ]; then
+    export EDITOR="/snap/bin/emacs"
+    export VISUAL="/snap/bin/emacs"
+elif [ -f /usr/bin/nvim ]; then
+    export EDITOR="/usr/bin/nvim"
+    export VISUAL="/usr/bin/nvim"
+elif [ -f /usr/bin/vim ]; then
+    export EDITOR="/usr/bin/vim"
+    export VISUAL="/usr/bin/vim"
+fi
+
 # Load aliases
 if [ -f ~/.aliases ]; then
     . ~/.aliases
 fi
 
-# Set nvim as default
-if [ -f /usr/bin/nvim ]; then
-    export EDITOR="/usr/bin/nvim"
-    export VISUAL="/usr/bin/nvim"
-fi
 
 # Add pyenv to path
 export PATH="$HOME/.pyenv/bin:$PATH"

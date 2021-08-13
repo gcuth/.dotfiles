@@ -37,11 +37,11 @@
       path: snippets/vim/markdown.snippets
     ~/.config/Code/User/settings.json:
       path: vscode-settings.json
-    ~/.config/Code/User/headers.code-snippets:
+    ~/.config/Code/User/snippets/headers.code-snippets:
       path: snippets/global-vscode-headers.code-snippets
     ~/.config/VSCodium/User/settings.json:
       path: vscode-settings.json
-    ~/.config/VSCodium/User/headers.code-snippets:
+    ~/.config/VSCodium/User/snippets/headers.code-snippets:
       path: snippets/global-vscode-headers.code-snippets
     ~/.newsboat/urls:
       path: newsboat/urls
@@ -151,6 +151,19 @@
     - sudo pip3 install cookiecutter
     - sudo apt install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 
+# INSTALL GOLANG AS A SNAP
+- shell:
+    - sudo snap install go --classic
+
+# BUILD & INSTALL TODOIST-CLI
+- shell:
+    - mkdir -p $GOPATH/src/github.com/sachaos; cd $GOPATH/src/github.com/sachaos; git clone https://github.com/sachaos/todoist.git; cd todoist; make install
+
+# INSTALL LIBGEN-CLI
+- shell:
+    - go get -u github.com/ciehanski/libgen-cli
+    - go install github.com/ciehanski/libgen-cli
+
 # INSTALL PYENV
 - shell:
     - curl https://pyenv.run | bash
@@ -168,10 +181,10 @@
     - sudo cp -rf $HOME/Downloads/Zotero_linux-x86_64/* /opt/zotero/
     - ln -sf /opt/zotero/zotero.desktop $HOME/.local/share/applications/zotero.desktop
     - rm -rf $Home/Downloads/Zotero_linux-x86_64
- 
+
 # INSTALL PROTONVPN CLIENT
 - shell:
-    - wget -q -O - https://repo.protonvpn.com/debian/public_key.asc | sudo apt-key add - 
+    - wget -q -O - https://repo.protonvpn.com/debian/public_key.asc | sudo apt-key add -
     - sudo add-apt-repository 'deb https://repo.protonvpn.com/debian unstable main'
     - sudo apt-get update && sudo apt-get install -y protonvpn
 

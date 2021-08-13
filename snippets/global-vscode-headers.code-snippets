@@ -1,23 +1,7 @@
 {
-	// Place your global snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
-	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
-	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
-	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
-	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
-	// Placeholders with the same ids are connected.
-	// Example:
-	// "Print to console": {
-	// 	"scope": "javascript,typescript",
-	// 	"prefix": "log",
-	// 	"body": [
-	// 		"console.log('$1');",
-	// 		"$2"
-	// 	],
-	// 	"description": "Log output to console"
-	// }
 	"Jekyll Post Header -- Journal": {
 		"scope": "markdown,rmd,plaintext",
-		"prefix": "hheadj",
+		"prefix": "hhj",
 		"body": [
 			"---",
 			"title: Morning Pages ($CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE)",
@@ -32,28 +16,9 @@
 		],
 		"description": "Add a jekyll-style post header for a private (unpublished) 'morning pages' journal post."
 	},
-	"Jekyll Post Header -- Quote": {
-		"scope": "markdown,rmd,plaintext",
-		"prefix": "hheadq",
-		"body": [
-			"---",
-			"title: $3",
-			"layout: post",
-			"permalink: /q/$4",
-			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
-			"categories: ['quote']",
-			"published: true",
-			"---",
-			"",
-			"> $CLIPBOARD ([$1]($2))",
-			"",
-			"$0"
-		],
-		"description": "Add a jekyll-style post header for a quote or citation post (with short note)."
-	},
 	"Jekyll Post Header -- Note": {
 		"scope": "markdown,rmd,plaintext",
-		"prefix": "hheadn",
+		"prefix": "hhn",
 		"body": [
 			"---",
 			"title: $1",
@@ -70,7 +35,7 @@
 	},
 	"Jekyll Post Header -- Reading": {
 		"scope": "markdown,rmd,plaintext",
-		"prefix": "hheadr",
+		"prefix": "hhr",
 		"body": [
 			"---",
 			"title: $3's '$2'",
@@ -93,9 +58,46 @@
 		],
 		"description": "Add a jekyll-style post header for a note post (default unpublished)."
 	},
+	"Jekyll Post Header -- Meeting": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "hhr",
+		"body": [
+			"---",
+			"title: $1",
+			"layout: post",
+			"permalink: /m/$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE-$2",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
+			"categories: ['meeting']",
+			"published: false",
+			"---",
+			"",
+			"$0"
+		],
+		"description": "Add a jekyll-style post header for a note post (default unpublished)."
+
+	},
+	"Jekyll Post Header -- Quote": {
+		"scope": "markdown,rmd,plaintext",
+		"prefix": "hhq",
+		"body": [
+			"---",
+			"title: $3",
+			"layout: post",
+			"permalink: /q/$4",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
+			"categories: ['quote']",
+			"published: true",
+			"---",
+			"",
+			"> $CLIPBOARD ([$1]($2))",
+			"",
+			"$0"
+		],
+		"description": "Add a jekyll-style post header for a quote or citation post (with short note)."
+	},
 	"YAML Paper Header": {
 		"scope": "markdown,rmd,plaintext",
-		"prefix": "hheadp",
+		"prefix": "hhp",
 		"body": [
 			"---",
 			"title: $1",
@@ -111,53 +113,6 @@
 		],
 		"description": "Add a yaml header for a paper/chapter."
 	},
-	"blot.im note header": {
-		"scope": "markdown,rmd,plaintext",
-		"prefix": "hhn",
-		"body": [
-			"title: $1",
-			"permalink: /$2",
-			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
-			"draft: true",
-			"",
-			"$0"
-		],
-		"description": "Add a header suitable for a note in blot.im"
-	},
-	"blot.im journal header": {
-		"scope": "markdown,rmd,plaintext",
-		"prefix": "hhj",
-		"body": [
-			"title: Morning Pages ($CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE)",
-			"permalink: /j/$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
-			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
-			"categories: journal",
-			"draft: true",
-			"",
-			"$0"
-		],
-		"description": "Add a header suitable for a morning pages doc in blot.im"
-	},
-	"blot.im reading header": {
-		"scope": "markdown,rmd,plaintext",
-		"prefix": "hhr",
-		"body": [
-			"title: $3's '$2'",
-			"permalink: /r/$1",
-			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
-			"reading_title: $2",
-			"reading_author: $3",
-			"reading_completed_date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
-			"reading_started_date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
-			"{$4|reading_link,doi,isbn|}: $CLIPBOARD",
-			"reading_rating: $5/5",
-			"categories: review",
-			"draft: false",
-			"",
-			"$0"
-		],
-		"description": "Add a jekyll-style post header for a note post (default unpublished)."
-	},
 	"Current Time": {
 		"scope": "markdown,rmd,plaintext",
 		"prefix": "ttime",
@@ -168,5 +123,39 @@
 		"prefix": "ddate",
 		"body": ["$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"]
 	},
+	"Questions Content (for a yaml blog header)": {
+		"scope": "markdown,rmd,plaintext,yaml",
+		"prefix": "qqns",
+		"body": [
+			"questions:",
+			"	- question:",
+			"		question: \"$1\"",
+			"		answer: \"$2\"",
+			"$0"
+		],
+		"description": "Create a 'questions' field for a blog post header"
+	},
+	"Individual Question Content (for a yaml blog header)": {
+		"scope": "markdown,rmd,plaintext,yaml",
+		"prefix": "qqns",
+		"body": [
+			"	- question:",
+			"		question: \"$1\"",
+			"		answer: \"$2\"",
+			"$0"
+		],
+		"description": "Create an individual 'question' field for a blog post header"
+	},
+	"Individual Question Content (for a yaml blog header)": {
+		"scope": "markdown,rmd,plaintext,yaml",
+		"prefix": "qqns",
+		"body": [
+			"	- question:",
+			"		front: \"$1\"",
+			"		back: \"$2\"",
+			"$0"
+		],
+		"description": "Create an individual front/back 'question' field for a blog post header"
+	}
 }
 

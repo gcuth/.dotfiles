@@ -125,23 +125,23 @@
 	},
 	"Questions Content (for a yaml blog header)": {
 		"scope": "markdown,rmd,plaintext,yaml",
-		"prefix": "qqns",
+		"prefix": "qqh",
 		"body": [
 			"questions:",
-			"	- question:",
-			"		question: \"$1\"",
-			"		answer: \"$2\"",
+			"    - question:",
+			"        question: \"$1\"",
+			"        answer: \"$2\"",
 			"$0"
 		],
 		"description": "Create a 'questions' field for a blog post header"
 	},
 	"Individual Question Content (for a yaml blog header)": {
 		"scope": "markdown,rmd,plaintext,yaml",
-		"prefix": "qqq",
+		"prefix": "qqn",
 		"body": [
-			"	- question:",
-			"		question: \"$1\"",
-			"		answer: \"$2\"",
+			"    - question:",
+			"        question: \"$1\"",
+			"        answer: \"$2\"",
 			"$0"
 		],
 		"description": "Create an individual 'question' field for a blog post header"
@@ -150,9 +150,9 @@
 		"scope": "markdown,rmd,plaintext,yaml",
 		"prefix": "qqf",
 		"body": [
-			"	- question:",
-			"		front: \"$1\"",
-			"		back: \"$2\"",
+			"    - question:",
+			"        front: \"$1\"",
+			"        back: \"$2\"",
 			"$0"
 		],
 		"description": "Create an individual front/back 'question' field for a blog post header"

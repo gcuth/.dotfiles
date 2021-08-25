@@ -146,7 +146,7 @@
 		],
 		"description": "Create an individual 'question' field for a blog post header"
 	},
-	"Individual Question Content (for a yaml blog header)": {
+	"Individual Front/Back Question Content (for a yaml blog header)": {
 		"scope": "markdown,rmd,plaintext,yaml",
 		"prefix": "qqf",
 		"body": [

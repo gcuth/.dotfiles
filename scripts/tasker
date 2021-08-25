@@ -20,6 +20,12 @@
 (def overload-threshold 5) ; if more than this many tasks due today, get worried
 (def work-late? false) ; a switch for whether to care about hours in best-task etc
 
+(def messages-per-day ; so that everybody on the list gets a message regularly, even as the list grows
+  (quot (count (set (line-seq (io/reader to-message-path)))) 7))
+
+(def person-to-mail (rand-nth (line-seq (io/reader to-mail-path))))
+(def person-to-message (rand-nth (line-seq (io/reader to-message-path))))
+
 ; UTILITY FUNCTIONS
 (defn csv-data->maps [csv-data]
   (map zipmap
@@ -135,7 +141,7 @@
                                    "list" "--filter" "(today|overdue)")))
 
 (def other-tasks (get-sorted-tasks (sh "/usr/local/bin/todoist"
-                                       "--csv" "--header" "list")))
+                                       "--csv" "--header" "list" "--priority")))
 
 (def has-due (remove #(str/blank? (:Date %)) other-tasks))
 
@@ -175,6 +181,7 @@
             (first (remove nil? (conj []
                                       (first (filter #(= "Thesis" (:Project %)) has-due))
                                       (first today)
+                                      (first has-due)
                                       (first other-tasks))))
           (and (not overworked?) (not overwhelmed?) (not last-task-was-a-work-task?))
             (if (not last-task-was-exercise?)
@@ -271,8 +278,10 @@
 
 (def send-message?
   (and active-hours?
-       (= 0 (count (filter #(re-find #"Send message" (:Content %)) today)))
-       (= 0 (count (filter #(re-find #"Send message" (:Content %)) completed-today)))))
+       (= 0 (count (filter #(re-find (re-pattern person-to-message) (:Content %)) today)))
+       (= 0 (count (filter #(re-find (re-pattern person-to-message) (:Content %)) completed-today)))
+       (> messages-per-day (count (filter #(re-find #"Send message" (:Content %)) today)))
+       (> messages-per-day (count (filter #(re-find #"Send message" (:Content %)) completed-today)))))
 
 (def too-many-tasks?
   (> (count today) overload-threshold))
@@ -394,10 +403,10 @@
         (true? clean-kitchen?) (add-task "Clean the kitchen" "Clean" "today" 3)
         (true? cook-dinner?) (add-task "Cook dinner" "Cook" "today" 3)
         (true? send-message?) (add-task (str/join ["Send message to "
-                                                   (rand-nth (line-seq (io/reader to-message-path)))])
+                                                   person-to-message])
                                         "Social" "today" 3)
         (true? send-postcard?) (add-task (str/join ["Send postcard to "
-                                                   (rand-nth (line-seq (io/reader to-mail-path)))])
+                                                   person-to-mail])
                                         "Social" "today" 3)
         ;; (true? cut-hair?) (add-task "Cut hair" "Life Admin" "today" 3)
         ))
@@ -412,5 +421,5 @@
                                   (do (mark-current-done)))
         (in? inputs "status") (display-status)
         (in? inputs "generate") (add-best-task)
-        (in? inputs "test") (println flag-too-many?)
+        (in? inputs "test") (println messages-per-day)
         :else (display-status))) ; display status by default

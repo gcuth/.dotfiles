@@ -37,6 +37,7 @@ if [ -f ~/.aliases ]; then
     . ~/.aliases
 fi
 
+export CHROME_BIN=chromium
 
 # Add pyenv to path
 export PATH="$HOME/.pyenv/bin:$PATH"

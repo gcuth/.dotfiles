@@ -41,6 +41,8 @@
       path: snippets/global-vscode-headers.code-snippets
     ~/.config/VSCodium/User/settings.json:
       path: vscode-settings.json
+    ~/.config/VSCodium/User/keybindings.json:
+      path: vscode-keybindings.json
     ~/.config/VSCodium/User/snippets/headers.code-snippets:
       path: snippets/global-vscode-headers.code-snippets
     ~/.newsboat/urls:

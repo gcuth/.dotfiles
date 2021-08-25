@@ -22,5 +22,7 @@
     "window.menuBarVisibility": "compact",
     "workbench.colorTheme": "Visual Studio Light",
     "python.pythonPath": "/home/g/.pyenv/versions/3.7.7/bin/python",
-    "python.dataScience.askForKernelRestart": false
+    "python.dataScience.askForKernelRestart": false,
+    "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.linux": "~/.config/nvim/init.vim"
 }

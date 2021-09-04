@@ -20,9 +20,10 @@
     "git.autofetch": true,
     "tabnine.experimentalAutoImports": true,
     "window.menuBarVisibility": "compact",
-    "workbench.colorTheme": "Visual Studio Light",
+    "workbench.colorTheme": "Visual Studio Dark",
     "python.pythonPath": "/home/g/.pyenv/versions/3.7.7/bin/python",
     "python.dataScience.askForKernelRestart": false,
     "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
-    "vscode-neovim.neovimInitVimPaths.linux": "~/.config/nvim/init.vim"
+    "vscode-neovim.neovimInitVimPaths.linux": "~/.config/nvim/init.vim",
+    "calva.paredit.defaultKeyMap": "strict"
 }

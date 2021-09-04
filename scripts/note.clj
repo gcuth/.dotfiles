@@ -460,7 +460,7 @@
         rejoin-lines #(str/trim (str/join "\\n> \\n" (into [] (remove nil? %)))) ;; a hyper-specific joining function we'll use
         wc #(count (str/split % #"\W+"))] ;; word count util function
     (->> contexted-sentences
-         (filter #(< (wc (:target %)) 8))
+         (filter #(< (wc (:target %)) 10))
          (map (fn [x] {:front
                        (rejoin-lines (concat previous-line [(rejoin-sentences (concat (:before x) [(blackout (:target x))] (:after x)))] next-line))
                        :back
@@ -477,7 +477,7 @@
         rejoin-lines #(str/trim (str/join "\\n> \\n" (into [] (remove nil? %)))) ;; a hyper-specific joining function we'll use
         wc #(count (str/split % #"\W+"))] ;; word count util function
       (->> contexted-phrases
-           (filter #(< (wc (:target %)) 7))
+           (filter #(< (wc (:target %)) 10))
            (filter #(> (wc (:target %)) 1))
            (map (fn [x] {:front
                          (rejoin-lines (concat previous-line [(rejoin-phrases (concat (:before x) [(blackout (:target x))] (:after x)))] next-line))

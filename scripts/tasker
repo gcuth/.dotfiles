@@ -291,6 +291,17 @@
        (= 0 (count (filter #(re-find #"Restructure tasklist for today" (:Content %)) today)))
        (= 0 (count (filter #(re-find #"Restructure tasklist for today" (:Content %)) completed-today)))))
 
+(def flag-not-enough?
+  (and (= 0 (count today))
+       (= 0 (count (filter #(re-find #"Generate habitual tasks for the day" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"Generate habitual tasks for the day" (:Content %)) completed-today)))))
+
+(def check-newsboat?
+  (and work-hours?
+       (= 0 (count (filter #(re-find #"newsboat" (:Content %)) today)))
+       (= 0 (count (filter #(re-find #"newsboat" (:Content %)) completed-today)))))
+
+
 ; TASK VARIABLES
 
 (def average-pushups
@@ -381,6 +392,7 @@
 
 (defn add-best-task []
   (cond (true? flag-too-many?) (add-task "Restructure tasklist for today" "Life Admin" "today" 1)
+        (true? flag-not-enough?) (add-task "Generate habitual tasks for the day" "Life Admin" "today" 1)
         (true? do-journal?) (add-task "Write morning pages"
                                       "Blog" "today" 3)
         (true? log-mood?) (add-task "Log mood"
@@ -408,6 +420,7 @@
         (true? send-postcard?) (add-task (str/join ["Send postcard to "
                                                    person-to-mail])
                                         "Social" "today" 3)
+        (true? check-newsboat?) (add-task "Add all interesting new articles from newsboat" "Read" "today" 3)
         ;; (true? cut-hair?) (add-task "Cut hair" "Life Admin" "today" 3)
         ))
 

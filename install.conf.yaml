@@ -82,7 +82,6 @@
 
 # INSTALL A TONNE OF STUFF
 - shell:
-    - sudo apt install -y emacs
     - sudo apt install -y wmctrl
     - sudo apt install -y curl
     - sudo apt install -y wget
@@ -161,18 +160,9 @@
 - shell:
     - mkdir -p $GOPATH/src/github.com/sachaos; cd $GOPATH/src/github.com/sachaos; git clone https://github.com/sachaos/todoist.git; cd todoist; make install
 
-# INSTALL LIBGEN-CLI
-- shell:
-    - go get -u github.com/ciehanski/libgen-cli
-    - go install github.com/ciehanski/libgen-cli
-
 # INSTALL PYENV
 - shell:
     - curl https://pyenv.run | bash
-
-# INSTALL POETRY
-- shell:
-    - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
 # INSTALL ZOTERO
 - shell:
@@ -200,32 +190,12 @@
 - shell:
     - curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install -o install-babashka; chmod +x install-babashka && sudo ./install-babashka; rm ./install-babashka
 
-# INSTALL AWS CLI
-- shell:
-    - wget -O $HOME/Downloads/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-    - unzip $HOME/Downloads/awscliv2.zip -d $HOME/Downloads/
-    - sudo $HOME/Downloads/aws/install
-    - rm -rf $HOME/Downloads/aws/
-    - rm $HOME/Downloads/awscliv2.zip
-
 # INSTALL GITHUB CLI
 - shell:
     - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
     - sudo apt-add-repository https://cli.github.com/packages
     - sudo apt update
     - sudo apt install -y gh
-
-# INSTALL ZOOM (EUGH)
-- shell:
-    - wget -O $HOME/Downloads/zoom_amd64.deb "https://zoom.us/client/latest/zoom_amd64.deb"
-    - sudo apt install -y $HOME/Downloads/zoom_amd64.deb
-    - rm $HOME/Downloads/zoom_amd64.deb
-
-# INSTALL ANACONDA
-- shell:
-    - wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" -O ~/miniconda.sh
-    - bash ~/miniconda.sh -b -p $HOME/miniconda
-    - rm ~/miniconda.sh
 
 # Add thesis post-commit hook
 - link:
@@ -249,10 +219,8 @@
 
 # Install some snaps
 - shell:
-    - sudo snap install todoist
     - sudo snap install --edge 1password
     - sudo snap install signal-desktop
     - sudo snap install chromium
     - sudo snap install codium --classic
     - sudo snap install docker
-

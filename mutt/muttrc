@@ -1,0 +1,144 @@
+set realname = "Galen Cuthbertson"
+
+set pgp_default_key = "C21B52A67C403E66DE5B3283B61949EDE15C2FA1"
+
+# MACROS
+macro index gd "<change-folder>$postponed<enter>" "go to drafts"
+macro index gs "<change-folder>$record<enter>" "go to sent"
+macro index gi "<change-folder>$spoolfile<Enter>" "go to inbox"
+macro index gt "<change-folder>$trash<enter>" "go to trash"
+macro index,pager a "<save-message> =Archive<enter> "archive message"
+macro index 1 "<change-folder> =../debian/inbox/<enter>"
+
+# Mouse wheel use
+bind pager <down> next-line
+bind pager <up> previous-line
+
+# Don't add a + to urls that wrap
+unset markers
+
+# Don't ask to confirm deletions
+set delete = no
+
+# Don't move read mail to all mail
+set move = no
+
+# Don't show the help bar
+set help = no
+
+#Don't wait to switch mailboxes
+set sleep_time = 0
+
+# Read top-down mail instead of bottom-up
+set sort = reverse-threads
+
+# Simplify UI
+set status_format = "%f"
+set date_format = "%m%d"
+set index_format = "%Z %D %-15.15n %s"
+
+# Keep a list of contacts (aliases)
+set alias_file = ~/.mutt/alias
+
+# Import SMTP and IMAP credentials
+source "gpg -dq ~/.mutt/protonmail.gpg |"
+
+### Pager
+ignore *
+
+unignore From Message-ID Date To Cc Bcc Subject
+
+set pager_stop
+
+# Prefer plain text to html
+
+alternative_order multipart/mixed multipart/related text/plain
+
+# Consult mime.types for determining types of attachments
+
+mime_lookup applications/octet-stream
+
+### Message composition
+
+set mime_type_query_command = "xdg-mime query filetype"
+
+set sendmail = "/usr/bin/msmtp"
+
+### Otherset indent_string = ">"
+
+set reflow_wrap = 80
+
+set reflow_text
+
+unset reflow_space_quotes
+
+unset imap_passive
+
+set imap_check_subscribed
+
+set mail_check = 15
+
+set timeout = 15
+
+set sidebar_visisble = no
+
+set sidebar_width = 30
+
+color sidebar_new brightred default
+
+macro index b "<enter-command>toggle sidebar_visible<enter>"
+macro pager b "<enter-command>toggle sidebar_visible<enter>"
+
+unset ssl_use_sslv3
+
+unset ssl_use_tlsv1
+
+set ssl_verify_dates
+
+set ssl_verify_host
+
+set to_chars=" +TCF"
+
+push <show-version>
+
+auto_view text/html
+
+set abort_subject = yes
+
+set copy = no
+
+set pgp_sign_as = "Galen Cuthbertson"
+
+set pgp_use_gpg_agent
+
+set pgp_timeout = 1800
+
+set crypt_autosign
+
+set crypt_replysign
+
+set crypt_replysignencrypted
+
+set check_new
+
+set editor = vim
+
+set mh_purge
+
+unset confirmappend
+
+unset confirmcreate
+
+set keep_flagged
+
+set save_address
+
+set save_name
+
+set mark_old
+
+set smart_wrap
+
+set signature= "~/.mutt/signature"
+
+set edit_hdrs

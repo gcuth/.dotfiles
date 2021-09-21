@@ -69,6 +69,9 @@
       path: mutt/*
       glob: true
       create: true
+    ~/.pandoc/templates/email.html:
+      path: templates/pandoc/email.html
+      create: true
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -101,7 +104,7 @@
     - sudo apt install -y vim
     - sudo apt install -y gnupg
     - sudo apt install -y msmtp
-    - sudo apt install -y mutt
+    - sudo apt install -y neomutt
     - sudo apt install -y zip
     - sudo apt install -y grc
     - sudo apt install -y fzf

@@ -1,144 +1,178 @@
-set realname = "Galen Cuthbertson"
+##########################################################################
+# Main configuration file for Mutt
+#
+# Note:
+#       Many comments and settings come from Sven Guckes .muttrc
+#       and Steve Losh's excellent tutorial at:
+#
+#       http://stevelosh.com/blog/2012/10/the-homely-mutt/
+#
+#       I also relied on Brian Thompson:
+#       
+#       https://brian-thompson.medium.com/setting-up-the-mutt-mail-client-with-protonmail-49c042486b3
+#
+##########################################################################
 
-set pgp_default_key = "C21B52A67C403E66DE5B3283B61949EDE15C2FA1"
+# Proton Variables ----------------------------------------------------------
+source "gpg -dq ~/.mutt/protonmail.gpg |"       # SMTP & IMAP credentials
 
-# MACROS
-macro index gd "<change-folder>$postponed<enter>" "go to drafts"
-macro index gs "<change-folder>$record<enter>" "go to sent"
-macro index gi "<change-folder>$spoolfile<Enter>" "go to inbox"
-macro index gt "<change-folder>$trash<enter>" "go to trash"
-macro index,pager a "<save-message> =Archive<enter> "archive message"
-macro index 1 "<change-folder> =../debian/inbox/<enter>"
+# Basic Options -------------------------------------------------------------
+set realname			= "Galen Cuthbertson"
+set from				= "g@galen.me"
+set use_from			= yes
+set edit_headers		= yes					# Show headers when composing mail
+set fast_reply			= yes					# Skip asking for address and subject when replying
+set fcc_attach			= yes					# Save attachments with the body
+set mime_forward		= no					# Forward attachments as part of the body
+set forward_format 		= "Fwd: %s"				# Subject of forwarded mails
+set forward_decode		= yes					# Decode on forwarding
+set attribution 		= "On %d, %n wrote:"	# Format of quoting header
+set reply_to			= yes					
+set reverse_name		= yes
+set include				= yes					# Include message in replies
+set forward_quote		= yes					# Include message in fowards
 
-# Mouse wheel use
-bind pager <down> next-line
-bind pager <up> previous-line
+# Use msmtp to send outgoing mail
+set sendmail			= "MIMEmbellish | msmtp" # wrapper script to convert markdown bodies
+set sendmail_wait		= 0
 
-# Don't add a + to urls that wrap
-unset markers
+# Set the editor to vi
+set editor				= "vim +/^$ ++1 -c 'set filetype=mail textwidth=0 noautoindent'"
 
-# Don't ask to confirm deletions
-set delete = no
+# # Set up preview pane for messages
+# set pager_index_lines 	= 10 	# number of index lines to show
+# set pager_context 		= 3     # number of context lines to show
+# set pager_stop          = yes   # don't go to next message automatically
+# set menu_scroll         = yes   # scroll in menus
+# set tilde               = yes   # show tildes like in vim
+# set markers             = no 	# no ugly plus signs
 
-# Don't move read mail to all mail
-set move = no
+# SSL -------------------------------------------------------------------------
 
-# Don't show the help bar
-set help = no
+set ssl_use_sslv3       = yes
+set ssl_use_tlsv1       = yes
+set ssl_verify_host     = yes
+set ssl_verify_dates    = yes
 
-#Don't wait to switch mailboxes
-set sleep_time = 0
+# Encryption ------------------------------------------------------------------
 
-# Read top-down mail instead of bottom-up
-set sort = reverse-threads
+# set pgp_default_key     = "C21B52A67C403E66DE5B3283B61949EDE15C2FA1"
 
-# Simplify UI
-set status_format = "%f"
-set date_format = "%m%d"
-set index_format = "%Z %D %-15.15n %s"
+# set pgp_sign_as         = "Galen Cuthbertson"
+# set pgp_use_gpg_agent   = yes
+# set pgp_timeout         = 1800
 
-# Keep a list of contacts (aliases)
-set alias_file = ~/.mutt/alias
+# set crypt_autosign      = yes
+# set crypt_replysign     = yes
+# set crypt_replysignencrypted    = yes
 
-# Import SMTP and IMAP credentials
-source "gpg -dq ~/.mutt/protonmail.gpg |"
+# Look and feel -----------------------------------------------------------------
+set index_format		= '%4C [%Z] %{%D} %-25.25L (%?l?%4l&%4c?) %s'	# Customize the messaage index display
+set sort_browser		= alpha											# Sort entries in the file browser
+set sort_aux			= reverse-last-date-received					# Sort mails in reverse date order (threads)
+set sort				= reverse-date-received							# Sort with the newest at the top
+set uncollapse_jump		= yes											# Don't jump to next unread message when a thread is collapsed
 
-### Pager
-ignore *
+# # Header Options
+ignore *                                		# ignore all headers
+unignore from: to: cc: bcc: date: subject:		# show only these
+unhdr_order *                           		# some distros order things by default
+hdr_order from: to: cc: bcc: date: subject:  	# and in this order
 
-unignore From Message-ID Date To Cc Bcc Subject
-
-set pager_stop
-
-# Prefer plain text to html
-
-alternative_order multipart/mixed multipart/related text/plain
-
-# Consult mime.types for determining types of attachments
-
-mime_lookup applications/octet-stream
-
-### Message composition
-
-set mime_type_query_command = "xdg-mime query filetype"
-
-set sendmail = "/usr/bin/msmtp"
-
-### Otherset indent_string = ">"
-
-set reflow_wrap = 80
-
-set reflow_text
-
-unset reflow_space_quotes
-
-unset imap_passive
-
-set imap_check_subscribed
-
-set mail_check = 15
-
-set timeout = 15
-
-set sidebar_visisble = no
-
-set sidebar_width = 30
-
-color sidebar_new brightred default
-
-macro index b "<enter-command>toggle sidebar_visible<enter>"
-macro pager b "<enter-command>toggle sidebar_visible<enter>"
-
-unset ssl_use_sslv3
-
-unset ssl_use_tlsv1
-
-set ssl_verify_dates
-
-set ssl_verify_host
-
-set to_chars=" +TCF"
-
-push <show-version>
-
+# # View HTML mails properly, but always view the plain text if it's available
 auto_view text/html
+alternative_order text/enriched text/plain text/html text
 
-set abort_subject = yes
 
-set copy = no
+# # Advanced Options ------------------------------------------------------------------
+set confirmappend		= no	# Don't confirm appending messages to mailboxes
+set move				= no	# Don't confirm moving read messages
+set delete				= yes	# Actually delete messages marked for deletion on exit
+set quit				= yes	# Make 'quit' and 'exit' actually quit mutt
+set mark_old			= no	# Don't mark messages as old
+set beep_new			= no	# Don't beep on new messages
+set pipe_decode			= yes	# Weed headers and attempt to PGP/MIME decode the messages first
+set thorough_search		= yes	# Strip headers and eval mimes before searching
+set auto_tag			= yes	# Apply function to all tagged messages
+set abort_nosubject		= no	# Allow messages with no subject
+set mime_forward		= yes
+set mime_forward_rest 	= yes
+set reply_regexp 		= "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
+set quote_regexp 		= "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
 
-set pgp_sign_as = "Galen Cuthbertson"
+# # Set the proper charsets
+set assumed_charset		= 'iso-2022-jp:euc-jp:shift_jis:utf-8'
+set attach_charset		= 'iso-2022-jp:euc-jp:shift_jis:utf-8'
+set send_charset		= 'us-ascii:iso-8859-1:iso-2022-jp:utf-8'
 
-set pgp_use_gpg_agent
 
-set pgp_timeout = 1800
+# Set Up Folders And Paths -------------------------------------------------------
+set mbox_type			= Maildir # Tell mutt to use the Maildir format
 
-set crypt_autosign
+set folder              = "imap://localhost:1143"
+set record              = +Sent
+set postponed           = +Drafts
+set trash               = +Trash
+set spoolfile           = +INBOX
 
-set crypt_replysign
+set alias_file       	= ~/.mutt/aliases         	# where to store aliases
+set header_cache     	= ~/.mutt/cache/headers 	# where to store headers
+set message_cachedir 	= ~/.mutt/cache/bodies  	# where to store bodies
+# set mailcap_path     	= ~/.mutt/mailcap       	# entries for filetypes
+# set tmpdir           	= ~/.mutt/temp          	# where to keep temp files
+set signature        	= ~/.mutt/signature         # my signature file
 
-set crypt_replysignencrypted
+# # Set up mailboxes by scanning for all subfolders in $MAILDIR/mail
+# mailboxes				= ! +.drafts +.sent +.search
 
-set check_new
 
-set editor = vim
+# # Key Bindings ------------------------------------------------------------------
+bind index,pager g          noop                    # unbind for neomutt support
+bind index gg				first-entry
+bind index 0				first-entry
+bind index G				last-entry
+bind index,pager R			group-reply
+bind index <space>			collapse-thread
+bind pager k  				previous-line
+bind pager j  				next-line
+bind pager gg 				top
+bind pager 0 				top
+bind pager G  				bottom
+bind compose p 				postpone-message
+bind index p 				recall-message
+bind index,pager \Cf		next-page
+bind index,pager \Cb		previous-page
 
-set mh_purge
 
-unset confirmappend
+# # Macros ------------------------------------------------------------------------
+macro index,pager gi   "<change-folder>$spoolfile<enter>"   "go to Inbox"
+macro index,pager gd   "<change-folder>$postponed<enter>"   "go to Drafts"
+macro index,pager A    "<save-message>=Archive<enter>"      "archive message"
 
-unset confirmcreate
+# # Ctrl-R to mark all as read
+macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" "mark all messages as read"
 
-set keep_flagged
+# # Add macros to make the folder browser usable by always using the mailboxes setup above
+# macro index,pager c "<change-folder>?<toggle-mailboxes><tab>" "open a different folder"
+# # macro pager c "<change-folder>?<toggle-mailboxes>" "open a different folder"
 
-set save_address
+# # To additionally get straight to the folder browser when copying, moving and attaching mail
+# macro index,pager C "<copy-message>?<toggle-mailboxes><tab>" "copy a message to a mailbox"
+# macro index,pager M "<save-message>?<toggle-mailboxes><tab>" "move a message to a mailbox"
+# macro compose A "<attach-message>?<toggle-mailboxes><tab>" "attach message(s) to this message"
 
-set save_name
+# # Save attachments to dropbox
+# macro attach W <tag-prefix><save-entry><kill-line>/Users/backalor/Dropbox/Attachments
 
-set mark_old
+# # Search using notmuch
+# macro index S "<enter-command>unset wait_key<enter><shell-escape>mutt-notmuch-py.py /Users/backalor/Mail/.search<enter><change-folder-readonly>+.search<enter>" "search mail (using notmuch)"
 
-set smart_wrap
+# # Show all mails that are flagged (and that I need to reply to)
+# macro index .i  "<limit>(~N|~F)<Enter>"  "view new/flag"
+# macro index .a  "<limit>~A<Enter>"       "view all"
 
-set signature= "~/.mutt/signature"
-
-set edit_hdrs
+# # Source Other Configuration Files ------------------------------------------------
+# # source ~/.mutt/colors.muttrc
+# # source ~/.mutt/sidebar.muttrc
+# # source ~/.mutt/pgp.muttrc
+# # source $alias_file

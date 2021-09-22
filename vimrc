@@ -31,6 +31,7 @@ Plug 'junegunn/goyo.vim' " a (*dry-retch*) 'distraction-free' writing environmen
 Plug 'junegunn/limelight.vim' " ... that greys all non-focus grafs
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'jalvesaq/Nvim-R', {'branch': 'stable'} " R
 
 call plug#end()
 
@@ -131,17 +132,6 @@ function! ClojureMode()
     RainbowParenthesesLoadBraces
     call CodingMode()
 endfunction
-
-" Quick Call to a Toggl-Starting Script
-
-function! Toggl()
-    let syntax = b:current_syntax
-    let here = expand('%:p')
-    let toggl_call = 'silent !python3 /home/g/.dotfiles/scripts/togglme "' . here .'" "' . syntax . '"'
-    :execute toggl_call
-    :redraw!
-endfunction
-
 
 " COC Interfacing
 " inoremap <silent><expr> <TAB>

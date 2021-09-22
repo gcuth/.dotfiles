@@ -1,6 +1,9 @@
 # Disable shadow in screenshots
 defaults write com.apple.screencapture disable-shadow -bool true
 
+# hide all 'persistent' apps from the dock (display active only)
+defaults write com.apple.dock static-only -bool true
+
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
@@ -12,9 +15,6 @@ defaults write com.apple.finder EmptyTrashSecurely -bool true
 
 # Enable subpixel font rendering on non-Apple LCDs
 defaults write NSGlobalDomain AppleFontSmoothing -int 2
-
-# Show all filename extensions in Finder
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false

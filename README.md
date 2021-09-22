@@ -1,6 +1,6 @@
 # Galen's .dotfiles
 
-My extremely chaotic, terminal-centric, computational-social-science-in-the-cloud-ish dotfiles. Made painless and idempotent with [dotbot](https://github.com/anishathalye/dotbot). Built with a fresh Ubuntu install and itchy fingertips in mind.
+My extremely chaotic, vim-centric, computational-social-science-in-the-cloud-ish dotfiles. Made painless and idempotent with [dotbot](https://github.com/anishathalye/dotbot). Scripts lean heavily on [babashka](https://github.com/babashka/babashka).
 
 ## Installation
 

@@ -5,6 +5,14 @@
 
 - clean: ['~']
 
+# FIX PIP:
+- shell:
+  - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py; rm get-pip.py
+
+# BREW:
+- shell:
+  - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 # VERY BASIC GLOBAL SETTINGS:
 - link:
     ~/.bashrc:
@@ -17,10 +25,10 @@
       create: true
       relink: true
       force: true
+    ~/.zprofile:
+      path: zprofile
     ~/.vimrc:
       path: vimrc
-    ~/.spacemacs:
-      path: spacemacs
     ~/.RProfile:
       path: RProfile
     ~/.aliases:
@@ -29,48 +37,19 @@
       path: gitignore
     ~/.gitconfig:
       path: gitconfig
-    ~/.tmux.conf:
-      path: tmux.conf
     ~/.config/starship.toml:
       path: starship.toml
     ~/.vim/UltiSnips/markdown.snippets:
       path: snippets/vim/markdown.snippets
-    ~/.config/Code/User/settings.json:
-      path: vscode-settings.json
-    ~/.config/Code/User/snippets/headers.code-snippets:
-      path: snippets/global-vscode-headers.code-snippets
-    ~/.config/VSCodium/User/settings.json:
-      path: vscode-settings.json
-    ~/.config/VSCodium/User/keybindings.json:
-      path: vscode-keybindings.json
-    ~/.config/VSCodium/User/snippets/headers.code-snippets:
-      path: snippets/global-vscode-headers.code-snippets
     ~/.newsboat/urls:
       path: newsboat/urls
     ~/.newsboat/config:
       path: newsboat/newsboatrc
-    ~/.config/kitty/kitty.conf:
-      path: kitty.conf
     ~/.config/nvim/init.vim:
       path: nvim_init
-    ~/.config/i3/config:
-      path: i3
-    ~/.config/i3blocks:
-      path: i3blocks
-    ~/.config/redshift.conf:
-      path: redshift.conf
-    ~/.config/dunst/dunstrc:
-      path: dunstrc
-    ~/.local/bin/:
+    /usr/local/bin/:
       path: scripts/*
       glob: true
-      create: true
-    ~/.mutt/:
-      path: mutt/*
-      glob: true
-      create: true
-    ~/.pandoc/templates/email.html:
-      path: templates/pandoc/email.html
       create: true
 
 # CREATE THE BASIC (NEEDED) DIRS
@@ -79,157 +58,20 @@
     - ~/Recordings/
     - ~/Readings/
 
+# basic brews:
+- shell:
+    - brew update && brew upgrade
+
+- shell:
+    - brew install neovim
+    - brew install pandoc
+    - brew install leiningen
+    - brew install newsboat
+
 # install starship for enlivening the prompt a little
 - shell:
     - curl -fsSL https://starship.rs/install.sh -o ./starship.sh; bash ./starship.sh -y; rm ./starship.sh
 
-# UPDATE APT
-- shell:
-    - sudo apt update
-
-# INSTALL A TONNE OF STUFF
-- shell:
-    - sudo apt install -y wmctrl
-    - sudo apt install -y curl
-    - sudo apt install -y wget
-    - sudo apt install -y cmake
-    - sudo apt install -y exfat-utils
-    - sudo apt install -y file
-    - sudo apt install -y feh
-    - sudo apt install -y git
-    - sudo apt install -y htop
-    - sudo apt install -y nmap
-    - sudo apt install -y openvpn
-    - sudo apt install -y tmux
-    - sudo apt install -y vim
-    - sudo apt install -y gnupg
-    - sudo apt install -y msmtp
-    - sudo apt install -y neomutt
-    - sudo apt install -y zip
-    - sudo apt install -y grc
-    - sudo apt install -y fzf
-    - sudo apt install -y python3
-    - sudo apt install -y python3-pip
-    - sudo apt install -y python3-setuptools
-    - sudo apt install -y python3-venv
-    - sudo apt install -y r-base-core
-    - sudo apt install -y libopenblas-base
-    - sudo apt install -y build-essential
-    - sudo apt install -y libatomic1
-    - sudo apt install -y x11-utils
-    - sudo apt install -y gfortran
-    - sudo apt install -y perl
-    - sudo apt install -y m4
-    - sudo apt install -y nodejs
-    - sudo apt install -y npm
-    - sudo apt install -y pkg-config
-    - sudo apt install -y texlive
-    - sudo apt install -y pandoc
-    - sudo apt install -y pandoc-citeproc
-    - sudo apt install -y anki
-    - sudo apt install -y ffmpeg
-    - sudo apt install -y postgresql
-    - sudo apt install -y sqlite3
-    - sudo apt install -y fail2ban
-    - sudo apt install -y rclone
-    - sudo apt install -y xclip
-    - sudo apt install -y default-jre
-    - sudo apt install -y qpdf
-    - sudo apt install -y figlet
-    - sudo apt install -y lolcat
-    - sudo apt install -y zsh
-    - sudo apt install -y snapd
-    - sudo apt install -y apt-transport-https
-    - sudo apt install -y ca-certificates
-    - sudo apt install -y gnupg-agent
-    - sudo apt install -y software-properties-common
-    - sudo apt install -y fonts-firacode
-    - sudo apt install -y leiningen
-    - sudo apt install -y openvpn
-    - sudo apt install -y dialog
-    - sudo apt install -y jq
-    - sudo apt install -y neovim
-    - sudo apt install -y speedtest-cli
-    - sudo apt install -y ranger
-    - sudo apt install -y newsboat
-    - sudo apt install -y kitty
-    - sudo apt install -y i3
-    - sudo apt install -y i3blocks
-    - sudo apt install -y redshift
-    - sudo apt install -y xfce4-power-manager
-    - sudo pip3 install togglcli
-    - sudo pip3 install cookiecutter
-    - sudo apt install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-
-# INSTALL GOLANG AS A SNAP
-- shell:
-    - sudo snap install go --classic
-
-# BUILD & INSTALL TODOIST-CLI
-- shell:
-    - mkdir -p $GOPATH/src/github.com/sachaos; cd $GOPATH/src/github.com/sachaos; git clone https://github.com/sachaos/todoist.git; cd todoist; make install
-
-# INSTALL PYENV
-- shell:
-    - curl https://pyenv.run | bash
-
-# INSTALL ZOTERO
-- shell:
-    - wget -O $HOME/Downloads/zotero.tar.bz2 "https://www.zotero.org/download/client/dl?channel=release&platform=linux-x86_64"
-    - tar xjf $HOME/Downloads/zotero.tar.bz2 -C $HOME/Downloads/
-    - rm $HOME/Downloads/zotero.tar.bz2
-    - sudo mkdir -p /opt/zotero
-    - sudo cp -rf $HOME/Downloads/Zotero_linux-x86_64/* /opt/zotero/
-    - ln -sf /opt/zotero/zotero.desktop $HOME/.local/share/applications/zotero.desktop
-    - rm -rf $Home/Downloads/Zotero_linux-x86_64
-
-# INSTALL PROTONVPN CLIENT
-- shell:
-    - wget -q -O - https://repo.protonvpn.com/debian/public_key.asc | sudo apt-key add -
-    - sudo add-apt-repository 'deb https://repo.protonvpn.com/debian unstable main'
-    - sudo apt-get update && sudo apt-get install -y protonvpn
-
-# INSTALL RESCUETIME
-- shell:
-    - wget -O $HOME/Downloads/rescuetime_current_amd64.deb "https://www.rescuetime.com/installers/rescuetime_current_amd64.deb"
-    - sudo apt install -y $HOME/Downloads/rescuetime_current_amd64.deb
-    - rm $HOME/Downloads/rescuetime_current_amd64.deb
-
 # INSTALL BABASHKA
 - shell:
     - curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install -o install-babashka; chmod +x install-babashka && sudo ./install-babashka; rm ./install-babashka
-
-# INSTALL GITHUB CLI
-- shell:
-    - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-    - sudo apt-add-repository https://cli.github.com/packages
-    - sudo apt update
-    - sudo apt install -y gh
-
-# Add thesis post-commit hook
-- link:
-    /home/g/Documents/thesis/.git/hooks/post-commit:
-      path: hooks/thesis-post-commit
-
-# Add blog commit hooks
-- link:
-    /home/g/Documents/blog/.git/hooks/post-commit:
-      path: hooks/blog-post-commit
-    /home/g/Documents/blog/.git/hooks/pre-commit:
-      path: hooks/blog-pre-commit
-
-# install my favourite cron jobs
-- shell:
-    - ./cron/setup_cron
-
-# tweak the standard desktop
-- shell:
-    - ./setup_desktop
-
-# Install some snaps
-- shell:
-    - sudo snap install --edge 1password
-    - sudo snap install signal-desktop
-    - sudo snap install chromium
-    - sudo snap install codium --classic
-    - sudo snap install docker

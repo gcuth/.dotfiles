@@ -16,10 +16,9 @@
 (require '[clojure.java.shell :refer [sh]]
          '[clojure.java.io :as io]
          '[babashka.curl :as curl]
-         '[clojure.data.xml :as xml]
-         )
+         '[clojure.data.xml :as xml])
 
-(def base-notes-directory "/home/g/Documents/blog/_posts/")
+(def base-notes-directory "~/Documents/blog/_posts/")
 (def input-lines (line-seq (io/reader *in*)))
 (def excludeable-words ["and" "as" "but" "for" "if" "nor" "or" "so" "yet" "a" "an" "the" "at" "by" "in" "of" "off" "on" "per" "to" "up" "via" "is"])
 

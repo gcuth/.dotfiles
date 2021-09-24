@@ -10,12 +10,13 @@
 
 (def unique-inputs (dedupe *command-line-args*))
 
-(def bp-log-path "/home/g/Documents/blog/data/logs/bp.csv")
-(def mood-log-path "/home/g/Documents/blog/data/logs/mood.csv")
-(def to-mail-path "/home/g/Documents/blog/data/tomail.txt")
-(def to-message-path "/home/g/Documents/blog/data/tomessage.txt")
-(def current-wifi (:out (sh "iwgetid" "-r"))) ; the name of the wifi I'm connected to
-(def home? (some? (re-find #"tell-my-wifi-love-her" current-wifi))) ; if connected to home wifi
+(def bp-log-path "~/Documents/blog/data/logs/bp.csv")
+(def mood-log-path "~/Documents/blog/data/logs/mood.csv")
+(def to-mail-path "~/Documents/blog/data/tomail.txt")
+(def to-message-path "~/Documents/blog/data/tomessage.txt")
+;; (def current-wifi (:out (sh "iwgetid" "-r"))) ; the name of the wifi I'm connected to
+;; (def home? (some? (re-find #"tell-my-wifi-love-her" current-wifi))) ; if connected to home wifi
+(def home? true)
 
 (def overload-threshold 5) ; if more than this many tasks due today, get worried
 (def work-late? false) ; a switch for whether to care about hours in best-task etc
@@ -136,23 +137,23 @@
   (remove is-exercise-task? tasks))
 
 ; CURRENT TODOIST
-(def today (get-sorted-tasks (sh "/usr/local/bin/todoist"
+(def today (get-sorted-tasks (sh "todoist"
                                    "--csv" "--header"
                                    "list" "--filter" "(today|overdue)")))
 
-(def other-tasks (get-sorted-tasks (sh "/usr/local/bin/todoist"
+(def other-tasks (get-sorted-tasks (sh "todoist"
                                        "--csv" "--header" "list" "--priority")))
 
 (def has-due (remove #(str/blank? (:Date %)) other-tasks))
 
-(def completed (sort-by :CompletedDate (into [] (-> (sh "/usr/local/bin/todoist"
+(def completed (sort-by :CompletedDate (into [] (-> (sh "todoist"
                                                         "--csv" "--header"
                                                         "completed-list")
                                                     (:out)
                                                     (csv/read-csv)
                                                     (csv-data->maps)))))
 
-(def completed-today (sort-by :CompletedDate (into [] (-> (sh "/usr/local/bin/todoist"
+(def completed-today (sort-by :CompletedDate (into [] (-> (sh "todoist"
                                                         "--csv" "--header"
                                                         "completed-list"
                                                         "--filter" "(today)")
@@ -204,7 +205,7 @@
 
 
 ; CURRENT TOGGL INFO
-(def toggl-now (sh "/usr/local/bin/toggl" "now"))
+(def toggl-now (sh "toggl" "now"))
 
 (def current-toggl-task (-> toggl-now
                             (:out)
@@ -346,16 +347,16 @@
 ; TARGETS FOR MANAGING TODOIST STOP & TOGGL SYNC
 (defn stop-toggl []
   "Stop toggl tracker by calling cli"
-  (sh "/usr/local/bin/toggl" "stop"))
+  (sh "toggl" "stop"))
 
 (defn sync-todoist []
   "Sync current todoist data with remote"
-  (sh "/usr/local/bin/todoist" "sync"))
+  (sh "todoist" "sync"))
 
 ; COMPLETE TODOIST TASK ASSOCIATED WITH CURRENT TOGGL
 (defn mark-a-task-done [task]
   "Mark some todoist task done"
-  (sh "/usr/local/bin/todoist" "close" (:ID task)))
+  (sh "todoist" "close" (:ID task)))
 
 (defn mark-current-done []
   "If it's actively tracking on todoist, mark the current todoist
@@ -370,7 +371,7 @@
   "Start toggl tracker for some todoist task"
   (let [project (first (str/split (str/replace (:Project task) "#" "") #"\/"))
         task (:Content task)]
-    (sh "/usr/local/bin/toggl" "start" "-o" project task)))
+    (sh "toggl" "start" "-o" project task)))
 
 ; DISPLAY STATUS
 (defn display-status []
@@ -387,7 +388,7 @@
 ; GENERATE
 (defn add-task "Send a system call to add a task to todoist"
   [task project-name date priority]
-  (sh "/usr/local/bin/todoist" "add"
+  (sh "todoist" "add"
       "--priority" (str priority)
       "--date" date
       "--project-name" project-name

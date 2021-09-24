@@ -31,13 +31,6 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # Use ack to locate TOD* and FIXM* lines in current folder tree
 alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+):.*((TODO|FIXME):.*)/\2 :>> \1/"|grep -E --color=always ":>>.*:\d+"'
 
-# switching kitty styling on the fly
-alias llight='kitty @ set-colors -a background=white foreground=black'
-alias ddark='kitty @ set-colors -a foreground=white background=black'
-
-# display management
-alias mirror='xrandr | grep -E "HDMI-2 connected" && xrandr --output eDP-1 --auto --output HDMI-2 --auto --same-as eDP-1; xrandr | grep -E "HDMI-1 connected" && xrandr --output eDP-1 --auto --output HDMI-1 --auto --same-as eDP-1'
-
 # those pesky permissions
 alias ax='chmod a+x'
 
@@ -57,30 +50,30 @@ alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
 
 # notetaking/filemaking shortcuts
 function take_note() {
-    $VISUAL ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
+    $EDITOR ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias note="take_note"
 
 function take_meeting_notes() {
-    $VISUAL ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
+    $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias meet="take_meeting_notes"
 
 function start_journal_writing() {
     # /usr/local/bin/toggl start -o 'Blog' -a 'writing' "Write morning pages."
-    $VISUAL ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
+    $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
 }
 alias journal="start_journal_writing"
 
 function fuzzy_find_and_edit() {
-    $VISUAL `fzf --preview="cat {}" --preview-window=right:70%:wrap`
+    $EDITOR `fzf --preview="cat {}" --preview-window=right:70%:wrap`
 }
 alias fuz="fuzzy_find_and_edit"
 
 # Open the most recently edited thesis file
 function start_thesis_writing() {
     # /usr/local/bin/toggl start -o 'Thesis' -a 'thesis, study, writing' "Write `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
-    $VISUAL ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
+    $EDITOR ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
 }
 alias thesis="start_thesis_writing"
 

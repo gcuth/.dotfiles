@@ -5,10 +5,6 @@
 
 - clean: ['~']
 
-# FIX PIP:
-- shell:
-  - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py; rm get-pip.py
-
 # BREW:
 - shell:
   - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -68,11 +64,21 @@
     - brew install leiningen
     - brew install newsboat
     - brew install git
+    - brew install gpg
+    - brew install fzf
+    - brew install gh
+    - brew install node
+    - brew tap sachaos/todoist; brew install todoist
 
 # if you don't already have them, you probably want them:
 - shell:
   - if [ ! -d "/Users/g/Documents/thesis" ]; then git clone git@github.com:gcuth/phd_thesis.git ~/Documents/thesis; fi
   - if [ ! -d "/Users/g/Documents/blog" ]; then git clone git@github.com:gcuth/gcuth.github.io.git ~/Documents/blog; fi
+
+# # link hooks:
+# - link:
+#     ~/Documents/blog/.git/hooks/pre-commit:
+#       path: hooks/blog-pre-commit
 
 # install starship for enlivening the prompt a little
 - shell:

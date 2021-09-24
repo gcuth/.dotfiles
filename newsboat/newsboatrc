@@ -36,14 +36,14 @@ confirm-exit no
 
 # bookmarking action ----------------------------------------------------------
 bookmark-autopilot yes
-bookmark-cmd "/home/g/.dotfiles/scripts/bookmark.sh"
+bookmark-cmd "~/.dotfiles/scripts/bookmark.sh"
 unbind-key s # nobody really needs "save"
 bind-key s bookmark
 
 
 # styling ---------------------------------------------------------------------
 
-include /usr/share/doc/newsboat/contrib/colorschemes/plain
+# include /usr/share/doc/newsboat/contrib/colorschemes/plain
 
 show-keymap-hint false
 datetime-format "%Y-%m-%d %H:%M:%S"

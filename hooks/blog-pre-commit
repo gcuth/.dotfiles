@@ -1,6 +1,7 @@
 #!/bin/sh
 
-/usr/bin/python3 /home/g/Documents/blog/crypto.py >> /home/g/Documents/blog/data/logs/crypto.csv
-/usr/bin/python3 /home/g/Documents/blog/generate_anki.py /home/g/Documents/blog/_posts/ /home/g/Documents/blog/Reading.apkg
-/usr/local/bin/todoist --csv completed-list --filter 'today' >> /home/g/Documents/blog/data/logs/completed_tasks.csv
-git add /home/g/Documents/blog/data/logs/crypto.csv /home/g/Documents/blog/Reading.apkg /home/g/Documents/blog/data/logs/completed_tasks.csv
+python3 ~/Documents/blog/crypto.py >> ~/Documents/blog/data/logs/crypto.csv
+toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> ~/Documents/blog/data/logs/toggl.log
+python3 ~/Documents/blog/generate_anki.py ~/Documents/blog/_posts/ ~/Documents/blog/Reading.apkg
+todoist --csv completed-list --filter 'today' >> ~/Documents/blog/data/logs/completed_tasks.csv
+git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/Reading.apkg ~/Documents/blog/data/logs/completed_tasks.csv ~/Documents/blog/data/logs/toggl

@@ -17,8 +17,8 @@ if [ -f /snap/bin/codium ]; then
     export VISUAL="/snap/bin/codium"
 elif [ -f /snap/bin/code ]; then
     export VISUAL="/snap/bin/code"
-elif [ -f /usr/bin/nvim ]; then
-    export VISUAL="/usr/bin/nvim"
+elif [ -f `which nvim` ]; then
+    export VISUAL=`which nvim`
 elif [ -f /usr/bin/vim ]; then
     export VISUAL="/usr/bin/vim"
 fi
@@ -37,12 +37,12 @@ fi
 export CHROME_BIN=chromium
 
 # Add pyenv to path
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+# export PATH="$HOME/.pyenv/bin:$PATH"
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
 
 # Add poetry to path
-export PATH="$HOME/.poetry/bin:$PATH"
+# export PATH="$HOME/.poetry/bin:$PATH"
 
 # Add golang to path
 export GOROOT=/usr/lib/go

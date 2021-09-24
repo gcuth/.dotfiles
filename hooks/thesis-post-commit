@@ -1,1 +1,0 @@
-/home/g/.dotfiles/scripts/update_exist_words $(/home/g/.dotfiles/scripts/calculate_words_today) >/dev/null 2>&1

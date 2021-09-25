@@ -2,7 +2,7 @@
 (import 'java.time.format.DateTimeFormatter
         'java.time.LocalDateTime)
 
-(def outpath "/home/g/Documents/blog/data/logs/mood.csv")
+(def outpath "/Users/g/Documents/blog/data/logs/mood.csv")
 
 (def now
   ; formatted current time

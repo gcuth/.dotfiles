@@ -10,10 +10,10 @@
 
 (def unique-inputs (dedupe *command-line-args*))
 
-(def bp-log-path "~/Documents/blog/data/logs/bp.csv")
-(def mood-log-path "~/Documents/blog/data/logs/mood.csv")
-(def to-mail-path "~/Documents/blog/data/tomail.txt")
-(def to-message-path "~/Documents/blog/data/tomessage.txt")
+(def bp-log-path "/Users/g/Documents/blog/data/logs/bp.csv")
+(def mood-log-path "/Users/g/Documents/blog/data/logs/mood.csv")
+(def to-mail-path "/Users/g/Documents/blog/data/tomail.txt")
+(def to-message-path "/Users/g/Documents/blog/data/tomessage.txt")
 ;; (def current-wifi (:out (sh "iwgetid" "-r"))) ; the name of the wifi I'm connected to
 ;; (def home? (some? (re-find #"tell-my-wifi-love-her" current-wifi))) ; if connected to home wifi
 (def home? true)

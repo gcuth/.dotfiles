@@ -69,6 +69,7 @@
     - brew install gh
     - brew install node
     - brew tap sachaos/todoist; brew install todoist
+    - brew install jq
 
 # if you don't already have them, you probably want them:
 - shell:

@@ -11,6 +11,8 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 # etc
 HIST_STAMPS="yyyy-mm-dd"
 
+# make gpg work for signing
+export GPG_TTY=$(tty)
 
 # Set visual editor with a tonne of fallbacks
 if [ -f /snap/bin/codium ]; then
@@ -23,8 +25,8 @@ elif [ -f /usr/bin/vim ]; then
     export VISUAL="/usr/bin/vim"
 fi
 # set normal editor with fewer callbacks
-if [ -f /usr/bin/nvim ]; then
-    export EDITOR="/usr/bin/nvim"
+if [ -f `which nvim` ]; then
+    export EDITOR=`which nvim`
 elif [ -f /usr/bin/vim ]; then
     export EDITOR="/usr/bin/vim"
 fi

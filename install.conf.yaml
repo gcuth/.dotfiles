@@ -5,10 +5,6 @@
 
 - clean: ['~']
 
-# BREW:
-- shell:
-  - if which brew; then echo "homebrew already installed"; else /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; fi
-
 # VERY BASIC GLOBAL SETTINGS:
 - link:
     ~/.bashrc:
@@ -54,23 +50,31 @@
     - ~/Recordings/
     - ~/Readings/
 
-# basic brews:
-- shell:
+# BREW:
+- ifmacos:
+  - shell:
+    - if which brew; then echo "homebrew already installed"; else /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; fi
+  - shell:
     - brew update && brew upgrade
-
-- shell:
-    - brew install neovim
-    - brew install pandoc
-    - brew install leiningen
-    - brew install newsboat
-    - brew install git
-    - brew install gpg
-    - brew install fzf
-    - brew install gh
-    - brew install node
-    - brew tap sachaos/todoist; brew install todoist
-    - brew install jq
-    - brew tap homebrew/cask-fonts; brew install --cask font-fira-code
+  - brew: 
+    - neovim
+    - pandoc
+    - leiningen
+    - newsboat
+    - git
+    - gpg
+    - fzf
+    - gh
+    - node
+    - jq
+  - tap:
+    - sachaos/todoist
+  - brew:
+    - todoist
+  - tap:
+    - homebrew/cask-fonts
+  - brew:
+    - font-fira-code
 
 # if you don't already have them, you probably want them:
 - shell:
@@ -89,3 +93,14 @@
 # INSTALL BABASHKA
 - shell:
     - if which bb; then echo "babashka already installed"; else curl -s https://raw.githubusercontent.com/borkdude/babashka/master/install -o install-babashka; chmod +x install-babashka && sudo ./install-babashka; rm ./install-babashka; fi
+
+# cron setup
+- crontab:
+  - cron: 0,10,20,30,40,50 * * * *
+    command: git -C ~/Documents/thesis add .; git -C ~/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
+  - cron: 0,10,20,30,40,50 * * * *
+    command: git -C ~/Documents/blog add .; git -C ~/Documents/blog/ commit -m 'Auto-commit' >/dev/null 2>&1
+  - cron: 1 * * * *
+    command: git -C ~/Documents/thesis push origin master >/dev/null 2>&1
+  - cron: 1 * * * *
+    command: git -C ~/Documents/blog push origin master >/dev/null 2>&1

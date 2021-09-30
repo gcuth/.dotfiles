@@ -60,7 +60,8 @@ function take_meeting_notes() {
 alias meet="take_meeting_notes"
 
 function start_journal_writing() {
-    # /usr/local/bin/toggl start -o 'Blog' -a 'writing' "Write morning pages."
+    /usr/local/bin/toggl stop
+    /usr/local/bin/toggl start -o 'Blog' -a 'writing' "Write morning pages"
     $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
 }
 alias journal="start_journal_writing"
@@ -82,7 +83,11 @@ alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science
 
 # record
 function default_record() {
-    arecord -f cd -D default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav
+    if [ `uname` = "Darwin" ]; then
+        open '/Applications/Just Press Record.app'
+    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+        arecord -f cd -D default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav
+    fi
 }
 alias rrecord="default_record"
 

@@ -8,3 +8,5 @@ description="$3"
 feed_title="$4"
 
 echo $url >> ~/Documents/blog/data/toread.txt
+
+xdg-open $url || open $url

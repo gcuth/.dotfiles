@@ -57,6 +57,7 @@
   - shell:
     - brew update && brew upgrade
   - brew: 
+    - python
     - neovim
     - pandoc
     - leiningen
@@ -75,10 +76,17 @@
     - homebrew/cask-fonts
   - brew:
     - font-fira-code
+  - shell:
+    - [ test -f `which toggl` || pip install togglCli ]
 - ifubuntu:
   - shell:
     - sudo apt update && sudo apt upgrade
   - shell:
+    - sudo apt install -y zsh
+    - sudo apt install -y python3
+    - sudo apt install -y python3-pip
+    - sudo apt install -y python3-setuptools
+    - sudo apt install -y python3-venv
     - sudo apt install -y neovim
     - sudo apt install -y pandoc
     - sudo apt install -y leiningen
@@ -94,7 +102,9 @@
     - sudo snap install go --classic
     - mkdir -p $GOPATH/src/github.com/sachaos; cd $GOPATH/src/github.com/sachaos; git clone https://github.com/sachaos/todoist.git; cd todoist; make install
   - shell:
-    - [ test -f `which toggl` || pip install togglCli ]
+    - sudo apt install -y fonts-firacode
+  - shell:
+    - [ test -f `which toggl` || sudo pip3 install togglCli ]
 
 # if you don't already have them, you probably want them:
 - shell:

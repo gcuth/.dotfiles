@@ -51,6 +51,9 @@ export GOROOT=/usr/lib/go
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 
+# Add $HOME/.local/bin/ to path
+export PATH="$PATH:$HOME/.local/bin"
+
 # Fix term
 export TERM=xterm-256color
 

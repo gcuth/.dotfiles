@@ -281,3 +281,6 @@ deps/deps.jl
 
 # LSP
 .lsp
+
+# lein
+.lein-failures

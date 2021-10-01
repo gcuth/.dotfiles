@@ -41,6 +41,9 @@ export CHROME_BIN=chromium
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
 
+# Add $HOME/.local/bin/ to path
+export PATH="$PATH:$HOME/.local/bin"
+
 # Fix term
 export TERM=xterm-256color
 

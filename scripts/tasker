@@ -8,12 +8,17 @@
 (require '[clojure.java.shell :refer [sh]]
          '[clojure.java.io :as io])
 
+(defn expand-home [s]
+  (if (.startsWith s "~")
+    (clojure.string/replace-first s "~" (System/getProperty "user.home"))
+    s))
+
 (def unique-inputs (dedupe *command-line-args*))
 
-(def bp-log-path "/Users/g/Documents/blog/data/logs/bp.csv")
-(def mood-log-path "/Users/g/Documents/blog/data/logs/mood.csv")
-(def to-mail-path "/Users/g/Documents/blog/data/tomail.txt")
-(def to-message-path "/Users/g/Documents/blog/data/tomessage.txt")
+(def bp-log-path (expand-home "~/Documents/blog/data/logs/bp.csv"))
+(def mood-log-path (expand-home "~/Documents/blog/data/logs/mood.csv"))
+(def to-mail-path (expand-home "~/Documents/blog/data/tomail.txt"))
+(def to-message-path (expand-home "~/Documents/blog/data/tomessage.txt"))
 ;; (def current-wifi (:out (sh "iwgetid" "-r"))) ; the name of the wifi I'm connected to
 ;; (def home? (some? (re-find #"tell-my-wifi-love-her" current-wifi))) ; if connected to home wifi
 (def home? true)
@@ -142,7 +147,7 @@
                                    "list" "--filter" "(today|overdue)")))
 
 (def other-tasks (get-sorted-tasks (sh "todoist"
-                                       "--csv" "--header" "list" "--priority")))
+                                       "--csv" "--header" "list")))
 
 (def has-due (remove #(str/blank? (:Date %)) other-tasks))
 
@@ -439,5 +444,5 @@
                                   (do (mark-current-done)))
         (in? inputs "status") (display-status)
         (in? inputs "generate") (add-best-task)
-        (in? inputs "test") (println messages-per-day)
+        (in? inputs "test") (println current-work-task-percentage)
         :else (display-status))) ; display status by default

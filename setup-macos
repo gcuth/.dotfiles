@@ -4,6 +4,9 @@ defaults write com.apple.screencapture disable-shadow -bool true
 # hide all 'persistent' apps from the dock (display active only)
 defaults write com.apple.dock static-only -bool true
 
+# remove dock autohide delay
+defaults write com.apple.dock autohide-delay -float 0 && defaults write com.apple.dock autohide-time-modifier -float 0.4
+
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 

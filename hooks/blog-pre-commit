@@ -1,5 +1,4 @@
 #!/bin/sh
 
-python3 ~/Documents/blog/crypto.py >> ~/Documents/blog/data/logs/crypto.csv
 python3 ~/Documents/blog/generate_anki.py ~/Documents/blog/_posts/ ~/Documents/blog/Reading.apkg
 git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/Reading.apkg ~/Documents/blog/data/logs/completed_tasks.csv ~/Documents/blog/data/logs/toggl

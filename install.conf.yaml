@@ -141,10 +141,12 @@
       command: /opt/homebrew/bin/git -C /Users/g/Documents/blog push origin master >/dev/null 2>&1
     - cron: 0,10,20,30,40,50 * * * *
       command: /opt/homebrew/bin/todoist sync >/dev/null 2>&1
-    - cron: 2 * * * *
-      command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl.log
-    - cron: 2 * * * *
+    - cron: 5,35 * * * *
+      command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl
+    - cron: 5,35 * * * *
       command: /opt/homebrew/bin/todoist --csv completed-list --filter 'today' >> /Users/g/Documents/blog/data/logs/completed_tasks.csv
+    - cron: 5,35 * * * *
+      command: /usr/homebrew/bin/python3 /Users/g/Documents/blog/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
 
 - ifubuntu:
   - crontab:

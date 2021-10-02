@@ -48,20 +48,14 @@ alias tn='tr -d "\n"'
 
 alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
 
-# notetaking/filemaking shortcuts
-function take_note() {
-    $EDITOR ~/Documents/blog/_posts/notes/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
-}
-alias note="take_note"
-
 function take_meeting_notes() {
     $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias meet="take_meeting_notes"
 
 function start_journal_writing() {
-    /usr/local/bin/toggl stop
-    /usr/local/bin/toggl start -o 'Blog' -a 'writing' "Write morning pages"
+    toggl stop
+    toggl start -o 'Blog' -a 'writing' "Write morning pages"
     $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
 }
 alias journal="start_journal_writing"

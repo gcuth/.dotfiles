@@ -32,6 +32,7 @@ Plug 'junegunn/limelight.vim' " ... that greys all non-focus grafs
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'jalvesaq/Nvim-R', {'branch': 'stable'} " R
+Plug 'github/copilot.vim'
 
 call plug#end()
 

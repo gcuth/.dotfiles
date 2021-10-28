@@ -313,17 +313,6 @@
 
 ; TASK VARIABLES
 
-(def average-pushups
-  (->> completed
-       (filter #(re-find #"pushups" (:Content %)))
-       (map #(re-find #"\d+" (:Content %)))
-       (concat)
-       (remove nil?)
-       (map #(Integer/parseInt %))
-       (mean)
-       (float)
-       (Math/round)))
-
 (def average-pullups
   (->> completed
        (filter #(re-find #"pullups" (:Content %)))
@@ -342,11 +331,7 @@
                   (max 1 (min 20 average-pullups)))))
 
 (def best-pushups
-  (rand-nth (list (* 5 (Math/round (float (/ average-pushups 5))))
-                  (min 100 (* 5 (Math/round (float (/ (+ 2.5 average-pushups) 5)))))
-                  10)))
-
-
+  (min 100 (max 5(* 5 (Math/round (float (/ (* best-pullups 4) 5)))))))
 
 
 ; TARGETS FOR MANAGING TODOIST STOP & TOGGL SYNC

@@ -79,11 +79,24 @@ alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science
 function default_record() {
     if [ `uname` = "Darwin" ]; then
         open '/Applications/Just Press Record.app'
-    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    elif [ `uname -s` = "Linux" ]; then
         arecord -f cd -D default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav
     fi
 }
 alias rrecord="default_record"
+
+# codewars kata
+function start_a_kata() {
+    open "https://www.codewars.com/trainer/clojure" | xdg-open "https://www.codewars.com/trainer/clojure"
+    if [ `toggl now | grep "kata" | wc -l` -gt 0 ]; then
+        echo "suitable task already running!"
+    else
+        toggl start -o 'Tekke' -a 'codewars, coding, clojure' "Complete a codewars kata"
+        echo "no";
+    fi
+}
+alias kata="start_a_kata"
+
 
 # Uni Convenience
 alias anuc="globalprotect connect --portal staff-access.anu.edu.au"

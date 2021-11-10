@@ -68,6 +68,7 @@
     - node
     - jq
     - gh
+    - chrome-cli
   - tap:
     - sachaos/todoist
   - brew:
@@ -146,7 +147,11 @@
     - cron: 5,35 * * * *
       command: /opt/homebrew/bin/todoist --csv completed-list --filter 'today' >> /Users/g/Documents/blog/data/logs/completed_tasks.csv
     - cron: 5,35 * * * *
-      command: /usr/homebrew/bin/python3 /Users/g/Documents/blog/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
+      command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
+    - cron: 3,13,23,33,43,53 * * * *
+      command: /Users/g/.dotfiles/scripts/tasker generate >/dev/null 2>&1
+    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
+      command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
 
 - ifubuntu:
   - crontab:

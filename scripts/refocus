@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ `pgrep "Chrome"` ]]; then
+    # if chrome is running, kill all distracting tabs immediately
+    for TAB in `/opt/homebrew/bin/chrome-cli list tabs | grep -iE 'netflix|facebook|instagram|reddit|pirate|youtube' | sed 's/\].*//g' | sed 's/\[//g'`; do
+        /opt/homebrew/bin/chrome-cli close -t $TAB;
+    done
+fi
+
+if [[ `pgrep -i "vlc|quicktime"` ]]; then
+    # kill all video players if running
+    for PLAYER in `pgrep -i "vlc|quicktime"`; do
+        kill -9 $PLAYER;
+    done
+fi

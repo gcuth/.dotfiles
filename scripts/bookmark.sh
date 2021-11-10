@@ -8,5 +8,7 @@ description="$3"
 feed_title="$4"
 
 echo $url >> ~/Documents/blog/data/toread.txt
+echo $url | ~/.dotfiles/scripts/note
 
-xdg-open $url || open $url
+~/.dotfiles/scripts/addtozotero.py "$url"
+

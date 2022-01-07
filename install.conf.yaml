@@ -69,6 +69,7 @@
     - jq
     - gh
     - chrome-cli
+    - hledger
   - tap:
     - sachaos/todoist
   - brew:
@@ -99,6 +100,7 @@
     - sudo apt install -y fzf
     - sudo apt install -y nodejs
     - sudo apt install -y jq
+    - sudo apt install -y hledger
     - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0; sudo apt-add-repository https://cli.github.com/packages; sudo apt update; sudo apt install -y gh
   - shell:
     - sudo apt install -y snapd

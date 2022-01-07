@@ -48,32 +48,7 @@ alias tn='tr -d "\n"'
 
 alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
 
-function take_meeting_notes() {
-    $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
-}
-alias meet="take_meeting_notes"
 
-function start_journal_writing() {
-    toggl stop
-    toggl start -o 'Blog' -a 'writing' "Write morning pages"
-    $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
-}
-alias journal="start_journal_writing"
-
-function fuzzy_find_and_edit() {
-    $EDITOR `fzf --preview="cat {}" --preview-window=right:70%:wrap`
-}
-alias fuz="fuzzy_find_and_edit"
-
-# Open the most recently edited thesis file
-function start_thesis_writing() {
-    # /usr/local/bin/toggl start -o 'Thesis' -a 'thesis, study, writing' "Write `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
-    $EDITOR ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
-}
-alias thesis="start_thesis_writing"
-
-# cookie cut a (python) Data Science project
-alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science"
 
 # record
 function default_record() {
@@ -83,7 +58,44 @@ function default_record() {
         arecord -f cd -D default ~/Recordings/$(date +%Y-%m-%d-%H-%M-%S).wav
     fi
 }
-alias rrecord="default_record"
+alias rr="default_record"
+
+
+function take_meeting_notes() {
+    $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
+    default_record
+}
+alias mm="take_meeting_notes"
+
+function start_journal_writing() {
+    toggl stop
+    toggl start -o 'Blog' -a 'writing' "Write morning pages"
+    $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
+}
+alias jj="start_journal_writing"
+
+function write_a_note() {
+    ~/.dotfiles/scripts/addtozotero.py `pbpaste`
+    pbpaste | ~/.dotfiles/scripts/note
+}
+alias nn="write_a_note"
+
+
+function fuzzy_find_and_edit() {
+    $EDITOR `fzf --preview="cat {}" --preview-window=right:70%:wrap`
+}
+alias fuz="fuzzy_find_and_edit"
+
+# Open the most recently edited thesis file
+function start_thesis_writing() {
+    toggl stop
+    toggl start -o 'Thesis' -a 'thesis, study, writing' "Write `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
+    $EDITOR ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
+}
+alias thesis="start_thesis_writing"
+
+# cookie cut a (python) Data Science project
+alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science"
 
 # codewars kata
 function start_a_kata() {

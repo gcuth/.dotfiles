@@ -1,15 +1,40 @@
 #!/usr/bin/env bash
 
+exit 0
+
+if [[ $(date '+%a') == "Sun" ]]; then
+    echo "It's Sunday, no need to run this script"
+    exit 0
+fi
+
 if [[ `pgrep "Chrome"` ]]; then
-    # if chrome is running, kill all distracting tabs immediately
-    for TAB in `/opt/homebrew/bin/chrome-cli list tabs | grep -iE 'netflix|facebook|instagram|reddit|pirate|youtube' | sed 's/\].*//g' | sed 's/\[//g'`; do
-        /opt/homebrew/bin/chrome-cli close -t $TAB;
+    # if chrome is running with a distracting tab (judging by the title), kill chrome entirely
+    for TAB in `/opt/homebrew/bin/chrome-cli list tabs | grep -iE 'netflix|facebook|instagram|reddit|pirate|youtube|xkcd|twitter' | sed 's/\].*//g' | sed 's/\[//g'`; do
+        for CHROME_PROCESS in `pgrep -i "Chrome"`; do
+            kill -9 $CHROME_PROCESS
+        done
+        date '+%Y-%m-%d %H:%M:%S %z' >> /Users/g/Documents/blog/data/logs/refocus.csv
+        exit 0
+    done
+    # check each tab (by id) to see if (judging by the url) it's a distracting tab; if so, kill it
+    for TABID in `/opt/homebrew/bin/chrome-cli list tabs | sed 's/\] .*//g' | sed 's/\[//g'`; do
+        TABURL=`/opt/homebrew/bin/chrome-cli info -t $TABID | grep -Eo 'http.*'`
+        if [[ `echo $TABURL | grep -iE 'netflix.com|facebook.com|instagram.com|reddit.com|youtube.com|xkcd.com|twitter.com'` ]]; then
+            for CHROME_PROCESS in `pgrep -i "Chrome"`; do
+                kill -9 $CHROME_PROCESS
+            done
+            date '+%Y-%m-%d %H:%M:%S %z' >> /Users/g/Documents/blog/data/logs/refocus.csv
+            exit 0
+        fi
     done
 fi
 
-if [[ `pgrep -i "vlc|quicktime"` ]]; then
-    # kill all video players if running
-    for PLAYER in `pgrep -i "vlc|quicktime"`; do
+if [[ `pgrep -i "vlc|quicktime|mtga"` ]]; then
+    # kill all distracting apps
+    for PLAYER in `pgrep -i "vlc|quicktime|mtga"`; do
         kill -9 $PLAYER;
     done
+    date '+%Y-%m-%d %H:%M:%S %z' >> /Users/g/Documents/blog/data/logs/refocus.csv
+    exit 0
 fi
+

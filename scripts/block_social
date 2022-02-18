@@ -5,5 +5,9 @@ curl -s "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/s
 
 echo "0.0.0.0 youtube.com" >> /etc/hosts
 echo "0.0.0.0 www.youtube.com" >> /etc/hosts
-echo "0.0.0.0 www.netflix.com" >> /etc/hosts
 echo "0.0.0.0 netflix.com" >> /etc/hosts
+echo "0.0.0.0 www.netflix.com" >> /etc/hosts
+echo "0.0.0.0 abc.net.au" >> /etc/hosts
+echo "0.0.0.0 www.abc.net.au" >> /etc/hosts
+echo "0.0.0.0 theguardian.com" >> /etc/hosts
+echo "0.0.0.0 www.theguardian.com" >> /etc/hosts

@@ -7,7 +7,7 @@ alias e="$VISUAL"
 alias l="ls -Glah"
 alias ls="ls -G"
 alias grep="grep --color=auto"
-alias diff='diff --color=auto'
+# alias diff='diff --color=auto'
 
 # git
 alias gs="git status -bs"
@@ -62,8 +62,10 @@ alias rr="default_record"
 
 
 function take_meeting_notes() {
-    $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
     default_record
+    toggl stop
+    toggl start -o 'Social' -a 'meeting' "'$*'"
+    $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias mm="take_meeting_notes"
 
@@ -99,12 +101,20 @@ alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science
 
 # codewars kata
 function start_a_kata() {
-    open "https://www.codewars.com/trainer/clojure" | xdg-open "https://www.codewars.com/trainer/clojure"
+    LANGUAGE=`bb -i '(rand-nth ["julia" "clojure" "r" "python"])' | sed 's/"//g' | tr -d "\n"`
+    open "https://www.codewars.com/trainer/$LANGUAGE" | xdg-open "https://www.codewars.com/trainer/$LANGUAGE"
     if [ `toggl now | grep "kata" | wc -l` -gt 0 ]; then
-        echo "suitable task already running!"
+        echo "Suitable task already running!"
     else
-        toggl start -o 'Tekke' -a 'codewars, coding, clojure' "Complete a codewars kata"
-        echo "no";
+        toggl start -o 'Tekke' -a 'codewars, coding, $LANGUAGE' "Complete a codewars kata";
+        echo "Started a toggl entry for a $LANGUAGE kata on codewars";
+    fi
+    if [ `todoist list --filter 'today|overdue' | grep "codewars kata" | wc -l` -gt 0 ]; then
+        echo "Suitable task already in todoist!"
+    else
+        todoist add --priority 1 --date "today" --project-name "Tekke" "Complete a codewars kata";
+        echo "Added a codewars kata task to todoist";
+        todoist sync;
     fi
 }
 alias kata="start_a_kata"

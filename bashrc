@@ -11,6 +11,14 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 # etc
 HIST_STAMPS="yyyy-mm-dd"
 
+
+# SET A PLATFORM VARIABLE
+case "$(uname -s)" in
+    Linux*)     CURRENTPLATFORM=linux;;
+    Darwin*)    CURRENTPLATFORM=macos;;
+esac
+
+
 # Set visual editor with a tonne of fallbacks
 if [ -f /snap/bin/codium ]; then
     export VISUAL="/snap/bin/codium"

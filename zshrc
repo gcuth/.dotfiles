@@ -11,6 +11,14 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 # etc
 HIST_STAMPS="yyyy-mm-dd"
 
+
+# SET A PLATFORM VARIABLE
+case "$(uname -s)" in
+    Linux*)     CURRENTPLATFORM=linux;;
+    Darwin*)    CURRENTPLATFORM=macos;;
+esac
+
+
 # make gpg work for signing
 export GPG_TTY=$(tty)
 
@@ -53,6 +61,14 @@ export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 
 # Add $HOME/.local/bin/ to path
 export PATH="$PATH:$HOME/.local/bin"
+
+# make sure homebrew openjdk is first in path
+# if [ `uname` == 'Darwin' ]; then
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+# fi
+
+# make sure julia is in the path:
+export PATH="/Applications/Julia-1.7.app/Contents/Resources/julia/bin:$PATH"
 
 # Fix term
 export TERM=xterm-256color

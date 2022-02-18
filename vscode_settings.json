@@ -1,0 +1,12 @@
+{
+    "editor.inlineSuggest.enabled": true,
+    "extempore.sharedir": "/Users/g/Downloads/extempore",
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": false,
+        "plaintext": true,
+        "markdown": false
+    },
+    "workbench.startupEditor": "none",
+    "files.autoSave": "afterDelay"
+}

@@ -43,6 +43,20 @@
       path: scripts/**
       glob: true
       create: true
+- ifmacos:
+    - link:
+      /Users/g/Library/Application\ Support/Code/User/settings.json:
+        path: vscode_settings.json
+        create: true
+        relink: true
+        force: true
+- ifubuntu:
+    - link:
+      /home/g/.config/Code/User/settings.json:
+        path: vscode_settings.json
+        create: true
+        relink: true
+        force: true
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -60,6 +74,8 @@
     - python
     - neovim
     - pandoc
+    - java
+    - julia
     - leiningen
     - newsboat
     - git
@@ -70,6 +86,7 @@
     - gh
     - chrome-cli
     - hledger
+    - ffmpeg
   - tap:
     - sachaos/todoist
   - brew:
@@ -101,6 +118,7 @@
     - sudo apt install -y nodejs
     - sudo apt install -y jq
     - sudo apt install -y hledger
+    - sudo apt install -y ffmpeg
     - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0; sudo apt-add-repository https://cli.github.com/packages; sudo apt update; sudo apt install -y gh
   - shell:
     - sudo apt install -y snapd
@@ -174,5 +192,3 @@
     stdin: true
     stdout: true
     stderr: true
-
-

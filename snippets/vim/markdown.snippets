@@ -105,8 +105,6 @@ $0
 endsnippet
 
 
-
-
 snippet ddate "Current Date" w
 `!v strftime("%Y-%m-%d")`
 endsnippet
@@ -114,3 +112,13 @@ endsnippet
 snippet ttime "Current Time" w
 `!v strftime("%H:%M:%S")`
 endsnippet
+
+
+
+snippet qqv "TEMPORARY Individual Question Content (for a yaml blog header)" b
+	- question:
+		question: "According to Mary **Morgan** in ***The World in the Model*** (2012), $1"
+		answer: "$2"
+$0
+endsnippet
+

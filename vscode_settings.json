@@ -13,5 +13,6 @@
         "language-julia.interrupt"
     ],
     "julia.symbolCacheDownload": true,
-    "julia.enableTelemetry": true
+    "julia.enableTelemetry": true,
+    "editor.minimap.enabled": false
 }

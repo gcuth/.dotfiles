@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-exit 0
-
+# Skip on Sundays and after 1700
 if [[ $(date '+%a') == "Sun" ]]; then
     echo "It's Sunday, no need to run this script"
+    exit 0
+fi
+
+if [[ $(date '+%H') -ge 17 ]]; then
+    echo "It's after 5pm, no need to run this script"
     exit 0
 fi
 

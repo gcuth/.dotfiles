@@ -1,20 +1,69 @@
 #!/usr/bin/env bash
 
-# Skip on Sundays and after 1700
+exit 0
+
+# Skip on Sundays
 if [[ $(date '+%a') == "Sun" ]]; then
     echo "It's Sunday, no need to run this script"
     exit 0
 fi
 
+# Skip after 5pm
 if [[ $(date '+%H') -ge 17 ]]; then
     echo "It's after 5pm, no need to run this script"
     exit 0
 fi
 
+# Get the number of git commits in thesis repo since yesterday
+THESIS=$(git -C ~/Documents/thesis rev-list --count HEAD --since=`date -v-1d +%Y-%m-%d`)
+FIRST_DATE=$(git -C ~/Documents/thesis log --reverse --format="format:%as" | head -n 1)
+TOTAL_COMMITS=$(git -C ~/Documents/thesis rev-list --count HEAD)
+TOTAL_DAYS=$(python3 -c "from datetime import datetime; start = datetime.strptime('$FIRST_DATE', '%Y-%m-%d'); end = datetime.now(); print((end - start).days)")
+AVERAGE_COMMITS=$(python3 -c "print(int(round($TOTAL_COMMITS / $TOTAL_DAYS)))")
+echo "Number of commits in thesis since yesterday: $THESIS"
+echo "Threshold number of commits to reach: $THRESHOLD"
+echo "Total number of commits in thesis: $TOTAL_COMMITS"
+echo "Total number of days since first commit: $TOTAL_DAYS"
+echo "Average commits per day: $AVERAGE_COMMITS"
+
+# On Saturdays, set a low threshold for the number of commits
+if [[ $(date '+%a') == "Sat" ]]; then
+    THRESHOLD=$AVERAGE_COMMITS
+else
+    THRESHOLD=`bb -i "(* 2 $AVERAGE_COMMITS)"`
+fi
+
+# Look at you, productivity! If you're 20+ commits for the day, you're free to do whatever you want.
+if [[ $THESIS -gt 24 ]]; then
+    echo "It's been $THESIS commits today, no need to run this script"
+    exit 0
+fi
+
+# If you've done less than the threshold number of commits today, you're probably not doing anything productive. Let's be strict.
+if [[ $THESIS -lt $THRESHOLD ]]; then
+    echo "It's been $THESIS commits today, which is less than the required threshold of $THRESHOLD, you should be working on something."
+    # kill all chrome processes
+    if [[ `pgrep "Chrome"` ]]; then
+        for CHROME_PROCESS in `pgrep -i "Chrome"`; do
+            echo "Killing Chrome process $CHROME_PROCESS"
+            kill -9 $CHROME_PROCESS
+        done
+    fi
+    # kill all safari processes
+    if [[ `pgrep -f "Safari.app"` ]]; then
+        for SAFARI_PROCESS in `pgrep -f "Safari.app"`; do
+            echo "Killing Safari process $SAFARI_PROCESS"
+            kill -9 $SAFARI_PROCESS
+        done
+    fi
+fi
+
+# No matter how things are going, let's make sure you're not super distracted by the killers.
 if [[ `pgrep "Chrome"` ]]; then
     # if chrome is running with a distracting tab (judging by the title), kill chrome entirely
     for TAB in `/opt/homebrew/bin/chrome-cli list tabs | grep -iE 'netflix|facebook|instagram|reddit|pirate|youtube|xkcd|twitter' | sed 's/\].*//g' | sed 's/\[//g'`; do
         for CHROME_PROCESS in `pgrep -i "Chrome"`; do
+            echo "$TAB in Chrome looks unproductive; killing Chrome process $CHROME_PROCESS"
             kill -9 $CHROME_PROCESS
         done
         date '+%Y-%m-%d %H:%M:%S %z' >> /Users/g/Documents/blog/data/logs/refocus.csv
@@ -25,6 +74,7 @@ if [[ `pgrep "Chrome"` ]]; then
         TABURL=`/opt/homebrew/bin/chrome-cli info -t $TABID | grep -Eo 'http.*'`
         if [[ `echo $TABURL | grep -iE 'netflix.com|facebook.com|instagram.com|reddit.com|youtube.com|xkcd.com|twitter.com'` ]]; then
             for CHROME_PROCESS in `pgrep -i "Chrome"`; do
+                echo "Killing Chrome process $CHROME_PROCESS"
                 kill -9 $CHROME_PROCESS
             done
             date '+%Y-%m-%d %H:%M:%S %z' >> /Users/g/Documents/blog/data/logs/refocus.csv
@@ -35,8 +85,9 @@ fi
 
 if [[ `pgrep -i "vlc|quicktime|mtga"` ]]; then
     # kill all distracting apps
-    for PLAYER in `pgrep -i "vlc|quicktime|mtga"`; do
-        kill -9 $PLAYER;
+    for HARM in `pgrep -i "vlc|quicktime|mtga"`; do
+        echo "You're using a distracting app! Killing the process associated with it $HARM"
+        kill -9 $HARM;
     done
     date '+%Y-%m-%d %H:%M:%S %z' >> /Users/g/Documents/blog/data/logs/refocus.csv
     exit 0

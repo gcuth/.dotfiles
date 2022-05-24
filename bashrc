@@ -24,11 +24,10 @@ if [ -f /snap/bin/codium ]; then
     export VISUAL="/snap/bin/codium"
 elif [ -f /snap/bin/code ]; then
     export VISUAL="/snap/bin/code"
-elif [ -f `which nvim` ]; then
-    export VISUAL=`which nvim`
-elif [ -f /usr/bin/vim ]; then
-    export VISUAL="/usr/bin/vim"
+elif [ -f `which code` ]; then
+    export VISUAL=`which code`
 fi
+
 # set normal editor with fewer callbacks
 if [ -f `which nvim` ]; then
     export EDITOR=`which nvim`

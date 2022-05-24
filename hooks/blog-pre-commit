@@ -1,4 +1,6 @@
 #!/bin/sh
 
 python3 ~/Documents/blog/generate_anki.py ~/Documents/blog/_posts/ ~/Documents/blog/Reading.apkg
-git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/Reading.apkg ~/Documents/blog/data/logs/completed_tasks.csv ~/Documents/blog/data/logs/toggl
+python3 ~/Documents/blog/blot.py
+rclone copy ./data/blot/ dropbox:Apps/Blot/
+git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/Reading.apkg ~/Documents/blog/data/logs/completed_tasks.csv ~/Documents/blog/data/logs/toggl ~/Documents/blog/data/blot/

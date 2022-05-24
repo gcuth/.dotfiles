@@ -5,7 +5,8 @@
         "*": true,
         "yaml": false,
         "plaintext": true,
-        "markdown": false
+        "markdown": true,
+        "clojure": true
     },
     "workbench.startupEditor": "none",
     "files.autoSave": "afterDelay",
@@ -14,5 +15,12 @@
     ],
     "julia.symbolCacheDownload": true,
     "julia.enableTelemetry": true,
-    "editor.minimap.enabled": false
+    "editor.minimap.enabled": false,
+    "editor.fontFamily": "'Fira Code', Fira, Menlo, Monaco, 'Courier New', monospace",
+    "window.autoDetectColorScheme": true,
+    "jupyter.askForKernelRestart": false,
+    "calva.paredit.defaultKeyMap": "strict",
+    "editor.largeFileOptimizations": false,
+    "window.zoomLevel": 1,
+    "workbench.colorTheme": "Default Light+"
 }

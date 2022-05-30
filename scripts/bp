@@ -7,7 +7,7 @@
     (clojure.string/replace-first s "~" (System/getProperty "user.home"))
     s))
 
-(def outpath (expand-home "~/g/Documents/blog/data/logs/bp.csv"))
+(def outpath (expand-home "~/Documents/blog/data/logs/bp.csv"))
 
 (def now
   ; formatted current time

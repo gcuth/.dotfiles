@@ -1,7 +1,7 @@
 # basics
 alias c="clear; ls"
 alias vi="nvim"
-alias e="$VISUAL"
+alias e="$EDITOR"
 
 # adding color to the usuals
 alias l="ls -Glah"
@@ -72,27 +72,27 @@ function take_meeting_notes() {
     default_record
     toggl stop
     toggl start -o 'Social' -a 'meeting' "'$*'"
-    $VISUAL ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
+    $EDITOR ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
 }
 alias mm="take_meeting_notes"
 
 function start_journal_writing() {
     toggl stop
     toggl start -o 'Blog' -a 'writing' "Write morning pages"
-    $VISUAL ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
+    $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
 }
 alias jj="start_journal_writing"
 
 function write_a_note() {
     ~/.dotfiles/scripts/addtozotero.py `pbpaste`
-    $VISUAL `pbpaste | ~/.dotfiles/scripts/note | tr -d '\n'`
+    $EDITOR `pbpaste | ~/.dotfiles/scripts/note | tr -d '\n'`
     ~/.dotfiles/scripts/as_audio.py `pbpaste`
 }
 alias nn="write_a_note"
 
 
 function fuzzy_find_and_edit() {
-    $VISUAL `fzf --preview="cat {}" --preview-window=right:70%:wrap`
+    $EDITOR `fzf --preview="cat {}" --preview-window=right:70%:wrap`
 }
 alias fuz="fuzzy_find_and_edit"
 
@@ -100,7 +100,7 @@ alias fuz="fuzzy_find_and_edit"
 function start_thesis_writing() {
     toggl stop
     toggl start -o 'Thesis' -a 'thesis, study, writing' "Write `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
-    $VISUAL ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
+    $EDITOR ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
 }
 alias thesis="start_thesis_writing"
 
@@ -127,6 +127,9 @@ function start_a_kata() {
 }
 alias kata="start_a_kata"
 
+# todoist
+alias tc="todoist close"
+alias tl="todoist list"
 
 # Uni Convenience
 alias anuc="globalprotect connect --portal staff-access.anu.edu.au"

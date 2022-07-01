@@ -22,17 +22,17 @@ Plug 'honza/vim-snippets' " default snippets
 " Plug 'neoclide/coc.nvim', {'branch': 'release'} " code completion engine to live in the modern world
 " Plug 'vim-airline/vim-airline' " a nicer statusline
 " Plug 'vim-airline/vim-airline-themes' " a nicer set of statusline themes
-Plug 'tpope/vim-commentary' " sensible commenting
-Plug 'tpope/vim-surround' " sensible paren management
-Plug 'vim-scripts/paredit.vim' " paren slurping and burping
-Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's greatest programming language
-Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } " sensible paren colouring
+" Plug 'tpope/vim-commentary' " sensible commenting
+" Plug 'tpope/vim-surround' " sensible paren management
+" Plug 'vim-scripts/paredit.vim', { 'for': 'clojure' } " paren slurping and burping
+" Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's greatest programming language
+" Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } " sensible paren colouring
 Plug 'junegunn/goyo.vim' " a (*dry-retch*) 'distraction-free' writing environment
 Plug 'junegunn/limelight.vim' " ... that greys all non-focus grafs
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug 'jalvesaq/Nvim-R', {'branch': 'stable'} " R
-Plug 'github/copilot.vim'
+" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf.vim'
+" Plug 'jalvesaq/Nvim-R', {'branch': 'stable'} " R
+" Plug 'github/copilot.vim'
 
 call plug#end()
 

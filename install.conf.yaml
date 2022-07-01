@@ -31,6 +31,8 @@
       path: gitconfig
     ~/.config/starship.toml:
       path: starship.toml
+    ~/.tmux.conf:
+      path: tmux.conf
     ~/.vim/UltiSnips/markdown.snippets:
       path: snippets/vim/markdown.snippets
     ~/.newsboat/urls:
@@ -89,6 +91,8 @@
     - ffmpeg
     - youtube-dl
     - rclone
+    - tmux
+    - dark-mode
   - tap:
     - sachaos/todoist
   - brew:

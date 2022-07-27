@@ -29,14 +29,18 @@ elif [ -f /snap/bin/code ]; then
     export VISUAL="/snap/bin/code"
 elif [ -f `which code` ]; then
     export VISUAL=`which code`
+elif [ -f `which nvim` ]; then
+    export VISUAL=`which nvim`
+elif [ -f /usr/bin/vim ]; then
+    export VISUAL="/usr/bin/vim"
 fi
 
 # set normal editor with fewer callbacks
-# if [ -f `which nvim` ]; then
-#     export EDITOR=`which nvim`
-# elif [ -f /usr/bin/vim ]; then
-#     export EDITOR="/usr/bin/vim"
-# fi
+if [ -f `which nvim` ]; then
+    export EDITOR=`which nvim`
+elif [ -f /usr/bin/vim ]; then
+    export EDITOR="/usr/bin/vim"
+fi
 
 # Load aliases
 if [ -f ~/.aliases ]; then
@@ -82,3 +86,7 @@ DISABLE_LS_COLORS="false"
 
 # use starship if it's available
 eval "$(starship init zsh)"
+
+# todoist functions
+source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
+# PROG=todoist source "$GOPATH/src/github.com/urfave/cli/autocomplete/zsh_autocomplete"

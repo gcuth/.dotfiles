@@ -1,6 +1,7 @@
 #!/bin/sh
 
-python3 ~/Documents/blog/generate_anki.py ~/Documents/blog/_posts/ ~/Documents/blog/Reading.apkg
-python3 ~/Documents/blog/blot.py
-rclone copy ./data/blot/ dropbox:Apps/Blot/
-git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/Reading.apkg ~/Documents/blog/data/logs/completed_tasks.csv ~/Documents/blog/data/logs/toggl ~/Documents/blog/data/blot/
+python3 ~/Documents/blog/bin/generate_anki.py ~/Documents/blog/_posts/ ~/Documents/blog/Reading.apkg
+python3 ~/Documents/blog/bin/crypto.py >> ~/Documents/blog/data/logs/crypto.csv
+cp ~/Library/Logs/Wizards\ Of\ The\ Coast/MTGA/Player.log ~/Documents/blog/data/logs/mtga/Player.log
+cp ~/Library/Logs/Wizards\ Of\ The\ Coast/MTGA/Player-prev.log ~/Documents/blog/data/logs/mtga/Player-prev.log
+git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/Reading.apkg ~/Documents/blog/data/logs/ ~/Documents/blog/data/blot/

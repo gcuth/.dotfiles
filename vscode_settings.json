@@ -3,7 +3,7 @@
     "extempore.sharedir": "/Users/g/Downloads/extempore",
     "github.copilot.enable": {
         "*": true,
-        "yaml": false,
+        "yaml": true,
         "plaintext": true,
         "markdown": true,
         "clojure": true
@@ -22,5 +22,7 @@
     "calva.paredit.defaultKeyMap": "strict",
     "editor.largeFileOptimizations": false,
     "window.zoomLevel": 1,
-    "workbench.colorTheme": "Default Light+"
+    "[css]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    }
 }

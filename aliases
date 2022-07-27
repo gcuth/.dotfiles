@@ -129,7 +129,7 @@ alias kata="start_a_kata"
 
 # todoist
 alias tc="todoist close"
-alias tl="todoist list"
+alias tl="todoist list --filter 'today|overdue'"
 
 # Uni Convenience
 alias anuc="globalprotect connect --portal staff-access.anu.edu.au"
@@ -143,3 +143,14 @@ alias pvcf="protonvpn-cli c -f"
 alias pvd="protonvpn-cli d"
 alias pvs="protonvpn-cli s"
 
+# generate loading screen tip emails from the task list
+function send_loading_screen_tips() {
+    for EMAIL in `todoist list | grep "Loading Screen Tip to" | sed 's/.*Loading Screen Tip to //g'`; do
+        MAILTO=`~/.dotfiles/scripts/mail_loading_screen_tip $EMAIL`;
+        open $MAILTO | xdg-open $MAILTO;
+    done
+    for TASKID in `todoist list | grep "Loading Screen Tip to" | sed 's/ .*//g'`; do
+        todoist close $TASKID;
+    done
+}
+alias loadingscreentips="send_loading_screen_tips"

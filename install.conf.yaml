@@ -183,6 +183,13 @@
       command: /Users/g/.dotfiles/scripts/tasker generate >/dev/null 2>&1
     - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
       command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
+    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
+      command: /Users/g/.dotfiles/scripts/refocus
+    - cron: 12 17 * * *
+      command: for GITDIR in `find ~/Documents ~/Code -name .git -type d -prune | sed 's/\/.git//g'`; do if [[ `git -C $GITDIR status -suno` ]]; then /opt/homebrew/bin/todoist add --priority 1 --project-name "Life Admin" --date "today" "Commit uncommitted changes in $GITDIR"; fi; done
+    - cron: */3 * * * *
+      command: /opt/homebrew/bin/python3 /Users/g/.dotfiles/scripts/remind_me_to_time_log
+
 
 - ifubuntu:
   - crontab:
@@ -196,6 +203,10 @@
       command: git -C ~/Documents/blog push origin master >/dev/null 2>&1
     - cron: 0,10,20,30,40,50 * * * *
       command: /usr/bin/todoist sync >/dev/null 2>&1
+    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
+      command: ~/.dotfiles/scripts/refocus
+    - cron: 12 17 * * *
+      command: for GITDIR in `find ~/Documents ~/Code -name .git -type d -prune | sed 's/\/.git//g'`; do if [[ `git -C $GITDIR status -suno` ]]; then /opt/homebrew/bin/todoist add --priority 1 --project-name "Life Admin" --date "today" "Commit uncommitted changes in $GITDIR"; fi; done
 
 - shell: 
   - ['test -f ~/.vim/autoload/plug.vim || curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', 'Installing vim-plug (if needed)']

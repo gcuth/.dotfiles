@@ -18,14 +18,11 @@ case "$(uname -s)" in
     Darwin*)    CURRENTPLATFORM=macos;;
 esac
 
-
 # Set visual editor with a tonne of fallbacks
-if [ -f /snap/bin/codium ]; then
-    export VISUAL="/snap/bin/codium"
-elif [ -f /snap/bin/code ]; then
-    export VISUAL="/snap/bin/code"
-elif [ -f `which code` ]; then
-    export VISUAL=`which code`
+if [ -f `which nvim` ]; then
+    export VISUAL=`which nvim`
+elif [ -f /usr/bin/vim ]; then
+    export VISUAL="/usr/bin/vim"
 fi
 
 # set normal editor with fewer callbacks

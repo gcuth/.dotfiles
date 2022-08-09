@@ -80,6 +80,10 @@ function start_journal_writing() {
     toggl stop
     toggl start -o 'Blog' -a 'writing' "Write morning pages"
     $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
+    for TASKID in `todoist list | grep "Write morning pages" | sed 's/ .*//g'`; do
+        todoist close $TASKID;
+    done
+    toggl stop
 }
 alias jj="start_journal_writing"
 

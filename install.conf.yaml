@@ -45,6 +45,8 @@
       path: scripts/**
       glob: true
       create: true
+    ~/.lein/profiles.clj:
+      path: lein/profiles.clj
 - ifmacos:
     - link:
       /Users/g/Library/Application\ Support/Code/User/settings.json:
@@ -187,7 +189,7 @@
       command: /Users/g/.dotfiles/scripts/refocus
     - cron: 12 17 * * *
       command: for GITDIR in `find ~/Documents ~/Code -name .git -type d -prune | sed 's/\/.git//g'`; do if [[ `git -C $GITDIR status -suno` ]]; then /opt/homebrew/bin/todoist add --priority 1 --project-name "Life Admin" --date "today" "Commit uncommitted changes in $GITDIR"; fi; done
-    - cron: */3 * * * *
+    - cron: * * * * *
       command: /opt/homebrew/bin/python3 /Users/g/.dotfiles/scripts/remind_me_to_time_log
 
 

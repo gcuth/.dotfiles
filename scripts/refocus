@@ -57,12 +57,12 @@ else
         done
     fi
     # kill all safari processes
-    if [[ `pgrep -f "Safari.app"` ]]; then
-        for SAFARI_PROCESS in `pgrep -f "Safari.app"`; do
-            echo "Killing Safari process $SAFARI_PROCESS"
-            kill -9 $SAFARI_PROCESS
-        done
-    fi
+    # if [[ `pgrep -f "Safari.app"` ]]; then
+    #     for SAFARI_PROCESS in `pgrep -f "Safari.app"`; do
+    #         echo "Killing Safari process $SAFARI_PROCESS"
+    #         kill -9 $SAFARI_PROCESS
+    #     done
+    # fi
     if [[ `pgrep "Chrome"` ]]; then
         # if chrome is running with a distracting tab (judging by the title), kill chrome entirely
         for TAB in `/opt/homebrew/bin/chrome-cli list tabs | grep -iE 'netflix|facebook|instagram|reddit|pirate|youtube|xkcd|twitter' | sed 's/\].*//g' | sed 's/\[//g'`; do
@@ -99,4 +99,3 @@ else
     echo "You're not using any distracting apps, so you're free to do whatever you want"
     exit 0
 fi
-

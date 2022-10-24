@@ -27,8 +27,43 @@ $0
 endsnippet
 
 
-snippet prompt "A journal prompt" b
-**`~/.dotfiles/scripts/journal_prompt`** $0
+snippet hha "Angst Post Header" b
+---
+title: Angst (`!v strftime("%Y-%m-%d")`)
+layout: post
+permalink: /a/`!v strftime("%Y-%m-%d")`
+date: `!v strftime("%Y-%m-%d %H:%M:%S %z")`
+location: `curl -s ipinfo.io | jq '.loc'`
+categories: ['angst']
+published: false
+---
+
+Stella,
+
+$0
+
+Love,
+
+Galen
+endsnippet
+
+snippet aangst "Angst.blog Prompt" b
+<!--`~/.dotfiles/scripts/blog_prompt`-->
+
+$0
+endsnippet
+
+snippet uugh "Ugh Field Prompt" b
+
+Right now, these are the top five most pressing tasks in my tasklist (according to a lil python script):
+`~/.dotfiles/scripts/next_nonrepeating_task.py 5`
+
+Which one feels most 'ugh'-ish right now? $0
+endsnippet
+
+
+snippet pprompt "A journal prompt" b
+<!--`~/.dotfiles/scripts/journal_prompt`--> $0
 endsnippet
 
 
@@ -172,7 +207,7 @@ endsnippet
 
 
 
-snippet grim "A grimoire prompt for running a 'resolve cycle' on a personal problem" b
+snippet ggrim "A grimoire prompt for running a 'resolve cycle' on a personal problem" b
 Okay, here's the problem: $1
 
 Most problems are easier to solve than they initially appear, provided you *actually try*. So, let's try to solve this one.

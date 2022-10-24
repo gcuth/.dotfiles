@@ -20,21 +20,27 @@ call plug#begin()
 Plug 'SirVer/ultisnips' " snippet engine of choice
 Plug 'honza/vim-snippets' " default snippets
 " Plug 'neoclide/coc.nvim', {'branch': 'release'} " code completion engine to live in the modern world
+Plug 'benmills/vimux'
 " Plug 'vim-airline/vim-airline' " a nicer statusline
 " Plug 'vim-airline/vim-airline-themes' " a nicer set of statusline themes
+Plug 'vim-scripts/paredit.vim', { 'for': 'clojure' } " paren slurping and burping
 Plug 'tpope/vim-commentary' " sensible commenting
 Plug 'tpope/vim-surround' " sensible paren management
-Plug 'vim-scripts/paredit.vim', { 'for': 'clojure' } " paren slurping and burping
 Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's greatest programming language
+Plug 'tpope/vim-fugitive' " git commands
+Plug 'scrooloose/nerdtree' " file drawer, open with :NERDTreeToggle
 Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } " sensible paren colouring
 Plug 'junegunn/goyo.vim' " a (*dry-retch*) 'distraction-free' writing environment
 Plug 'junegunn/limelight.vim' " ... that greys all non-focus grafs
 " Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 " Plug 'junegunn/fzf.vim'
 " Plug 'jalvesaq/Nvim-R', {'branch': 'stable'} " R
-Plug 'airblade/vim-gitgutter'
+" Plug 'airblade/vim-gitgutter'
 Plug 'github/copilot.vim'
 Plug 'hashivim/vim-terraform'
+Plug 'dense-analysis/ale' " syntax checker
+
+Plug 'gcuth/cowriter.vim' " collaborative writing with gpt3
 
 call plug#end()
 
@@ -97,7 +103,7 @@ set nobackup
 " limit number of open tabs to 100
 set tabpagemax=100
 
-set clipboard^=unnamed
+set clipboard^=unnamed " yank to the system clipboard by default
 
 " Snippet hotkeys
 let g:UltiSnipsExpandTrigger="<tab>"
@@ -107,7 +113,7 @@ let g:snips_author="Galen"
 let g:snips_author_email="g@galen.me"
 
 " save files on InsertLeave
-autocmd InsertLeave * :w!
+autocmd InsertLeave *.{md,markdown,Rmd} :w!
 autocmd InsertLeave * :execute 'silent !tmux refresh-client -S &' | redraw!
 
 " Writing Mode for Markdown files
@@ -136,14 +142,5 @@ function! ClojureMode()
     call CodingMode()
 endfunction
 
-" COC Interfacing
-" inoremap <silent><expr> <TAB>
-"       \ pumvisible() ? "\<C-n>" :
-"       \ <SID>check_back_space() ? "\<TAB>" :
-"       \ coc#refresh()
-" inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" function! s:check_back_space() abort
-"   let col = col('.') - 1
-"   return !col || getline('.')[col - 1]  =~# '\s'
-" endfunction
+nnoremap <leader>o :call cowriter#Complete()<CR>

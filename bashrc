@@ -57,3 +57,4 @@ eval "$(starship init bash)"
 
 # [[ -s "/etc/profile.d/grc.bashrc" ]] && source /etc/profile.d/grc.bashrc
 
+. "$HOME/.cargo/env"

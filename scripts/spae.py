@@ -374,7 +374,7 @@ def now(id: int = typer.Option(default=None, prompt="Question ID", help="ID of q
 
 @app.command()
 def adopt(id: int = typer.Option(default=None, help="ID of question to adopt"),
-          mode: str = typer.Option(default="median", help="Value to adopt prediction from ['median, 'mean', 'both']"),):
+          mode: str = typer.Option(default="both", help="Value to adopt prediction from ['median, 'mean', 'both']"),):
     """Adopt a prediction from the community for a question given by id."""
     config = read_config(os.path.expanduser(DEFAULT_CONFIG_PATH))
     if 'metaculus' not in config:
@@ -389,46 +389,73 @@ def adopt(id: int = typer.Option(default=None, help="ID of question to adopt"),
             for question in get_metaculus_results(session, url, 20000):
                 id = question['id']
                 typer.echo(f"{id} {question['title']}")
+                typer.echo(f"{id} Question Type: {question.get('possibilities', {}).get('type', None)}")
+                # check to see whether I'm the most recent forecast
                 try:
-                    if question['possibilities']['type'] == 'binary':
-                            summary = summarise_metaculus_question(question)
-                            if mode == "median":
-                                prediction = summary['community']['median']
-                            elif mode == "mean":
-                                prediction = summary['community']['mean']
-                            elif mode == "both":
-                                prediction = round((summary['community']['median'] + summary['community']['mean'])/2,2)
+                    if question.get('possibilities', {}).get('type', '') != 'binary':
+                        typer.echo(f"{id} is not binary! Question type not supported yet.")
+                    else:
+                        summary = summarise_metaculus_question(question)
+                        typer.echo(f"{id} Community Median: {summary.get('community', {}).get('median')}")
+                        typer.echo(f"{id} Community Mean: {summary.get('community', {}).get('mean')}")
+                        typer.echo(f"{id} User Latest: {summary.get('user', {}).get('latest')}")
+                        typer.echo(f"{id} User/Community Difference: {summary.get('difference')}")
+                        if summary.get('user',{}).get('time_since') is not None:
+                            time_behind = summary.get('user',{}).get('time_since') - summary.get('community',{}).get('time_since')
+                            typer.echo(f"{id} Time Behind Community: {summary.get('user',{}).get('time_since') - summary.get('community',{}).get('time_since')}")
+                        else:
+                            time_behind = None
+                        
+                        if mode == "median":
+                            prediction = summary['community']['median']
+                        elif mode == "mean":
+                            prediction = summary['community']['mean']
+                        elif mode == "both":
+                            # if past user forecast, use that as part of the new prediction decision
+                            if summary.get('user', {}).get('latest') is not None:
+                                past = summary.get('user', {}).get('latest')
                             else:
-                                typer.echo(f"Unknown mode {mode}")
-                                typer.exit(1)
-                            typer.echo(f"Adopting {prediction} as new user prediction")
-                            if summary['user']['latest'] != prediction:
-                                r = predict_metaculus_binary(session, question_id = id, prediction = prediction, api_url="https://www.metaculus.com/api2")
-                                if r.ok:
-                                    typer.echo("{} successfully adopted: {} switched to {}".format(id, summary['user']['latest'], prediction))
-                                else:
-                                    typer.echo(f"{id} failed to adopt (returned {r.status_code})")
-                                time.sleep(random.randint(1,13))
-                except:
-                    typer.echo(f"{id} failed to adopt")
-        else:
-            question = get_metaculus_question(session, question_id = id)
-            summary = summarise_metaculus_question(question)
-            if mode == "median":
-                prediction = summary['community']['median']
-            elif mode == "mean":
-                prediction = summary['community']['mean']
-            elif mode == "both":
-                prediction = round((summary['community']['median'] + summary['community']['median'] + summary['community']['mean'])/3,2)
-            else:
-                typer.echo(f"Unknown mode {mode}")
-                typer.exit(1)
-            if summary['user']['latest'] != prediction:
-                r = predict_metaculus_binary(session, question_id = id, prediction = prediction, api_url="https://www.metaculus.com/api2")
-                if r.ok:
-                    typer.echo("{} successfully adopted: {} switched to {}".format(id, summary['user']['latest'], prediction))
-                else:
-                    typer.echo(f"{id} failed to adopt (returned {r.status_code})")
+                                past = random.choice([summary['community']['median'], summary['community']['mean']])
+                            prediction = round((summary['community']['median'] + summary['community']['median'] + summary['community']['median'] + summary['community']['median'] + past)/5,2)
+                            if random.choice([True, True, False]):
+                                # switch to 'median with a bit of noise'
+                                noise = summary['community']['median'] * random.uniform(0.01, 0.1)
+                                prediction = max([0.01, min([0.99, round(summary['community']['median'] + random.uniform(-noise, noise), 2)])])
+                        else:
+                            typer.echo(f"Unknown mode {mode} provided!")
+                            typer.exit(1)
+                        
+                        typer.echo(f"{id} New Proposed Prediction: {prediction}")
+                       
+                        should_update = False
+                        
+                        if time_behind is not None and time_behind > (60*60*24*2):
+                            should_update = True
+
+                        if summary['disagreement'] == 'strong':
+                            should_update = True
+
+                        if prediction == summary['user']['latest']:
+                            should_update = False
+
+                        if summary.get('user', {}).get('latest') is None and summary.get('community', {}).get('median') is not None:
+                            should_update = True
+
+                        if should_update:
+                            r = predict_metaculus_binary(session, question_id = id, prediction = prediction, api_url="https://www.metaculus.com/api2")
+                            if r.ok:
+                                typer.echo("{} successfully adopted: {} switched to {}".format(id, summary['user']['latest'], prediction))
+                            else:
+                                typer.echo(f"{id} failed to adopt (returned {r.status_code})")
+                            # wait = random.randint(60, random.randint(130, 600))
+                            wait = random.randint(10,63)
+                            typer.echo(f"Waiting {wait} ...")
+                            time.sleep(wait)
+                        else:
+                            typer.echo(f"{id} Skipping update.")
+                except Exception as e:
+                    typer.echo(f"{id} Exception! {e}")
+
 
 if __name__ == "__main__":
     app()

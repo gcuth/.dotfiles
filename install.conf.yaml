@@ -85,7 +85,6 @@
     - git
     - gpg
     - fzf
-    - node
     - jq
     - gh
     - chrome-cli
@@ -107,6 +106,10 @@
     - hashicorp/tap
   - brew:
     - hashicorp/tap/terraform
+  - tap:
+    - discord
+  - brew:
+    - discord
   - shell:
     - [ test -e `which toggl` || pip install togglCli ]
   - shell:
@@ -127,7 +130,6 @@
     - sudo apt install -y git
     - sudo apt install -y gnupg
     - sudo apt install -y fzf
-    - sudo apt install -y nodejs
     - sudo apt install -y jq
     - sudo apt install -y hledger
     - sudo apt install -y ffmpeg
@@ -176,9 +178,11 @@
     - cron: 0,10,20,30,40,50 * * * *
       command: /opt/homebrew/bin/todoist sync >/dev/null 2>&1
     - cron: 5,35 * * * *
-      command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl
+      command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl; cp /Users/g/Documents/blog/data/logs/toggl /Users/g/Documents/blog/data/logs/old_toggl; cat /Users/g/Documents/blog/data/logs/old_toggl | sort -u > /Users/g/Documents/blog/data/logs/toggl; rm /Users/g/Documents/blog/data/logs/old_toggl
     - cron: 5,35 * * * *
-      command: /opt/homebrew/bin/todoist --csv completed-list --filter 'today' >> /Users/g/Documents/blog/data/logs/completed_tasks.csv
+      command: /opt/homebrew/bin/todoist --csv completed-list --filter 'today' >> /Users/g/Documents/blog/data/logs/completed_tasks.csv; cp /Users/g/Documents/blog/data/logs/completed_tasks.csv /Users/g/Documents/blog/data/logs/old_completed_tasks.csv; cat /Users/g/Documents/blog/data/logs/old_completed_tasks.csv | sort -u > /Users/g/Documents/blog/data/logs/completed_tasks.csv; rm /Users/g/Documents/blog/data/logs/old_completed_tasks.csv
+    - cron: 5,35 * * * *
+      command: /opt/homebrew/bin/todoist --csv list >> /Users/g/Documents/blog/data/logs/active_tasks.csv; cp /Users/g/Documents/blog/data/logs/active_tasks.csv /Users/g/Documents/blog/data/logs/old_active_tasks.csv; cat /Users/g/Documents/blog/data/logs/old_active_tasks.csv | sort -u > /Users/g/Documents/blog/data/logs/active_tasks.csv; rm /Users/g/Documents/blog/data/logs/old_active_tasks.csv
     - cron: 5,35 * * * *
       command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
     - cron: 3,13,23,33,43,53 * * * *
@@ -189,8 +193,8 @@
       command: /Users/g/.dotfiles/scripts/refocus
     - cron: 12 17 * * *
       command: for GITDIR in `find ~/Documents ~/Code -name .git -type d -prune | sed 's/\/.git//g'`; do if [[ `git -C $GITDIR status -suno` ]]; then /opt/homebrew/bin/todoist add --priority 1 --project-name "Life Admin" --date "today" "Commit uncommitted changes in $GITDIR"; fi; done
-    - cron: * * * * *
-      command: /opt/homebrew/bin/python3 /Users/g/.dotfiles/scripts/remind_me_to_time_log
+    # - cron: * * * * *
+    #   command: /opt/homebrew/bin/python3 /Users/g/.dotfiles/scripts/remind_me_to_time_log
 
 
 - ifubuntu:
@@ -216,3 +220,6 @@
     stdin: true
     stdout: true
     stderr: true
+
+- shell:
+  command: ['curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash']

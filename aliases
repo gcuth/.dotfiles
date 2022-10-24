@@ -46,8 +46,9 @@ alias myusbs="list_my_usbs"
 # trim newlines
 alias tn='tr -d "\n"'
 
-alias tag="/home/g/.dotfiles/scripts/update_exist_tags add --tag "
-
+# recursive grep
+recursivegrep () { grep -r "$*" . }
+alias rg="recursivegrep"
 
 
 # record
@@ -79,13 +80,34 @@ alias mm="take_meeting_notes"
 function start_journal_writing() {
     toggl stop
     toggl start -o 'Blog' -a 'writing' "Write morning pages"
-    $EDITOR ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
+    if [ -f ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md ]; then
+        $EDITOR -c ':exe "normal G$a\<Enter>\<Enter>---\<Enter>\<Enter>ttime\<Tab>\<Enter>\<Enter>"' ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md;
+    else
+        $EDITOR -c ':exe "normal ihhj\<Tab>"' ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
+    fi
     for TASKID in `todoist list | grep "Write morning pages" | sed 's/ .*//g'`; do
         todoist close $TASKID;
     done
     toggl stop
 }
 alias jj="start_journal_writing"
+
+function start_angst_blogging() {
+    # One shot (speed) write a post for angst.blog / relentlessangst.com
+    toggl stop
+    toggl start -o 'Blog' -a 'writing' "Write a blog post for angst.blog"
+    if [ -f ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md ]; then
+        $EDITOR ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md;
+    else
+        $EDITOR -c ':exe "normal ihha\<Tab>aangst\<Tab>"' ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md
+    fi
+    for TASKID in `todoist list | grep "Write a blog post for angst.blog" | sed 's/ .*//g'`; do
+        todoist close $TASKID;
+    done
+    osascript ~/.dotfiles/applescripts/relentless_draft.scpt
+    toggl stop
+}
+alias bblog="start_angst_blogging"
 
 function write_a_note() {
     ~/.dotfiles/scripts/addtozotero.py `pbpaste`

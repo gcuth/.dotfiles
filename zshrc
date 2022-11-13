@@ -81,10 +81,6 @@ DISABLE_LS_COLORS="false"
 # use starship if it's available
 eval "$(starship init zsh)"
 
-# todoist functions
-source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
-# PROG=todoist source "$GOPATH/src/github.com/urfave/cli/autocomplete/zsh_autocomplete"
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

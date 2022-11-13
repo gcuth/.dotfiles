@@ -13,11 +13,12 @@ alias grep="grep --color=auto"
 alias gs="git status -bs"
 alias gd="git diff"
 alias ga="git add"
-alias gcs="git commit -S -m" # sign using -S by default!
-alias gcams="git commit -a -S -m" # sign using -S by default!
 alias gc="git commit -m"
+alias gcs="git commit -S -m" # sign
 alias gcam="git commit -a -m"
+alias gcams="git commit -a -S -m" # sign
 alias gp="git pull"
+alias gpo="git push origin"
 alias gpom="git push origin master"
 # jump to top level of git repo
 alias gt="cd \$(git rev-parse --show-toplevel)"
@@ -49,6 +50,9 @@ alias tn='tr -d "\n"'
 # recursive grep
 recursivegrep () { grep -r "$*" . }
 alias rg="recursivegrep"
+
+# rot13
+alias rot13="tr 'A-MN-Za-mn-z' 'N-ZA-Mn-za-m'"
 
 
 # record
@@ -85,9 +89,6 @@ function start_journal_writing() {
     else
         $EDITOR -c ':exe "normal ihhj\<Tab>"' ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
     fi
-    for TASKID in `todoist list | grep "Write morning pages" | sed 's/ .*//g'`; do
-        todoist close $TASKID;
-    done
     toggl stop
 }
 alias jj="start_journal_writing"
@@ -101,9 +102,6 @@ function start_angst_blogging() {
     else
         $EDITOR -c ':exe "normal ihha\<Tab>aangst\<Tab>"' ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md
     fi
-    for TASKID in `todoist list | grep "Write a blog post for angst.blog" | sed 's/ .*//g'`; do
-        todoist close $TASKID;
-    done
     osascript ~/.dotfiles/applescripts/relentless_draft.scpt
     toggl stop
 }
@@ -143,19 +141,8 @@ function start_a_kata() {
         toggl start -o 'Tekke' -a 'codewars, coding, clojure' "Complete a codewars kata";
         echo "Started a toggl entry for a clojure kata on codewars";
     fi
-    # if [ `todoist list --filter '(today|overdue)' | grep "kata" | wc -l` -gt 0 ]; then
-    #     echo "Suitable task already in todoist!"
-    # else
-    #     todoist add --priority 1 --date "today" --project-name "Tekke" "Complete a codewars kata";
-    #     echo "Added a codewars kata task to todoist";
-    #     todoist sync;
-    # fi
 }
 alias kata="start_a_kata"
-
-# todoist
-alias tc="todoist close"
-alias tl="todoist list --filter 'today|overdue'"
 
 # Uni Convenience
 alias anuc="globalprotect connect --portal staff-access.anu.edu.au"
@@ -168,15 +155,3 @@ alias pvcr="protonvpn-cli c -r"
 alias pvcf="protonvpn-cli c -f"
 alias pvd="protonvpn-cli d"
 alias pvs="protonvpn-cli s"
-
-# generate loading screen tip emails from the task list
-function send_loading_screen_tips() {
-    for EMAIL in `todoist list | grep "Loading Screen Tip to" | sed 's/.*Loading Screen Tip to //g'`; do
-        MAILTO=`~/.dotfiles/scripts/mail_loading_screen_tip $EMAIL`;
-        open $MAILTO | xdg-open $MAILTO;
-    done
-    for TASKID in `todoist list | grep "Loading Screen Tip to" | sed 's/ .*//g'`; do
-        todoist close $TASKID;
-    done
-}
-alias loadingscreentips="send_loading_screen_tips"

@@ -1,0 +1,6 @@
+templates:
+  params:
+    author-email: g@galen.me
+    author-name: Galen Cuthbertson
+    copyright: 'Copyright: (c) 2022 Galen Cuthbertson'
+    github-username: gcuth

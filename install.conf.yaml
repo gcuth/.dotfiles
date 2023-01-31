@@ -17,6 +17,8 @@
       create: true
       relink: true
       force: true
+    ~/.stack/config.yaml:
+      path: stack/config.yaml
     ~/.zprofile:
       path: zprofile
     ~/.vimrc:
@@ -47,20 +49,6 @@
       create: true
     ~/.lein/profiles.clj:
       path: lein/profiles.clj
-- ifmacos:
-    - link:
-      /Users/g/Library/Application\ Support/Code/User/settings.json:
-        path: vscode_settings.json
-        create: true
-        relink: true
-        force: true
-- ifubuntu:
-    - link:
-      /home/g/.config/Code/User/settings.json:
-        path: vscode_settings.json
-        create: true
-        relink: true
-        force: true
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -94,10 +82,9 @@
     - rclone
     - tmux
     - dark-mode
-  - tap:
-    - sachaos/todoist
-  - brew:
-    - todoist
+    - haskell-stack
+    - toot
+    - borkdude/brew/babashka
   - tap:
     - homebrew/cask-fonts
   - brew:
@@ -110,6 +97,10 @@
     - discord
   - brew:
     - discord
+  - tap:
+    - docker
+  - brew:
+    - docker
   - shell:
     - [ test -e `which toggl` || pip install togglCli ]
   - shell:
@@ -138,7 +129,6 @@
   - shell:
     - sudo apt install -y snapd
     - sudo snap install go --classic
-    - mkdir -p $GOPATH/src/github.com/sachaos; cd $GOPATH/src/github.com/sachaos; git clone https://github.com/sachaos/todoist.git; cd todoist; make install
   - shell:
     - sudo apt install -y fonts-firacode
   - shell:
@@ -160,10 +150,6 @@
 - shell:
     - curl -fsSL https://starship.rs/install.sh -o ./starship.sh; bash ./starship.sh -y; rm ./starship.sh
 
-# INSTALL BABASHKA
-- shell:
-    - [ test -f `which bb` || curl -fsSL https://raw.githubusercontent.com/borkdude/babashka/master/install -o ./install-babashka; chmod +x ./install-babashka && sudo ./install-babashka; rm ./install-babashka ]
-
 # cron setup
 - ifmacos:
   - crontab:
@@ -175,26 +161,14 @@
       command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
     - cron: 1 * * * *
       command: /opt/homebrew/bin/git -C /Users/g/Documents/blog push origin master >/dev/null 2>&1
-    - cron: 0,10,20,30,40,50 * * * *
-      command: /opt/homebrew/bin/todoist sync >/dev/null 2>&1
     - cron: 5,35 * * * *
       command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl; cp /Users/g/Documents/blog/data/logs/toggl /Users/g/Documents/blog/data/logs/old_toggl; cat /Users/g/Documents/blog/data/logs/old_toggl | sort -u > /Users/g/Documents/blog/data/logs/toggl; rm /Users/g/Documents/blog/data/logs/old_toggl
     - cron: 5,35 * * * *
-      command: /opt/homebrew/bin/todoist --csv completed-list --filter 'today' >> /Users/g/Documents/blog/data/logs/completed_tasks.csv; cp /Users/g/Documents/blog/data/logs/completed_tasks.csv /Users/g/Documents/blog/data/logs/old_completed_tasks.csv; cat /Users/g/Documents/blog/data/logs/old_completed_tasks.csv | sort -u > /Users/g/Documents/blog/data/logs/completed_tasks.csv; rm /Users/g/Documents/blog/data/logs/old_completed_tasks.csv
-    - cron: 5,35 * * * *
-      command: /opt/homebrew/bin/todoist --csv list >> /Users/g/Documents/blog/data/logs/active_tasks.csv; cp /Users/g/Documents/blog/data/logs/active_tasks.csv /Users/g/Documents/blog/data/logs/old_active_tasks.csv; cat /Users/g/Documents/blog/data/logs/old_active_tasks.csv | sort -u > /Users/g/Documents/blog/data/logs/active_tasks.csv; rm /Users/g/Documents/blog/data/logs/old_active_tasks.csv
-    - cron: 5,35 * * * *
       command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
-    - cron: 3,13,23,33,43,53 * * * *
-      command: /Users/g/.dotfiles/scripts/tasker generate >/dev/null 2>&1
     - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
       command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
     - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
-      command: /Users/g/.dotfiles/scripts/refocus
-    - cron: 12 17 * * *
-      command: for GITDIR in `find ~/Documents ~/Code -name .git -type d -prune | sed 's/\/.git//g'`; do if [[ `git -C $GITDIR status -suno` ]]; then /opt/homebrew/bin/todoist add --priority 1 --project-name "Life Admin" --date "today" "Commit uncommitted changes in $GITDIR"; fi; done
-    # - cron: * * * * *
-    #   command: /opt/homebrew/bin/python3 /Users/g/.dotfiles/scripts/remind_me_to_time_log
+      command: osascript /Users/g/.dotfiles/applescripts/refocus.scpt >/dev/null 2>&1
 
 
 - ifubuntu:
@@ -207,12 +181,6 @@
       command: git -C ~/Documents/thesis push origin master >/dev/null 2>&1
     - cron: 1 * * * *
       command: git -C ~/Documents/blog push origin master >/dev/null 2>&1
-    - cron: 0,10,20,30,40,50 * * * *
-      command: /usr/bin/todoist sync >/dev/null 2>&1
-    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
-      command: ~/.dotfiles/scripts/refocus
-    - cron: 12 17 * * *
-      command: for GITDIR in `find ~/Documents ~/Code -name .git -type d -prune | sed 's/\/.git//g'`; do if [[ `git -C $GITDIR status -suno` ]]; then /opt/homebrew/bin/todoist add --priority 1 --project-name "Life Admin" --date "today" "Commit uncommitted changes in $GITDIR"; fi; done
 
 - shell: 
   - ['test -f ~/.vim/autoload/plug.vim || curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', 'Installing vim-plug (if needed)']

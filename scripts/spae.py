@@ -187,6 +187,8 @@ def pretty_echo_metaculus_question(question):
 
 def predict_metaculus(session, question_id: str, data: dict, api_url="https://www.metaculus.com/api2"):
     """Post a prediction to metaculus."""
+    # print(session.cookies.get_dict())
+    # time.sleep(100)
     url = f"{api_url}/questions/{question_id}/predict/"
     r = session.post(url,
         headers={

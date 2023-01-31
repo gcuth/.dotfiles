@@ -83,7 +83,15 @@ alias mm="take_meeting_notes"
 
 function start_journal_writing() {
     toggl stop
-    toggl start -o 'Blog' -a 'writing' "Write morning pages"
+    # if it's the morning, start a new journal entry for 'morning pages';
+    # if it's the evening, use 'evening pages' instead.
+    if [ `date +%H` -lt 12 ]; then
+        toggl start -o 'Blog' -a 'writing' "Write morning pages"
+    elif [ `date +%H` -gt 17 ]; then
+        toggl start -o 'Blog' -a 'writing' "Write evening pages"
+    else
+        toggl start -o 'Blog' -a 'writing' "Write journal"
+    fi
     if [ -f ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md ]; then
         $EDITOR -c ':exe "normal G$a\<Enter>\<Enter>---\<Enter>\<Enter>ttime\<Tab>\<Enter>\<Enter>"' ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md;
     else
@@ -110,7 +118,7 @@ alias bblog="start_angst_blogging"
 function write_a_note() {
     ~/.dotfiles/scripts/addtozotero.py `pbpaste`
     $EDITOR `pbpaste | ~/.dotfiles/scripts/note | tr -d '\n'`
-    ~/.dotfiles/scripts/as_audio.py `pbpaste`
+    # ~/.dotfiles/scripts/as_audio.py `pbpaste`
 }
 alias nn="write_a_note"
 

@@ -27,6 +27,7 @@ Plug 'vim-scripts/paredit.vim', { 'for': 'clojure' } " paren slurping and burpin
 Plug 'tpope/vim-commentary' " sensible commenting
 Plug 'tpope/vim-surround' " sensible paren management
 Plug 'tpope/vim-fireplace', { 'for': 'clojure' } " a quasi-repl for the world's greatest programming language
+Plug 'venantius/vim-cljfmt', { 'for': 'clojure' } " formatter for clojure
 Plug 'tpope/vim-fugitive' " git commands
 Plug 'scrooloose/nerdtree' " file drawer, open with :NERDTreeToggle
 Plug 'kien/rainbow_parentheses.vim', { 'for': 'clojure' } " sensible paren colouring
@@ -132,7 +133,7 @@ endfunction
 au BufNewFile,BufRead *.{py,R} call CodingMode()
 
 " Clojure Mode for clj
-au BufNewFile,BufRead *.{clj,cljs,cljc,cljx} call ClojureMode()
+au BufNewFile,BufRead *.{clj,cljs,cljc,cljx,bb} call ClojureMode()
 
 function! ClojureMode()
     RainbowParenthesesToggle

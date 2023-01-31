@@ -1,8 +1,7 @@
 # convert the body of the latest written post to html and dump it to a variable
-do shell script "TMPDIR=$(mktemp -d); TMPFILE=$TMPDIR/angst.html; cat ~/Documents/blog/_posts/angst/`ls -Art ~/Documents/blog/_posts/angst/ | tail -n 1 | tn` | sed -n '/^$/,$p' | pandoc -f markdown -t html > $TMPFILE; open -a Safari $TMPFILE"
-# do shell script "TMPDIR=$(mktemp -d); TMPFILE=$TMPDIR/angst.html; cat ~/Documents/blog/_posts/angst/`ls -Art ~/Documents/blog/_posts/angst/ | tail -n 1 | tn` | sed -n '/^$/,$p' | pandoc -s -f markdown -t html > $TMPFILE; open -a Safari $TMPFILE"
+do shell script "TMPDIR=$(mktemp -d); TMPFILE=$TMPDIR/angst.html; echo '<head><meta charset=\'utf-8\'></head><body>' > $TMPFILE; cat ~/Documents/blog/_posts/angst/`ls -Art ~/Documents/blog/_posts/angst/ | tail -n 1 | tn` | sed -n '/^$/,$p' | pandoc -f markdown -t html >> $TMPFILE; echo '</body>' >> $TMPFILE; open -a Safari $TMPFILE"
 
-delay 1.5
+delay 2.5
 
 tell application "Safari"
     activate

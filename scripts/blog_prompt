@@ -43,7 +43,7 @@ def collect_prompts(locations=TOLOOKFOR):
 
 def filter_prompts(prompts: list) -> list:
     """Exclude prompts for a list that are unlikely to be useful."""
-    actual = [p for p in prompts if not p.startswith("#") and not len(p) < 5]
+    actual = [p for p in prompts if not p.startswith("#") and not p.startswith("<!--") and not len(p) < 5]
     return [p for p in actual if p not in [v for v in read_prompt_log().values()]]
 
 
@@ -72,6 +72,8 @@ def main():
     prompts = filter_prompts(collect_prompts())
     if len(prompts) > 0:
         best_prompt = random.choice(prompts)
+        recent_prompt = prompts[-1]
+        best_prompt = random.choice([best_prompt, recent_prompt])
         log_prompt(best_prompt)
         print(best_prompt)
     else:

@@ -167,8 +167,10 @@
       command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
     - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
       command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
-    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
+    - cron: * * * * *
       command: osascript /Users/g/.dotfiles/applescripts/refocus.scpt >/dev/null 2>&1
+    - cron: 22 * * * *
+      command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
 
 
 - ifubuntu:
@@ -181,6 +183,8 @@
       command: git -C ~/Documents/thesis push origin master >/dev/null 2>&1
     - cron: 1 * * * *
       command: git -C ~/Documents/blog push origin master >/dev/null 2>&1
+    - cron: 22 * * * *
+      command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
 
 - shell: 
   - ['test -f ~/.vim/autoload/plug.vim || curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', 'Installing vim-plug (if needed)']

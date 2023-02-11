@@ -52,7 +52,7 @@
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
-    - ~/Code/
+    - ~/Developer/
     - ~/Recordings/
     - ~/Readings/
 

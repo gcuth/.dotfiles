@@ -33,7 +33,8 @@ if (Application("Music").running()) {
         const source = "Apple Music";
         // duration comes in seconds automatically
         const length = track.duration();
-        output = `${datetime}, "${source}", "${title}", "${artist}", "${album}", ${length}`;
+        const genre = track.genre();
+        output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
     }
     catch {
         output = null;
@@ -47,7 +48,8 @@ if (Application("Music").running()) {
         const source = "Spotify";
         // get duration in seconds
         const length = track.duration() / 1000;
-        output = `${datetime}, "${source}", "${title}", "${artist}", "${album}", ${length}`;
+        const genre = "";
+        output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
     }
     catch {
         output = null;

@@ -167,10 +167,26 @@
       command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
     - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
       command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
-    - cron: * * * * *
-      command: osascript /Users/g/.dotfiles/applescripts/refocus.scpt >/dev/null 2>&1
+    # - cron: * * * * *
+    #   command: osascript /Users/g/.dotfiles/applescripts/refocus.scpt >/dev/null 2>&1
     - cron: 22 * * * *
       command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
+    # - cron: * * * * *
+    #   command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
+    - cron: 0,12,24,36,48 * * * *
+      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_anki_progress.py >/dev/null
+    - cron: 0,12,24,36,48 * * * *
+      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_email_inbox.py >/dev/null
+    - cron: 0,12,24,36,48 * * * *
+      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_network_status.py >/dev/null
+    - cron: 14 * * * *
+      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_run_log.py >/dev/null
+    - cron: 14 * * * *
+      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_finance_logs.py >/dev/null
+    - cron: 14 * * * *
+      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_shortcut_health_logs.py >/dev/null
+    - cron: 0 9,12,15,17 * * *
+      command: if [ `cat ~/Documents/blog/data/logs/anki_progress.csv | tail -n1 | sed 's/.*, //g' | tn` != "0" ]; then open ~/Documents/blog/data/Reading.apkg; fi
 
 
 - ifubuntu:

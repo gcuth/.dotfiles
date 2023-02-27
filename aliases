@@ -113,11 +113,11 @@ function start_angst_blogging() {
     osascript ~/.dotfiles/applescripts/relentless_draft.scpt
     toggl stop
 }
-alias bblog="start_angst_blogging"
+alias angst="start_angst_blogging"
 
 function write_a_note() {
     ~/.dotfiles/scripts/addtozotero.py `pbpaste`
-    $EDITOR `pbpaste | ~/.dotfiles/scripts/note | tr -d '\n'`
+    $EDITOR `pbpaste | ~/.dotfiles/scripts/note.bb | tr -d '\n'`
     # ~/.dotfiles/scripts/as_audio.py `pbpaste`
 }
 alias nn="write_a_note"
@@ -141,7 +141,6 @@ alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science
 
 # codewars kata
 function start_a_kata() {
-    # LANGUAGE=`bb -i '(rand-nth ["julia" "clojure" "r" "python"])' | sed 's/"//g' | tr -d "\n"`
     open "https://www.codewars.com/trainer/clojure" | xdg-open "https://www.codewars.com/trainer/clojure"
     if [ `toggl now | grep "kata" | wc -l` -gt 0 ]; then
         echo "Suitable task already running!"

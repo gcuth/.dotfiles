@@ -82,22 +82,14 @@ function take_meeting_notes() {
 alias mm="take_meeting_notes"
 
 function start_journal_writing() {
-    toggl stop
-    # if it's the morning, start a new journal entry for 'morning pages';
-    # if it's the evening, use 'evening pages' instead.
-    if [ `date +%H` -lt 12 ]; then
-        toggl start -o 'Blog' -a 'writing' "Write morning pages"
-    elif [ `date +%H` -gt 17 ]; then
-        toggl start -o 'Blog' -a 'writing' "Write evening pages"
-    else
-        toggl start -o 'Blog' -a 'writing' "Write journal"
-    fi
+    shortcuts run "Enforce Journal Focus"
     if [ -f ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md ]; then
         $EDITOR -c ':exe "normal G$a\<Enter>\<Enter>---\<Enter>\<Enter>ttime\<Tab>\<Enter>\<Enter>"' ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md;
     else
         $EDITOR -c ':exe "normal ihhj\<Tab>"' ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
     fi
     toggl stop
+    osascript ~/.dotfiles/applescripts/mark_task_complete.scpt "Journal for 10 minutes"
 }
 alias jj="start_journal_writing"
 

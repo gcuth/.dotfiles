@@ -2,12 +2,22 @@
 (import 'java.time.format.DateTimeFormatter
         'java.time.LocalDateTime)
 
+(require '[babashka.process :as p])
+
 (defn expand-home [s]
   (if (.startsWith s "~")
     (clojure.string/replace-first s "~" (System/getProperty "user.home"))
     s))
 
+(defn run-applescript [script-file arg]
+  (-> (p/process ["osascript" script-file arg])
+      deref
+      :exit))
+
 (def outpath (expand-home "~/Documents/blog/data/logs/bp.csv"))
+
+(def applescript-file
+  (expand-home "~/.dotfiles/applescripts/mark_task_complete.scpt"))
 
 (def now
   ; formatted current time
@@ -22,7 +32,10 @@
 (def systolic (reduce max rawnums))
 (def diastolic (reduce min rawnums))
 
-(if (and (= (count rawnums) 2) (.exists (io/file outpath))) 
-  (spit outpath
-        (str/join [(str/join "," [now (float diastolic) (float systolic)]) "\n"])
-        :append true))
+(do
+    (if (and (= (count rawnums) 2) (.exists (io/file outpath))) 
+      (spit outpath
+            (str/join [(str/join "," [now (float diastolic) (float systolic)]) "\n"])
+            :append true))
+    (run-applescript applescript-file "Log blood pressure")
+        )

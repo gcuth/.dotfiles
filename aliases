@@ -108,6 +108,8 @@ function start_angst_blogging() {
 alias angst="start_angst_blogging"
 
 function write_a_note() {
+    pbpaste >> ~/Documents/blog/data/toread.txt
+    echo "\n" >> ~/Documents/blog/data/toread.txt
     ~/.dotfiles/scripts/addtozotero.py `pbpaste`
     $EDITOR `pbpaste | ~/.dotfiles/scripts/note.bb | tr -d '\n'`
     # ~/.dotfiles/scripts/as_audio.py `pbpaste`

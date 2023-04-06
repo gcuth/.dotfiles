@@ -3,7 +3,13 @@
       create: true
       relink: true
 
-- clean: ['~']
+- clean: ['~', '~/.local/bin/']
+
+# CREATE THE BASIC (NEEDED) DIRS
+- create:
+    - ~/Developer/
+    - ~/Recordings/
+    - ~/Readings/
 
 # VERY BASIC GLOBAL SETTINGS:
 - link:
@@ -21,8 +27,6 @@
       path: stack/config.yaml
     ~/.zprofile:
       path: zprofile
-    ~/.vimrc:
-      path: vimrc
     ~/.RProfile:
       path: RProfile
     ~/.aliases:
@@ -35,26 +39,23 @@
       path: starship.toml
     ~/.tmux.conf:
       path: tmux.conf
-    ~/.vim/UltiSnips/markdown.snippets:
-      path: snippets/vim/markdown.snippets
     ~/.newsboat/urls:
       path: newsboat/urls
     ~/.newsboat/config:
       path: newsboat/newsboatrc
-    ~/.config/nvim/init.vim:
-      path: nvim_init
     ~/.local/bin/:
       path: scripts/**
       glob: true
       create: true
+    ~/.config/nvim/:
+      path: vim/**
+      create: true
+      glob: true
+      relink: true
+      force: true
     ~/.lein/profiles.clj:
       path: lein/profiles.clj
 
-# CREATE THE BASIC (NEEDED) DIRS
-- create:
-    - ~/Developer/
-    - ~/Recordings/
-    - ~/Readings/
 
 # BREW:
 - ifmacos:
@@ -84,23 +85,22 @@
     - dark-mode
     - haskell-stack
     - toot
+    - rust
     - borkdude/brew/babashka
+    - ripgrep
+    - jesseduffield/lazygit/lazygit
+    - gdu
+    - bottom
+    - iterm2
+    - discord
+    - docker
   - tap:
     - homebrew/cask-fonts
   - brew:
     - font-fira-code
-  - tap:
-    - hashicorp/tap
+    - font-hack-nerd-font
   - brew:
     - hashicorp/tap/terraform
-  - tap:
-    - discord
-  - brew:
-    - discord
-  - tap:
-    - docker
-  - brew:
-    - docker
   - shell:
     - [ test -e `which toggl` || pip install togglCli ]
   - shell:
@@ -140,6 +140,10 @@
 - shell:
   - if [ ! -d "/Users/g/Documents/thesis" ]; then git clone git@github.com:gcuth/phd_thesis.git ~/Documents/thesis; fi
   - if [ ! -d "/Users/g/Documents/blog" ]; then git clone git@github.com:gcuth/gcuth.github.io.git ~/Documents/blog; fi
+
+# use cargo to install some stuff!
+- shell:
+  - cargo install tree-sitter-cli
 
 # # link hooks:
 - link:
@@ -202,12 +206,9 @@
     - cron: 22 * * * *
       command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
 
-- shell: 
-  - ['test -f ~/.vim/autoload/plug.vim || curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', 'Installing vim-plug (if needed)']
-  - command: ['vim -c PlugInstall', 'Please observe any error messages and quit vim afterwards.']
-    stdin: true
-    stdout: true
-    stderr: true
-
 - shell:
   command: ['curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash']
+
+# ensure astrovim etc is actually setup
+- shell:
+  command: nvim --headless -c 'autocmd User LazyDone quitall'

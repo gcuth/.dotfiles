@@ -189,8 +189,6 @@
       command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_finance_logs.py >/dev/null
     - cron: 14 * * * *
       command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_shortcut_health_logs.py >/dev/null
-    - cron: 0 9,12,15,17 * * *
-      command: if [ `cat ~/Documents/blog/data/logs/anki_progress.csv | tail -n1 | sed 's/.*, //g' | tn` != "0" ]; then open ~/Documents/blog/data/Reading.apkg; fi
 
 
 - ifubuntu:

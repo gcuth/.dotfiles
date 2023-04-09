@@ -1,9 +1,15 @@
 return {
-  { "tpope/vim-commentary",         lazy = false },
-  { "tpope/vim-unimpaired",         lazy = false },
-  { "tpope/vim-surround",           lazy = false },
-  { "tpope/vim-fireplace",          lazy = false },
-  { "kien/rainbow_parentheses.vim", lazy = false },
+  { "tpope/vim-commentary", lazy = false },
+  { "tpope/vim-unimpaired", lazy = false },
+  { "tpope/vim-surround",   lazy = false },
+  {
+    "tpope/vim-fireplace",
+    ft = { "clojure", "clojurescript" }
+  },
+  {
+    "kien/rainbow_parentheses.vim",
+    ft = { "clojure", "clojurescript" }
+  },
   --
   -- You can also add new plugins here as well:
   -- Add plugins, the lazy syntax

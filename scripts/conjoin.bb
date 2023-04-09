@@ -82,6 +82,11 @@
   (let [outfile (str outdir fs/file-separator "out.mp3")]
     (sh "ffmpeg" "-f" "concat" "-safe" "0" "-i" list-text-path outfile)))
 
+(defn ffmpeg-downsample
+  "Take a given mp3 file and downsample it to 32kbps."
+  [inpath outpath]
+  (sh "ffmpeg" "-i" inpath "-b:a" "32k" outpath))
+
 (defn conjoin
   "Run the conjoining process."
   [inpath outpath]
@@ -96,9 +101,13 @@
     (ffmpeg-join (str tempdir fs/file-separator "list.txt") outpath)
     (println (str "Deleting temporary directory " tempdir "..."))
     (fs/delete-tree tempdir)
+    (println (str "Downsampling " outpath fs/file-separator "out.mp3..."))
+    (ffmpeg-downsample (str outpath fs/file-separator "out.mp3")
+                       (str outpath fs/file-separator "out_small.mp3"))
+    (println (str "Deleting " outpath fs/file-separator "out.mp3..."))
     (println (str "Renaming " outpath fs/file-separator
-                  "out.mp3 to " (fs/file-name inpath) ".mp3"))
-    (fs/move (str outpath fs/file-separator "out.mp3")
+                  "out_small.mp3 to " (fs/file-name inpath) ".mp3"))
+    (fs/move (str outpath fs/file-separator "out_small.mp3")
              (str outpath fs/file-separator (fs/file-name inpath) ".mp3"))))
 
 (def cli-spec {:input  {:ref          "<directory>"
@@ -125,5 +134,5 @@
       (println (str "Usage: conjoin.clj -i <input dir> -o <output dir>"
                     "\n\n"
                     (cli/format-opts {:spec cli-spec}))))))
-    
+
 (-main *command-line-args*)

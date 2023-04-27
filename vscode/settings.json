@@ -1,4 +1,23 @@
 {
     "editor.inlineSuggest.enabled": true,
-    "workbench.startupEditor": "none"
+    "workbench.startupEditor": "none",
+    "files.autoSave": "afterDelay",
+    "editor.fontSize": 16,
+    "editor.lineHeight": 27,
+    "files.defaultLanguage": "markdown",
+    "editor.cursorWidth": 3,
+    "editor.cursorBlinking": "phase",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.minimap.enabled": false,
+    "breadcrumbs.enabled": false,
+    "workbench.activityBar.visible": false,
+    "workbench.statusBar.visible": false,
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": true,
+        "plaintext": true,
+        "markdown": true,
+        "clojure": true
+    },
+    "editor.fontFamily": "'Fira Code', Fira, Menlo, Monaco, 'Courier New', monospace"
 }

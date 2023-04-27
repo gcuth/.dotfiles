@@ -19,7 +19,9 @@ case "$(uname -s)" in
 esac
 
 # Set visual editor with a tonne of fallbacks
-if [ -f `which nvim` ]; then
+if [ -f `which code` ]; then
+    export VISUAL=`which code`
+elif [ -f `which nvim` ]; then
     export VISUAL=`which nvim`
 elif [ -f /usr/bin/vim ]; then
     export VISUAL="/usr/bin/vim"
@@ -40,11 +42,6 @@ fi
 
 export CHROME_BIN=chromium
 
-# Add pyenv to path
-# export PATH="$HOME/.pyenv/bin:$PATH"
-# eval "$(pyenv init -)"
-# eval "$(pyenv virtualenv-init -)"
-
 # Add $HOME/.local/bin/ to path
 export PATH="$PATH:$HOME/.local/bin"
 
@@ -54,7 +51,5 @@ export TERM=xterm-256color
 CASE_SENSITIVE="false"
 
 eval "$(starship init bash)"
-
-# [[ -s "/etc/profile.d/grc.bashrc" ]] && source /etc/profile.d/grc.bashrc
 
 . "$HOME/.cargo/env"

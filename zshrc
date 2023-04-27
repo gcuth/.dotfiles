@@ -23,7 +23,9 @@ esac
 export GPG_TTY=$(tty)
 
 # Set visual editor with a tonne of fallbacks
-if [ -f `which nvim` ]; then
+if [ -f `which code` ]; then
+    export VISUAL=`which code`
+elif [ -f `which nvim` ]; then
     export VISUAL=`which nvim`
 elif [ -f /usr/bin/vim ]; then
     export VISUAL="/usr/bin/vim"

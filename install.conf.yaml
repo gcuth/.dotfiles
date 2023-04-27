@@ -47,20 +47,22 @@
       path: scripts/**
       glob: true
       create: true
-    ~/.config/nvim/:
-      path: vim/**
-      create: true
-      glob: true
-      relink: true
-      force: true
     ~/.lein/profiles.clj:
       path: lein/profiles.clj
-    ~/Library/Application\ Support/Code/User/settings.json:
-      path: vscode/settings.json
-      create: true
-      relink: true
-      force: true
-
+- ifmacos:
+    - link:
+      /Users/g/Library/Application\ Support/Code/User/settings.json:
+        path: vscode/settings.json
+        create: true
+        relink: true
+        force: true
+- ifubuntu:
+    - link:
+      /home/g/.config/Code/User/settings.json:
+        path: vscode/settings.json
+        create: true
+        relink: true
+        force: true
 
 # BREW:
 - ifmacos:
@@ -210,7 +212,3 @@
 
 - shell:
   command: ['curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash']
-
-# ensure astrovim etc is actually setup
-- shell:
-  command: nvim --headless -c 'autocmd User LazyDone quitall'

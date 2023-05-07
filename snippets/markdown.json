@@ -1,0 +1,29 @@
+{
+	"Jekyll Post Header -- Journal": {
+		"prefix": "hhj",
+		"body": [
+			"---",
+			"title: Morning Pages ($CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE)",
+			"layout: post",
+			"permalink: /j/$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
+			"date: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND +1000",
+			"categories: ['journal']",
+			"published: false",
+			"---",
+			"",
+			"$0"
+		],
+		"description": "Add a jekyll-style post header for a private (unpublished) 'morning pages' journal post."
+	},
+	"Current Time": {
+		"prefix": "ttime",
+		"body": ["$CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND"],
+		"description": "Insert the current time in HH:MM:SS format."
+	},
+	"Current Date": {
+		"prefix": "ddate",
+		"body": ["$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"],
+		"description": "Insert the current date in YYYY-MM-DD format."
+	}
+}
+

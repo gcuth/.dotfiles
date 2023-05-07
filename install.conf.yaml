@@ -3,7 +3,7 @@
       create: true
       relink: true
 
-- clean: ['~', '~/.local/bin/']
+- clean: ['~', '~/.local/bin/', '~/Library/Application Support/Code/User/snippets/']
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
@@ -49,99 +49,64 @@
       create: true
     ~/.lein/profiles.clj:
       path: lein/profiles.clj
-- ifmacos:
-    - link:
-      /Users/g/Library/Application\ Support/Code/User/settings.json:
-        path: vscode/settings.json
-        create: true
-        relink: true
-        force: true
-- ifubuntu:
-    - link:
-      /home/g/.config/Code/User/settings.json:
-        path: vscode/settings.json
-        create: true
-        relink: true
-        force: true
+    ~/Library/Application Support/Code/User/settings.json:
+      path: vscode/settings.json
+      create: true
+      relink: true
+      force: true
+    ~/Library/Application Support/Code/User/snippets/:
+      path: snippets/**
+      glob: true
+      create: true
 
 # BREW:
-- ifmacos:
-  - shell:
-    - [ test -e `which brew` || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ]
-  - shell:
-    - brew update && brew upgrade
-  - brew: 
-    - python
-    - neovim
-    - pandoc
-    - java
-    - julia
-    - leiningen
-    - newsboat
-    - git
-    - gpg
-    - fzf
-    - jq
-    - gh
-    - chrome-cli
-    - hledger
-    - ffmpeg
-    - youtube-dl
-    - rclone
-    - tmux
-    - dark-mode
-    - haskell-stack
-    - toot
-    - rust
-    - borkdude/brew/babashka
-    - ripgrep
-    - jesseduffield/lazygit/lazygit
-    - gdu
-    - bottom
-    - iterm2
-    - discord
-    - docker
-  - tap:
-    - homebrew/cask-fonts
-  - brew:
-    - font-fira-code
-    - font-hack-nerd-font
-  - brew:
-    - hashicorp/tap/terraform
-  - shell:
-    - [ test -e `which toggl` || pip install togglCli ]
-  - shell:
-    - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
-- ifubuntu:
-  - shell:
-    - sudo apt update && sudo apt upgrade
-  - shell:
-    - sudo apt install -y zsh
-    - sudo apt install -y python3
-    - sudo apt install -y python3-pip
-    - sudo apt install -y python3-setuptools
-    - sudo apt install -y python3-venv
-    - sudo apt install -y neovim
-    - sudo apt install -y pandoc
-    - sudo apt install -y leiningen
-    - sudo apt install -y newsboat
-    - sudo apt install -y git
-    - sudo apt install -y gnupg
-    - sudo apt install -y fzf
-    - sudo apt install -y jq
-    - sudo apt install -y hledger
-    - sudo apt install -y ffmpeg
-    - sudo apt install -y rclone
-    - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0; sudo apt-add-repository https://cli.github.com/packages; sudo apt update; sudo apt install -y gh
-  - shell:
-    - sudo apt install -y snapd
-    - sudo snap install go --classic
-  - shell:
-    - sudo apt install -y fonts-firacode
-  - shell:
-    - [ test -e `which toggl` || sudo pip3 install togglCli ]
-  - shell:
-    - sudo apt install -y anki
+- shell:
+  - [ test -e `which brew` || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ]
+- shell:
+  - brew update && brew upgrade
+- brew: 
+  - python
+  - neovim
+  - pandoc
+  - java
+  - julia
+  - leiningen
+  - newsboat
+  - git
+  - gpg
+  - fzf
+  - jq
+  - gh
+  - chrome-cli
+  - hledger
+  - ffmpeg
+  - youtube-dl
+  - rclone
+  - tmux
+  - dark-mode
+  - haskell-stack
+  - toot
+  - rust
+  - borkdude/brew/babashka
+  - ripgrep
+  - jesseduffield/lazygit/lazygit
+  - gdu
+  - bottom
+  - iterm2
+  - discord
+  - docker
+- tap:
+  - homebrew/cask-fonts
+- brew:
+  - font-fira-code
+  - font-hack-nerd-font
+- brew:
+  - hashicorp/tap/terraform
+- shell:
+  - [ test -e `which toggl` || pip install togglCli ]
+- shell:
+  - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
+
 
 # if you don't already have them, you probably want them:
 - shell:
@@ -162,53 +127,39 @@
     - curl -fsSL https://starship.rs/install.sh -o ./starship.sh; bash ./starship.sh -y; rm ./starship.sh
 
 # cron setup
-- ifmacos:
-  - crontab:
-    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
-      command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
-    - cron: 0,10,20,30,40,50 * * * *
-      command: /opt/homebrew/bin/git -C /Users/g/Documents/blog add .; /opt/homebrew/bin/git -C /Users/g/Documents/blog/ commit -m 'Auto-commit' >/dev/null 2>&1
-    - cron: 1 * * * *
-      command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
-    - cron: 1 * * * *
-      command: /opt/homebrew/bin/git -C /Users/g/Documents/blog push origin master >/dev/null 2>&1
-    - cron: 5,35 * * * *
-      command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl; cp /Users/g/Documents/blog/data/logs/toggl /Users/g/Documents/blog/data/logs/old_toggl; cat /Users/g/Documents/blog/data/logs/old_toggl | sort -u > /Users/g/Documents/blog/data/logs/toggl; rm /Users/g/Documents/blog/data/logs/old_toggl
-    - cron: 5,35 * * * *
-      command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
-    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
-      command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
-    - cron: 22 * * * *
-      command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
-    - cron: 0,12,24,36,48 * * * *
-      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_anki_progress.py >/dev/null
-    - cron: 0,12,24,36,48 * * * *
-      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_email_inbox.py >/dev/null
-    - cron: 0,12,24,36,48 * * * *
-      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_network_status.py >/dev/null
-    - cron: 14 * * * *
-      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_run_log.py >/dev/null
-    - cron: 14 * * * *
-      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_finance_logs.py >/dev/null
-    - cron: 14 * * * *
-      command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_shortcut_health_logs.py >/dev/null
-    - cron: "* * * * *"
-      command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
-    - cron: "*/5 * * * *"
-      command: shortcuts run "Prompt for Current Activity"
-
-- ifubuntu:
-  - crontab:
-    - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
-      command: git -C ~/Documents/thesis add .; git -C ~/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
-    - cron: 0,10,20,30,40,50 * * * *
-      command: git -C ~/Documents/blog add .; git -C ~/Documents/blog/ commit -m 'Auto-commit' >/dev/null 2>&1
-    - cron: 1 * * * *
-      command: git -C ~/Documents/thesis push origin master >/dev/null 2>&1
-    - cron: 1 * * * *
-      command: git -C ~/Documents/blog push origin master >/dev/null 2>&1
-    - cron: 22 * * * *
-      command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
+- crontab:
+  - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
+    command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
+  - cron: 0,10,20,30,40,50 * * * *
+    command: /opt/homebrew/bin/git -C /Users/g/Documents/blog add .; /opt/homebrew/bin/git -C /Users/g/Documents/blog/ commit -m 'Auto-commit' >/dev/null 2>&1
+  - cron: 1 * * * *
+    command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
+  - cron: 1 * * * *
+    command: /opt/homebrew/bin/git -C /Users/g/Documents/blog push origin master >/dev/null 2>&1
+  - cron: 5,35 * * * *
+    command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl; cp /Users/g/Documents/blog/data/logs/toggl /Users/g/Documents/blog/data/logs/old_toggl; cat /Users/g/Documents/blog/data/logs/old_toggl | sort -u > /Users/g/Documents/blog/data/logs/toggl; rm /Users/g/Documents/blog/data/logs/old_toggl
+  - cron: 5,35 * * * *
+    command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
+  - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
+    command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
+  - cron: 22 * * * *
+    command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
+  - cron: 0,12,24,36,48 * * * *
+    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_anki_progress.py >/dev/null
+  - cron: 0,12,24,36,48 * * * *
+    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_email_inbox.py >/dev/null
+  - cron: 0,12,24,36,48 * * * *
+    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_network_status.py >/dev/null
+  - cron: 14 * * * *
+    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_run_log.py >/dev/null
+  - cron: 14 * * * *
+    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_finance_logs.py >/dev/null
+  - cron: 14 * * * *
+    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_shortcut_health_logs.py >/dev/null
+  - cron: "* * * * *"
+    command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
+  - cron: "*/5 * * * *"
+    command: shortcuts run "Prompt for Current Activity"
 
 - shell:
   command: ['curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash']

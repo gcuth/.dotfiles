@@ -25,34 +25,38 @@ const now = new Date()
 const datetime = now.getFullYear() + "-" + addZero(now.getMonth() + 1) + "-" + addZero(now.getDate()) + " " + addZero(now.getHours()) + ":" + addZero(now.getMinutes()) + ":" + addZero(now.getSeconds()) + " " + formatOffset(now.getTimezoneOffset());
 
 if (Application("Music").running()) {
-    try {
-        const track = Application("Music").currentTrack;
-        const artist = track.artist();
-        const title = track.name();
-        const album = track.album();
-        const source = "Apple Music";
-        // duration comes in seconds automatically
-        const length = track.duration();
-        const genre = track.genre();
-        output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
-    }
-    catch {
-        output = null;
+    if (Application("Music").playerState() === "playing") {
+        try {
+            const track = Application("Music").currentTrack;
+            const artist = track.artist();
+            const title = track.name();
+            const album = track.album();
+            const source = "Apple Music";
+            // duration comes in seconds automatically
+            const length = track.duration();
+            const genre = track.genre();
+            output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
+        }
+        catch {
+            output = null;
+        }
     }
 } else if (Application("Spotify").running()) {
-    try {
-        const track = Application("Spotify").currentTrack;
-        const artist = track.artist();
-        const title = track.name();
-        const album = track.album();
-        const source = "Spotify";
-        // get duration in seconds
-        const length = track.duration() / 1000;
-        const genre = "";
-        output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
-    }
-    catch {
-        output = null;
+    if (Application("Spotify").playerState() === "playing") {
+        try {
+            const track = Application("Spotify").currentTrack;
+            const artist = track.artist();
+            const title = track.name();
+            const album = track.album();
+            const source = "Spotify";
+            // get duration in seconds
+            const length = track.duration() / 1000;
+            const genre = "";
+            output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
+        }
+        catch {
+            output = null;
+        }
     }
 } else {
     output = null;

@@ -88,7 +88,7 @@
             ]
         },
         "(\\s*)(.{80})(.*)": {        // skip leading whitespace, skip next 80 characters
-            "filterLanguageRegex": "clojure",
+            "filterLanguageRegex": "clojure|python",
             "decorations": [
                 {},               // do nothing to first 2 capture groups
                 {},

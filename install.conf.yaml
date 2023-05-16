@@ -8,8 +8,6 @@
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
     - ~/Developer/
-    - ~/Recordings/
-    - ~/Readings/
 
 # VERY BASIC GLOBAL SETTINGS:
 - link:
@@ -126,6 +124,10 @@
 - shell:
     - curl -fsSL https://starship.rs/install.sh -o ./starship.sh; bash ./starship.sh -y; rm ./starship.sh
 
+# if VSCode exists, install some extensions from a file
+- shell:
+  - [ test -e `which code` && cat /Users/g/.dotfiles/vscode/extensions.txt | xargs -n 1 code --install-extension ]
+
 # cron setup
 - crontab:
   - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
@@ -160,6 +162,8 @@
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
   - cron: "*/5 * * * *"
     command: shortcuts run "Prompt for Current Activity"
+  - cron: "0 9 * * *"
+    command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh
 
 - shell:
   command: ['curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash']

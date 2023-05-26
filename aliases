@@ -74,13 +74,7 @@ function start_angst_blogging() {
     # One shot (speed) write a post for angst.blog / relentlessangst.com
     toggl stop
     toggl start -o 'Blog' -a 'writing' "Write a blog post for angst.blog"
-    if [ -f ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md ]; then
-        $VISUAL ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md;
-    else
-        $VISUAL -c ':exe "normal ihha\<Tab>aangst\<Tab>"' ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md
-    fi
-    osascript ~/.dotfiles/applescripts/relentless_draft.scpt
-    toggl stop
+    $VISUAL ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md;
 }
 alias angst="start_angst_blogging"
 

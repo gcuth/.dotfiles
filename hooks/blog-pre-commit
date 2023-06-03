@@ -15,4 +15,5 @@ python3 ~/Documents/blog/bin/log_email_inbox.py
 /opt/homebrew/bin/bb ~/Documents/blog/bin/log_thesis_progress.bb
 /opt/homebrew/bin/bb ~/Documents/blog/bin/forecast_thesis_progress.bb
 /opt/homebrew/bin/bb ~/Documents/blog/bin/forecast_running_progress.bb
-git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/data/Reading.apkg ~/Documents/blog/data/Jet.apkg ~/Documents/blog/data/logs/ ~/Documents/blog/data/blot/ ~/Documents/blog/_data/
+curl "https://hasa.blog/@galen.rss" > ~/Documents/blog/data/logs/mastodon/rss
+git add ~/Documents/blog/data/logs/crypto.csv ~/Documents/blog/data/Reading.apkg ~/Documents/blog/data/Jet.apkg ~/Documents/blog/data/logs/mastodon/rss ~/Documents/blog/data/logs/ ~/Documents/blog/data/blot/ ~/Documents/blog/_data/

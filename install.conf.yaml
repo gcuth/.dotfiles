@@ -164,7 +164,7 @@
     command: shortcuts run "Prompt for Current Activity"
   - cron: "*/6 5-17 * * 1-5"
     command: shortcuts run "You Should Exercise"
-  - cron: "*/4 5-17 * * 1-5"
+  - cron: "*/4 5-17 * * *"
     command: shortcuts run "How Are You Check-In"
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh

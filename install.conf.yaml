@@ -155,6 +155,8 @@
     command: shortcuts run "You Should Exercise"
   - cron: "*/4 * * * *"
     command: shortcuts run "How Are You Check-In"
+  - cron: "30 * * * *" # at 30 minutes past the hour, every hour
+    command: shortcuts run "Post Drafted Toots"
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh
 

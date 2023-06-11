@@ -10,7 +10,7 @@
     "github.copilot.enable": {
         "*": true,
         "plaintext": true,
-        "markdown": false,
+        "markdown": true,
         "scminput": false,
         "yaml": true,
         "clojure": true
@@ -18,7 +18,7 @@
     "editor.fontFamily": "'Fira Code', Fira, Menlo, Monaco, 'Courier New', monospace",
     "security.workspace.trust.untrustedFiles": "open",
     "workbench.activityBar.visible": false,
-    "workbench.statusBar.visible": false,
+    "workbench.statusBar.visible": true,
     "breadcrumbs.enabled": false,
     "editor.renderWhitespace": "none",
     "editor.renderControlCharacters": false,
@@ -87,10 +87,24 @@
                 }
             ]
         },
-        "(\\s*)(.{80})(.*)": {        // skip leading whitespace, skip next 80 characters
+        "(\\s*)(.{80})(.*)": { // skip leading whitespace, skip next 80 characters
             "filterLanguageRegex": "clojure|python",
             "decorations": [
-                {},               // do nothing to first 2 capture groups
+                {}, // do nothing to first 2 capture groups
+                {},
+                {
+                    "borderWidth": "0 0 2px 0",
+                    "borderColor": "red",
+                    "borderStyle": "solid"
+                },
+            ]
+        },
+        // FOR DRAFTING THREADS ON MASTODON:
+        "(\\s*)(.{490})(.*)": { // skip leading whitespace, skip next 500 characters
+            "filterLanguageRegex": "(markdown|text)", // only apply to markdown or text files
+            "filterFileRegex": ".*(Mastodon|Toots).*", // only apply to files with 'Mastodon' or 'Toot' somewhere in the path
+            "decorations": [
+                {}, // do nothing to first 2 capture groups
                 {},
                 {
                     "borderWidth": "0 0 2px 0",

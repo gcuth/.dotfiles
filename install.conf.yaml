@@ -154,6 +154,3 @@
     command: shortcuts run "Post Drafted Toots"
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh
-
-- shell:
-  command: ['curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash']

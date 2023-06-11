@@ -80,6 +80,7 @@
   - iterm2
   - discord
   - docker
+  - starship
 - tap:
   - homebrew/cask-fonts
 - brew:
@@ -100,10 +101,6 @@
 - link:
     ~/Documents/blog/.git/hooks/pre-commit:
       path: hooks/blog-pre-commit
-
-# install starship for enlivening the prompt a little
-- shell:
-    - curl -fsSL https://starship.rs/install.sh -o ./starship.sh; bash ./starship.sh -y; rm ./starship.sh
 
 # if VSCode exists, install some extensions from a file
 - shell:

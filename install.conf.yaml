@@ -11,11 +11,6 @@
 
 # VERY BASIC GLOBAL SETTINGS:
 - link:
-    ~/.bashrc:
-      path: bashrc
-      create: true
-      relink: true
-      force: true
     ~/.zshrc:
       path: zshrc
       create: true

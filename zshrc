@@ -1,28 +1,30 @@
 #!/bin/zsh
-# HISTORY
-# don't add duplicate lines (or lines beginning with spaces) into the history
+
+###########
+# HISTORY #
+###########
 setopt inc_append_history
 HISTCONTROL=ignoreboth
-# set sensible lengths
 HISTSIZE=5000
 HISTFILESIZE=10000
-# set a callable history
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
-# etc
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND" # set a callable history
 HIST_STAMPS="yyyy-mm-dd"
 
 
-# SET A PLATFORM VARIABLE
-case "$(uname -s)" in
-    Linux*)     CURRENTPLATFORM=linux;;
-    Darwin*)    CURRENTPLATFORM=macos;;
-esac
 
 
-# make gpg work for signing
+#######
+# GPG #
+#######
+# (make gpg work for signing)
 export GPG_TTY=$(tty)
 
-# Set visual editor with a tonne of fallbacks
+
+
+
+##########
+# EDITOR #
+##########
 if [ -f `which code` ]; then
     export VISUAL=`which code`
 elif [ -f `which nvim` ]; then
@@ -31,45 +33,43 @@ elif [ -f /usr/bin/vim ]; then
     export VISUAL="/usr/bin/vim"
 fi
 
-# set normal editor with fewer callbacks
 if [ -f `which nvim` ]; then
     export EDITOR=`which nvim`
 elif [ -f /usr/bin/vim ]; then
     export EDITOR="/usr/bin/vim"
 fi
 
-# Load aliases
+
+
+
+###########
+# ALIASES #
+###########
 if [ -f ~/.aliases ]; then
     . ~/.aliases
 fi
 
-export CHROME_BIN=chromium
 
-# Add pyenv to path
-# export PATH="$HOME/.pyenv/bin:$PATH"
-# eval "$(pyenv init -)"
-# eval "$(pyenv virtualenv-init -)"
 
-# Add poetry to path
-# export PATH="$HOME/.poetry/bin:$PATH"
 
-# Add golang to path
+########
+# PATH #
+########
+# Golang Path:
 export GOROOT=/usr/lib/go
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
-
+# make sure the homebrew openjdk is first in path:
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 # Add $HOME/.local/bin/ to path
 export PATH="$PATH:$HOME/.local/bin"
 
-# make sure homebrew openjdk is first in path
-# if [ `uname` == 'Darwin' ]; then
-export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
-# fi
 
-# make sure julia is in the path:
-export PATH="/Applications/Julia-1.7.app/Contents/Resources/julia/bin:$PATH"
 
-# Fix term
+
+#############################
+# GENERAL TERMINAL SETTINGS #
+#############################
 export TERM=xterm-256color
 
 CASE_SENSITIVE="false"
@@ -80,9 +80,21 @@ plugins=(
 
 DISABLE_LS_COLORS="false"
 
-# use starship if it's available
-eval "$(starship init zsh)"
 
+
+
+#######
+# NVM #
+#######
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+
+
+#################
+# CUSTOM PROMPT #
+#################
+# use starship if it's available
+eval "$(starship init zsh)"

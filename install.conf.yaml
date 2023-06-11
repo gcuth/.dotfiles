@@ -59,6 +59,7 @@
   - brew update && brew upgrade
 - brew: 
   - python
+  - nvm
   - neovim
   - pandoc
   - java

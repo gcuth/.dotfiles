@@ -1,13 +1,14 @@
+# Disable the blank line at the start of the prompt
 add_newline = false
 
-# don't add a line break after the prompt info!
+# Disable the line break after the prompt info
 [line_break]
 disabled = true
 
-# only let starship scan the current dir for 10 milliseconds
+# Only let starship scan the current dir for 10 milliseconds
 scan_timeout = 10
 
-# set a simple prompt character
+# Set a simple prompt character
 [character]
 success_symbol = "[=](bold green)"
 error_symbol = "[!](bold red)"

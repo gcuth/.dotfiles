@@ -11,6 +11,17 @@
          '[clj-yaml.core :as yaml]
          '[clojure.string :as str])
 
+(def default-paths ["~/Documents/blog/_data/stuff/wishlist.yml"
+                    "~/Documents/blog/_data/stuff/wishlist.yaml"
+                    "~/blog/_data/stuff/wishlist.yml"
+                    "~/blog/_data/stuff/wishlist.yaml"
+                    "~/Documents/blog/_data/wishlist.yml"
+                    "~/Documents/blog/_data/wishlist.yaml"
+                    "~/blog/_data/wishlist.yml"
+                    "~/blog/_data/wishlist.yaml"
+                    "~/.wishlist.yml"
+                    "~/.wishlist.yaml"])
+
 (def cli-options
   [["-n" "--name NAME" "Name of the item"
     :default ""]
@@ -50,12 +61,7 @@
 
 (defn -main [& args]
   (let [{:keys [arguments options errors]} (parse-opts (first args) cli-options)
-        path (get-existing-file ["~/Documents/blog/_data/wishlist.yml"
-                                 "~/Documents/blog/_data/wishlist.yaml"
-                                 "~/blog/_data/wishlist.yml"
-                                 "~/blog/_data/wishlist.yaml"
-                                 "~/.wishlist.yml"
-                                 "~/.wishlist.yaml"])]
+        path (get-existing-file default-paths)]
     (if (not path)
       (do  ;; if the file doesn't exist, error out
         (println "Warning: wishlist file not found!")
@@ -89,10 +95,7 @@
                   :price price
                   :currency currency
                   :note (if (empty? note) nil note)
-                  :date date}
-            ;; remove any keys with nil values
-            data (->> data
-                      (filter (fn [[k v]] (not (nil? v)))))]
+                  :date date}]
         ;; append the new item to the file
         (append-to-file path data)))))
 

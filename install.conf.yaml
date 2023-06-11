@@ -96,10 +96,6 @@
   - if [ ! -d "/Users/g/Documents/thesis" ]; then git clone git@github.com:gcuth/phd_thesis.git ~/Documents/thesis; fi
   - if [ ! -d "/Users/g/Documents/blog" ]; then git clone git@github.com:gcuth/gcuth.github.io.git ~/Documents/blog; fi
 
-# use cargo to install some stuff!
-- shell:
-  - cargo install tree-sitter-cli
-
 # # link hooks:
 - link:
     ~/Documents/blog/.git/hooks/pre-commit:

@@ -138,8 +138,6 @@
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_shortcut_health_logs.py >/dev/null
   - cron: "* * * * *"
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
-  - cron: "*/5 * * * *"
-    command: shortcuts run "Prompt for Current Activity"
   - cron: "*/6 5-17 * * 1-5"
     command: shortcuts run "You Should Exercise"
   - cron: "*/4 * * * *"

@@ -6,6 +6,7 @@ python3 ~/Documents/blog/bin/crypto.py >> ~/Documents/blog/data/logs/crypto.csv
 python3 ~/Documents/blog/bin/extract_run_log.py
 python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py
 python3 ~/Documents/blog/bin/extract_shortcut_aranet_logs.py
+python3 ~/Documents/blog/bin/clean_up_aranet_log_csv.py ~/Documents/blog/data/logs/aranet4/raw_logs.csv
 python3 ~/Documents/blog/bin/extract_finance_logs.py
 python3 ~/Documents/blog/bin/scrape_rescuetime.py
 python3 ~/Documents/blog/bin/log_anki_progress.py

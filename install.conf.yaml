@@ -108,9 +108,9 @@
 
 # cron setup
 - crontab:
-  - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
+  - cron: "/5 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
-  - cron: 0,10,20,30,40,50 * * * *
+  - cron: "*/10 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/blog add .; /opt/homebrew/bin/git -C /Users/g/Documents/blog/ commit -m 'Auto-commit' >/dev/null 2>&1
   - cron: 1 * * * *
     command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
@@ -120,15 +120,13 @@
     command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl; cp /Users/g/Documents/blog/data/logs/toggl /Users/g/Documents/blog/data/logs/old_toggl; cat /Users/g/Documents/blog/data/logs/old_toggl | sort -u > /Users/g/Documents/blog/data/logs/toggl; rm /Users/g/Documents/blog/data/logs/old_toggl
   - cron: 5,35 * * * *
     command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
-  - cron: 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
-    command: for TAB in `chrome-cli list tabs | grep "YouTube" | sed 's/\].*//g' | sed 's/\[//g'`; do chrome-cli close -t $TAB; done >/dev/null 2>&1
   - cron: 22 * * * *
     command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
-  - cron: 0,12,24,36,48 * * * *
+  - cron: "/12 * * * *"
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_anki_progress.py >/dev/null
-  - cron: 0,12,24,36,48 * * * *
+  - cron: "/12 * * * *"
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_email_inbox.py >/dev/null
-  - cron: 0,12,24,36,48 * * * *
+  - cron: "/12 * * * *"
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_network_status.py >/dev/null
   - cron: 14 * * * *
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_run_log.py >/dev/null
@@ -138,11 +136,7 @@
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_shortcut_health_logs.py >/dev/null
   - cron: "* * * * *"
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
-  - cron: "*/6 5-17 * * 1-5"
-    command: shortcuts run "You Should Exercise"
   - cron: "*/4 * * * *"
-    command: shortcuts run "How Are You Check-In"
-  - cron: "30 * * * *" # at 30 minutes past the hour, every hour
-    command: shortcuts run "Post Drafted Toots"
+    command: shortcuts run "Scheduled Check-In"
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh

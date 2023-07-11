@@ -17,13 +17,26 @@
 	},
 	"Current Time": {
 		"prefix": "ttime",
-		"body": ["$CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND"],
+		"body": [
+			"$CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND"
+		],
 		"description": "Insert the current time in HH:MM:SS format."
 	},
 	"Current Date": {
 		"prefix": "ddate",
-		"body": ["$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"],
+		"body": [
+			"$CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE"
+		],
 		"description": "Insert the current date in YYYY-MM-DD format."
+	},
+	"Question": {
+		"prefix": "qqn",
+		"body": [
+			"- question:",
+			"    question: \"$1\"",
+			"    answer: \"$2\"",
+			"$0"
+		],
+		"description": "Add a question to the list of questions. Used in yaml headers for posts/notes."
 	}
 }
-

@@ -108,7 +108,7 @@
 
 # cron setup
 - crontab:
-  - cron: "/5 * * * *"
+  - cron: "*/5 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit' >/dev/null 2>&1
   - cron: "*/10 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/blog add .; /opt/homebrew/bin/git -C /Users/g/Documents/blog/ commit -m 'Auto-commit' >/dev/null 2>&1
@@ -122,11 +122,11 @@
     command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
   - cron: 22 * * * *
     command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
-  - cron: "/12 * * * *"
+  - cron: "*/12 * * * *"
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_anki_progress.py >/dev/null
-  - cron: "/12 * * * *"
+  - cron: "*/12 * * * *"
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_email_inbox.py >/dev/null
-  - cron: "/12 * * * *"
+  - cron: "*/12 * * * *"
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_network_status.py >/dev/null
   - cron: 14 * * * *
     command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_run_log.py >/dev/null

@@ -138,5 +138,7 @@
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
   - cron: "*/4 * * * *"
     command: shortcuts run "Scheduled Check-In"
+  - cron: "45 16 * * *"
+    command: shortcuts run "Clean Up Desktop"
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh

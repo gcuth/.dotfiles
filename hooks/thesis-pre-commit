@@ -1,0 +1,10 @@
+#!/bin/sh
+
+/opt/homebrew/bin/bb ~/Documents/blog/bin/log_thesis_progress.bb
+/opt/homebrew/bin/bb ~/Documents/blog/bin/forecast_thesis_progress.bb
+cp ~/Documents/blog/_data/phd/progress.yml ~/Documents/thesis/_reports/progress/day_log.yml
+cp ~/Documents/blog/_data/phd/forecast.yml ~/Documents/thesis/_reports/progress/day_forecast.yml
+
+python3 ~/Documents/thesis/bin/log.py ~/Documents/thesis/chapters ~/Documents/thesis/_reports/progress/log.json
+python3 ~/Documents/thesis/bin/summary.py
+python3 ~/Documents/thesis/bin/report.py ~/Documents/thesis/chapters ~/Documents/thesis/_reports/chapters

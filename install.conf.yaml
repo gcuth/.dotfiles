@@ -103,6 +103,9 @@
 - link:
     ~/Documents/blog/.git/hooks/pre-commit:
       path: hooks/blog-pre-commit
+- link:
+    ~/Documents/thesis/.git/hooks/pre-commit:
+      path: hooks/thesis-pre-commit
 
 # if VSCode exists, install some extensions from a file
 - shell:

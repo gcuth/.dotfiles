@@ -15,7 +15,8 @@
         "yaml": true,
         "clojure": true
     },
-    "editor.fontFamily": "'Fira Code', Fira, Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontFamily": "FiraCode-Retina, 'Fira Code', Fira, Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontLigatures": true,
     "security.workspace.trust.untrustedFiles": "open",
     "workbench.activityBar.visible": false,
     "workbench.statusBar.visible": true,
@@ -114,5 +115,5 @@
             ]
         }
     },
-    "workbench.colorTheme": "Default Light Modern"
+    "workbench.colorTheme": "Default Light Modern",
 }

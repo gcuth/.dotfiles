@@ -65,8 +65,6 @@ export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 export PATH="$PATH:$HOME/.local/bin"
 
 
-
-
 #############################
 # GENERAL TERMINAL SETTINGS #
 #############################

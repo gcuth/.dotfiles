@@ -79,7 +79,6 @@
   - borkdude/brew/babashka
   - ripgrep
   - gdu
-  - iterm2
   - discord
   - docker
   - starship
@@ -88,6 +87,10 @@
 - brew:
   - font-fira-code
   - font-hack-nerd-font
+- tap:
+  - homebrew/cask-versions
+- brew:
+  - iterm2-beta
 - shell:
   - [ test -e `which toggl` || pip install togglCli ]
 - shell:
@@ -106,6 +109,9 @@
 - link:
     ~/Documents/thesis/.git/hooks/pre-commit:
       path: hooks/thesis-pre-commit
+- link:
+    ~/Documents/thesis/.git/hooks/post-commit:
+      path: hooks/thesis-post-commit
 
 # if VSCode exists, install some extensions from a file
 - shell:
@@ -113,6 +119,8 @@
 
 # cron setup
 - crontab:
+  - cron: "*/5 * * * *"
+    command: "[ \"$(/opt/homebrew/bin/bb /Users/g/.dotfiles/scripts/onaroll.bb)\" = \"true\" ] && shortcuts run \"Start Deep Work\" || shortcuts run \"Stop Deep Work\""
   - cron: "*/5 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
   - cron: "*/10 * * * *"

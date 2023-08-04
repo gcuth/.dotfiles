@@ -98,6 +98,7 @@ alias fuz="fuzzy_find_and_edit"
 function start_thesis_writing() {
     toggl stop
     toggl start -o 'Thesis' -a 'thesis, study, writing' "Write `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
+    $VISUAL ~/Documents/thesis/
     $VISUAL ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
 }
 alias thesis="start_thesis_writing"

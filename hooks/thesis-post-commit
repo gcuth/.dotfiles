@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "datetime, hash" > ~/Documents/blog/data/logs/thesis/commits.csv
+git log --pretty=format:'%ad, %h' --date=iso --reverse >> ~/Documents/blog/data/logs/thesis/commits.csv

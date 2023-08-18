@@ -88,11 +88,10 @@
                 }
             ]
         },
-        "(\\s*)(.{80})(.*)": { // skip leading whitespace, skip next 80 characters
+        "(.{80})(.*)": { // skip the first 80 characters
             "filterLanguageRegex": "clojure|python",
             "decorations": [
-                {}, // do nothing to first 2 capture groups
-                {},
+                {}, // do nothing with the first capture group
                 {
                     "borderWidth": "0 0 2px 0",
                     "borderColor": "red",
@@ -112,6 +111,20 @@
                     "borderColor": "red",
                     "borderStyle": "solid"
                 },
+            ]
+        },
+        // FOR HIGHLIGHTING 'TK' PLACEHOLDERS IN MARKDOWN TEXT (case insensitive):
+        // match 'tk' or 'TK' if it's *not* followed by a letter (to avoid matching 'atkins' or 'lotka' etc.)
+        "((tk|TK)(?!\\w))(.*)": {
+            "filterLanguageRegex": "(markdown|text)", // only apply to markdown or text files
+            "decorations": [
+                {
+                    "overviewRulerColor": "#ffcc00",
+                    "backgroundColor": "#ffcc00",
+                    "color": "#1f1f1f",
+                    "fontWeight": "bold"
+                },
+                {}
             ]
         }
     },

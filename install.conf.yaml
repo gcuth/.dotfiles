@@ -34,10 +34,6 @@
       path: starship.toml
     ~/.tmux.conf:
       path: tmux.conf
-    ~/.newsboat/urls:
-      path: newsboat/urls
-    ~/.newsboat/config:
-      path: newsboat/newsboatrc
     ~/.local/bin/:
       path: scripts/**
       glob: true
@@ -66,7 +62,6 @@
   - pandoc
   - java
   - leiningen
-  - newsboat
   - git
   - gpg
   - fzf

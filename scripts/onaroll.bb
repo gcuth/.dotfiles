@@ -14,12 +14,12 @@
 (def CODE-DIR "~/Developer/") ;; almost all git repos are here
 
 ;; by default, we consider a file to have been edited 'recently' if it was
-;; edited in the last 5 minutes. we also consider a git repo to have been
+;; edited in the last 10 minutes. we also consider a git repo to have been
 ;; committed to 'recently' if it has had at least 4 commits in the last 60
 ;; minutes. We halve the commit threshold for git repositories found in the
 ;; code directory, because I have 'auto-commit' scripts running in blog and
 ;; thesis directories, but not in code directories.
-(def EDIT-THRESHOLD 300000) ;; 5 minutes
+(def EDIT-THRESHOLD 600000) ;; 10 minutes
 (def COMMIT-THRESHOLD 60) ;; 60 minutes
 (def AT-LEAST-N-COMMITS 4) ;; 4 commits
 
@@ -48,9 +48,9 @@
     (- now (fs/file-time->millis (fs/last-modified-time path)))))
 
 (defn edited-recently?
-  "Return true if a file was edited 'recently' (default: 5 minutes ago)."
+  "Return true if a file was edited 'recently' (default: 10 minutes ago)."
   ([path]
-   (edited-recently? path 300000))
+   (edited-recently? path 600000))
   ([path threshold]
    (< (time-since-modified path) threshold)))
 
@@ -116,6 +116,7 @@
                                             (int (/ COMMIT-THRESHOLD 2)))
                               code-dirs)]
     (println (or thesis?
+                ;;  blog?
                  (> (count hot-code-dirs) 0)))))
 
 (-main *command-line-args*)

@@ -82,6 +82,7 @@
   - discord
   - docker
   - starship
+  - keybase
 - tap:
   - homebrew/cask-fonts
 - brew:
@@ -120,7 +121,7 @@
 # cron setup
 - crontab:
   - cron: "*/5 * * * *"
-    command: "[ \"$(/opt/homebrew/bin/bb /Users/g/.dotfiles/scripts/onaroll.bb)\" = \"true\" ] && shortcuts run \"Start Deep Work\" || shortcuts run \"Stop Deep Work\""
+    command: "shortcuts run 'Set One Thing Text'"
   - cron: "*/5 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
   - cron: "*/10 * * * *"

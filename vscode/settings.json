@@ -129,5 +129,11 @@
         }
     },
     "workbench.layoutControl.enabled": false,
+    "calva.prettyPrintingOptions": {
+        "printEngine": "pprint",
+        "enabled": false,
+        "width": 120,
+        "maxLength": 50
+    },
     "workbench.colorTheme": "Default Light Modern",
 }

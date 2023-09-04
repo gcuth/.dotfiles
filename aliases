@@ -1,15 +1,13 @@
-# basics
+# BASICS
 alias c="clear; ls"
-alias vi="nvim"
-alias e="$VISUAL"
+alias vi="nvim" # should be installed
+alias e="$VISUAL" # quick-open editor
+alias l="ls -Glah" # override to add colour
+alias ls="ls -G" # override ls usual to add colour by default
+alias grep="grep --color=auto" # who *doesn't* want grep colour?
 
-# adding color to the usuals
-alias l="ls -Glah"
-alias ls="ls -G"
-alias grep="grep --color=auto"
-# alias diff='diff --color=auto'
 
-# git
+# GIT
 alias gs="git status -bs"
 alias gd="git diff"
 alias ga="git add"
@@ -26,24 +24,11 @@ alias gt="cd \$(git rev-parse --show-toplevel)"
 # Remove all traces of git from a folder
 alias degit="find . -name '.git' -exec rm -rf {} \;"
 
-# helpful extras
-alias rg="grep -r '$*' ."
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
 # Use ack to locate TOD* and FIXM* lines in current folder tree
 alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+):.*((TODO|FIXME):.*)/\2 :>> \1/"|grep -E --color=always ":>>.*:\d+"'
 
 # those pesky permissions
 alias ax='chmod a+x'
-
-# Get current external IP
-alias myip="curl icanhazip.com"
-
-# List currently mounted usbs
-function list_my_usbs() {
-    lsblk | grep /media | grep -oP "sd[a-z]" | awk '{print "/dev/"$1}' | sort | uniq
-}
-alias myusbs="list_my_usbs"
 
 # trim newlines
 alias tn='tr -d "\n"'
@@ -54,78 +39,3 @@ alias rg="recursivegrep"
 
 # rot13
 alias rot13="tr 'A-MN-Za-mn-z' 'N-ZA-Mn-za-m'"
-
-
-function take_meeting_notes() {
-    default_record
-    toggl stop
-    toggl start -o 'Social' -a 'meeting' "'$*'"
-    $VISUAL ~/Documents/blog/_posts/meetings/$(date +%Y-%m-%d)-$(echo "'$*'" | sed "s/[A-Z]/\L&/g" | sed "s/ /-/g" | sed "s/'//g").md
-}
-alias mm="take_meeting_notes"
-
-function start_journal_writing() {
-    shortcuts run "Enforce Journal Focus"
-    $VISUAL ~/Documents/blog/_posts/journals/$(date +%Y-%m-%d).md
-    osascript ~/.dotfiles/applescripts/mark_task_complete.scpt "Journal for 10 minutes"
-}
-alias jj="start_journal_writing"
-
-function start_angst_blogging() {
-    # One shot (speed) write a post for angst.blog / relentlessangst.com
-    toggl stop
-    toggl start -o 'Blog' -a 'writing' "Write a blog post for angst.blog"
-    $VISUAL ~/Documents/blog/_posts/angst/$(date +%Y-%m-%d).md;
-}
-alias angst="start_angst_blogging"
-
-function write_a_note() {
-    pbpaste >> ~/Documents/blog/data/toread.txt
-    echo "\n" >> ~/Documents/blog/data/toread.txt
-    ~/.dotfiles/scripts/addtozotero.py `pbpaste`
-    $VISUAL `pbpaste | ~/.dotfiles/scripts/note.bb | tr -d '\n'`
-    # ~/.dotfiles/scripts/as_audio.py `pbpaste`
-}
-alias nn="write_a_note"
-
-
-function fuzzy_find_and_edit() {
-    $VISUAL `fzf --preview="cat {}" --preview-window=right:70%:wrap`
-}
-alias fuz="fuzzy_find_and_edit"
-
-# Open the most recently edited thesis file
-function start_thesis_writing() {
-    toggl stop
-    toggl start -o 'Thesis' -a 'thesis, study, writing' "Write `ls -At ~/Documents/thesis/chapters | head -n 1 | sed 's/\..*//g'` chapter."
-    $VISUAL ~/Documents/thesis/
-    $VISUAL ~/Documents/thesis/chapters/`ls -At ~/Documents/thesis/chapters | head -n 1`
-}
-alias thesis="start_thesis_writing"
-
-# cookie cut a (python) Data Science project
-alias ccds="cookiecutter https://github.com/drivendata/cookiecutter-data-science"
-
-# codewars kata
-function start_a_kata() {
-    open "https://www.codewars.com/trainer/clojure" | xdg-open "https://www.codewars.com/trainer/clojure"
-    if [ `toggl now | grep "kata" | wc -l` -gt 0 ]; then
-        echo "Suitable task already running!"
-    else
-        toggl start -o 'Tekke' -a 'codewars, coding, clojure' "Complete a codewars kata";
-        echo "Started a toggl entry for a clojure kata on codewars";
-    fi
-}
-alias kata="start_a_kata"
-
-# Uni Convenience
-alias anuc="globalprotect connect --portal staff-access.anu.edu.au"
-alias anud="globalprotect disconnect"
-alias anus="globalprotect show --status"
-
-# ProtonVPN Convenience
-alias pvc="protonvpn-cli c -r"
-alias pvcr="protonvpn-cli c -r"
-alias pvcf="protonvpn-cli c -f"
-alias pvd="protonvpn-cli d"
-alias pvs="protonvpn-cli s"

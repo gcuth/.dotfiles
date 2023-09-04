@@ -12,11 +12,15 @@ else
     exit 0
 fi
 
-/opt/homebrew/bin/bb ~/Documents/blog/bin/log_thesis_progress.bb
-/opt/homebrew/bin/bb ~/Documents/blog/bin/forecast_thesis_progress.bb
+# generate an updated progress / 'day log'
+/opt/homebrew/bin/bb ~/Documents/thesis/bin/log_thesis_progress.bb
 cp ~/Documents/blog/_data/phd/progress.yml ~/Documents/thesis/_reports/progress/day_log.yml
+
+# generate an updated forecast based on progress
+/opt/homebrew/bin/bb ~/Documents/thesis/bin/forecast_thesis_progress.bb
 cp ~/Documents/blog/_data/phd/forecast.yml ~/Documents/thesis/_reports/progress/day_forecast.yml
 
+# generate updated summaries and reports
 /opt/homebrew/bin/python3 ~/Documents/thesis/bin/log.py ~/Documents/thesis/chapters ~/Documents/thesis/_reports/progress/log.json
 /opt/homebrew/bin/python3 ~/Documents/thesis/bin/summary.py
 /opt/homebrew/bin/python3 ~/Documents/thesis/bin/report.py ~/Documents/thesis/chapters ~/Documents/thesis/_reports/chapters

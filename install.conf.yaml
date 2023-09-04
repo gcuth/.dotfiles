@@ -1,15 +1,17 @@
+# DEFAULT BEHAVIOURS
 - defaults:
     link:
       create: true
       relink: true
 
+# CLEAN ON START
 - clean: ['~', '~/.local/bin/', '~/Library/Application Support/Code/User/snippets/']
 
 # CREATE THE BASIC (NEEDED) DIRS
 - create:
     - ~/Developer/
 
-# VERY BASIC GLOBAL SETTINGS:
+# LINK VERY BASIC GLOBAL SETTINGS FILES, SNIPPETS, & SCRIPTS:
 - link:
     ~/.zshrc:
       path: zshrc
@@ -93,12 +95,10 @@
   - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
 
 
-# if you don't already have them, you probably want them:
+# CLONE THESIS & BLOG IF NOT ALREADY PRESENT (AND LINK HOOKS)
 - shell:
   - if [ ! -d "/Users/g/Documents/thesis" ]; then git clone git@github.com:gcuth/phd_thesis.git ~/Documents/thesis; fi
   - if [ ! -d "/Users/g/Documents/blog" ]; then git clone git@github.com:gcuth/gcuth.github.io.git ~/Documents/blog; fi
-
-# # link hooks:
 - link:
     ~/Documents/blog/.git/hooks/pre-commit:
       path: hooks/blog-pre-commit
@@ -109,43 +109,31 @@
     ~/Documents/thesis/.git/hooks/post-commit:
       path: hooks/thesis-post-commit
 
-# if VSCode exists, install some extensions from a file
+
+# IF VSCODE EXISTS, INSTALL BASIC EXTENSIONS FROM FILE
 - shell:
   - [ test -e `which code` && cat /Users/g/.dotfiles/vscode/extensions.txt | xargs -n 1 code --install-extension ]
 
-# cron setup
+# SETUP CRON JOBS:
 - crontab:
+  # set text in the 'One Thing' app every five minutes (to display in menubar)
   - cron: "*/5 * * * *"
     command: "shortcuts run 'Set One Thing Text'"
+  # commit any thesis changes in the last five minutes automatically
   - cron: "*/5 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
+  # commit any blog changes in the last ten minutes automatically
   - cron: "*/10 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/blog add .; /opt/homebrew/bin/git -C /Users/g/Documents/blog/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/blog push origin master >/dev/null 2>&1
-  - cron: 5,35 * * * *
-    command: /opt/homebrew/bin/toggl ls --fields 'id,workspace,description,project,task,billable,start,stop,duration,tags' >> /Users/g/Documents/blog/data/logs/toggl; cp /Users/g/Documents/blog/data/logs/toggl /Users/g/Documents/blog/data/logs/old_toggl; cat /Users/g/Documents/blog/data/logs/old_toggl | sort -u > /Users/g/Documents/blog/data/logs/toggl; rm /Users/g/Documents/blog/data/logs/old_toggl
-  - cron: 5,35 * * * *
-    command: /opt/homebrew/bin/python3 /Users/g/Documents/blog/bin/crypto.py >> /Users/g/Documents/blog/data/logs/crypto.csv
-  - cron: 22 * * * *
-    command: /opt/homebrew/bin/bb ~/Documents/blog/bin/colophon.bb >/dev/null 2>&1
-  - cron: "*/12 * * * *"
-    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_anki_progress.py >/dev/null
-  - cron: "*/12 * * * *"
-    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_email_inbox.py >/dev/null
-  - cron: "*/12 * * * *"
-    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/log_network_status.py >/dev/null
-  - cron: 14 * * * *
-    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_run_log.py >/dev/null
-  - cron: 14 * * * *
-    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_finance_logs.py >/dev/null
-  - cron: 14 * * * *
-    command: /opt/homebrew/bin/python3 Users/g/Documents/blog/bin/extract_shortcut_health_logs.py >/dev/null
+  # every minute, log the currently playing song (if any) to a csv file
   - cron: "* * * * *"
-    command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> /Users/g/Documents/blog/data/logs/music/playing.csv
+    command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv
+  # run a 'check in' shortcut every four minutes (prompting to log activity, or exercise, or mood, or whatever)
   - cron: "*/4 * * * *"
     command: shortcuts run "Scheduled Check-In"
-  - cron: "45 16 * * *"
+  # run a shortcut to clean up the desktop (move screenshots to photos etc)
+  - cron: "45 9-17 * * *"
     command: shortcuts run "Clean Up Desktop"
-  - cron: "*/15 * * * *"
-    command: shortcuts run "Post Drafts To Mastodon"
+  # save a list of the current vscode extensions to a file for easy reinstallation
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh

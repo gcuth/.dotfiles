@@ -35,7 +35,7 @@ if (Application("Music").running()) {
             // duration comes in seconds automatically
             const length = track.duration();
             const genre = track.genre();
-            output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
+            output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", "${length}", "${genre}"`;
         }
         catch {
             output = null;
@@ -52,7 +52,7 @@ if (Application("Music").running()) {
             // get duration in seconds
             const length = track.duration() / 1000;
             const genre = "";
-            output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", ${length}, "${genre}"`;
+            output = `"${datetime}", "${source}", "${title}", "${artist}", "${album}", "${length}", "${genre}"`;
         }
         catch {
             output = null;

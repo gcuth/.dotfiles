@@ -80,6 +80,8 @@
   - docker
   - starship
   - keybase
+  - obsidian
+  - sqlcipher
 - tap:
   - homebrew/cask-fonts
 - brew:
@@ -119,9 +121,9 @@
   # set text in the 'One Thing' app every five minutes (to display in menubar)
   - cron: "*/5 * * * *"
     command: "shortcuts run 'Set One Thing Text'"
-  # commit any thesis changes in the last five minutes automatically
+  # commit any changes to a thesis chapter in the last five minutes automatically
   - cron: "*/5 * * * *"
-    command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add .; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
+    command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add ./chapters; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
   # commit any blog changes in the last ten minutes automatically
   - cron: "*/10 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/blog add .; /opt/homebrew/bin/git -C /Users/g/Documents/blog/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/blog push origin master >/dev/null 2>&1
@@ -134,6 +136,9 @@
   # run a shortcut to clean up the desktop (move screenshots to photos etc)
   - cron: "45 9-17 * * *"
     command: shortcuts run "Clean Up Desktop"
+  # run a shortcut to log the email inbox
+  - cron: "59 * * * *"
+    command: shortcuts run "Save Email Report"
   # save a list of the current vscode extensions to a file for easy reinstallation
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh

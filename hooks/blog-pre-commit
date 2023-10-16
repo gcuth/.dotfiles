@@ -1,12 +1,19 @@
 #!/bin/sh
 
+# Extract posts from Obsidian Notes folder to _posts folder
+/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_obsidian_posts.py ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_posts
+
+# Backup all of Obsidian Notes folder to _archive folder of blog repo
+cp -a ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_archive/obsidian
+
+
 # Export data from Apple Health (exported as shortcut logs in iCloud) to public CSV and _data YAML files
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/Weight ~/Documents/blog/_data/health/weight.yml ~/Documents/blog/public/logs/weight.csv
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/VO2\ Max ~/Documents/blog/_data/health/vo2_max.yml ~/Documents/blog/public/logs/vo2_max.csv
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/Resting\ Heart\ Rate ~/Documents/blog/_data/health/resting_heart_rate.yml ~/Documents/blog/public/logs/resting_heart_rate.csv
 
 # Export Aranet4 C02 data logs from iCloud to a CSV file in _data
-python3 ./bin/extract_aranet_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Aranet4/ ~/Documents/blog/_data/co2/aranet4_logs.csv
+python3 ~/Documents/blog/bin/extract_aranet_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Aranet4/ ~/Documents/blog/_data/co2/aranet4_logs.csv
 
 # Try to get an updated copy of strava data from 'strava-offline' (see https://github.com/liskin/strava-offline)
 /opt/homebrew/bin/strava-offline sqlite
@@ -26,5 +33,5 @@ cp -a ~/Library/Application\ Support/strava_offline/activities/. ~/Documents/blo
 # Extract media log data
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_music_log.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv ~/Documents/blog/_data/media/music.yml
 
-# Add the updated files to the commit
-git add ~/Documents/blog/_data ~/Documents/blog/public
+# Add the updated log & data & post files to the commit
+git add ~/Documents/blog/_data ~/Documents/blog/public ~/Documents/blog/_posts

@@ -118,9 +118,6 @@
 
 # SETUP CRON JOBS:
 - crontab:
-  # set text in the 'One Thing' app every five minutes (to display in menubar)
-  - cron: "*/5 * * * *"
-    command: "shortcuts run 'Set One Thing Text'"
   # commit any changes to a thesis chapter in the last five minutes automatically
   - cron: "*/5 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add ./chapters; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
@@ -130,9 +127,9 @@
   # every minute, log the currently playing song (if any) to a csv file
   - cron: "* * * * *"
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv
-  # run a 'check in' shortcut every four minutes (prompting to log activity, or exercise, or mood, or whatever)
-  - cron: "*/4 * * * *"
-    command: shortcuts run "Scheduled Check-In"
+  # Run a 'check in' shortcut every five minutes (prompting to log activity, or exercise, or mood, or whatever)
+  - cron: "*/5 * * * *"
+    command: shortcuts run "Every Five Minutes"
   # run a shortcut to clean up the desktop (move screenshots to photos etc)
   - cron: "45 9-17 * * *"
     command: shortcuts run "Clean Up Desktop"

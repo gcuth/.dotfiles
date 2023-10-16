@@ -88,7 +88,7 @@
                 }
             ]
         },
-        "(.{80})(.*)": { // skip the first 80 characters
+        "(.{79})(.*)": { // skip the first 79 characters
             "filterLanguageRegex": "clojure|python",
             "decorations": [
                 {}, // do nothing with the first capture group
@@ -135,5 +135,9 @@
         "width": 120,
         "maxLength": 50
     },
+    "terminal.integrated.commandsToSkipShell": [
+        "language-julia.interrupt"
+    ],
+    "julia.symbolCacheDownload": true,
     "workbench.colorTheme": "Default Light Modern",
 }

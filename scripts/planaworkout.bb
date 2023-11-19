@@ -7,13 +7,11 @@
 ;; set of a (weight)lifting exercise. Each has the following format (example):
 ;; {
 ;;   "exercise": "Back Squat",
-;;   "device_name": "Galen’s iPhone",
-;;   "longitude": "149.1270023349141",
+;;   "device_name": "My iPhone",
 ;;   "datetime": "2023-10-27T13:28:14+11:00",
 ;;   "kg": 35,
 ;;   "reps": 5,
 ;;   "percieved_difficulty": "8",
-;;   "latitude": "-35.27072640221976",
 ;;   "device_model": "iPhone",
 ;;   "device_type": "iPhone"
 ;; }
@@ -115,122 +113,51 @@
 (defn measure-orm-level
   "Take an exercise name & 1RM, along with optionally 'gender', & 'bodyweight'.
    
-   Use rough 'strength levels' to return a score between 0 and 5, where 1 is a
-   beginner and 5 is elite."
-  [& {:keys [exercise orm gender bodyweight age]}]
+   Use rough 'strength levels' to return a continuous score between 0 and 5, 
+   interpolating between defined thresholds."
+  [& {:keys [exercise orm gender bodyweight]}]
   (let [bodyweight (or bodyweight
                        (cond (= gender "male") 85
                              (= gender "female") 60
                              :else 70))
-        fractional-orm (/ orm bodyweight)]
-    (cond (= gender "male")
-          (cond (= exercise "Overhead Press")
-                (cond (< fractional-orm 0.35) 0
-                      (< fractional-orm 0.55) 1
-                      (< fractional-orm 0.8) 2
-                      (< fractional-orm 1.1) 3
-                      (< fractional-orm 1.4) 4
-                      (>= fractional-orm 1.4) 5
-                      :else nil)
-                (= exercise "Bench Press")
-                (cond (< fractional-orm 0.5) 0
-                      (< fractional-orm 0.75) 1
-                      (< fractional-orm 1.25) 2
-                      (< fractional-orm 1.75) 3
-                      (< fractional-orm 2) 4
-                      (>= fractional-orm 2) 5
-                      :else nil)
-                (= exercise "Barbell Row")
-                (cond (< fractional-orm 0.5) 0
-                      (< fractional-orm 0.75) 1
-                      (< fractional-orm 1) 2
-                      (< fractional-orm 1.5) 3
-                      (< fractional-orm 1.75) 4
-                      (>= fractional-orm 1.75) 5
-                      :else nil)
-                (= exercise "Back Squat")
-                (cond (< fractional-orm 0.75) 0
-                      (< fractional-orm 1.25) 1
-                      (< fractional-orm 1.5) 2
-                      (< fractional-orm 2.25) 3
-                      (< fractional-orm 2.75) 4
-                      (>= fractional-orm 2.75) 5
-                      :else nil)
-                (= exercise "Deadlift")
-                (cond (< fractional-orm 1) 0
-                      (< fractional-orm 1.5) 1
-                      (< fractional-orm 2) 2
-                      (< fractional-orm 2.5) 3
-                      (< fractional-orm 3) 4
-                      (>= fractional-orm 3) 5
-                      :else nil)
-                (= exercise "Barbell Bicep Curl")
-                (cond (< fractional-orm 0.2) 0
-                      (< fractional-orm 0.4) 1
-                      (< fractional-orm 0.6) 2
-                      (< fractional-orm 0.85) 3
-                      (< fractional-orm 1.15) 4
-                      (>= fractional-orm 1.15) 5
-                      :else nil)
-                :else nil)
-          (= gender "female")
-          (cond (= exercise "Overhead Press")
-                (cond (< fractional-orm 0.2) 0
-                      (< fractional-orm 0.35) 1
-                      (< fractional-orm 0.5) 2
-                      (< fractional-orm 0.75) 3
-                      (< fractional-orm 1) 4
-                      (>= fractional-orm 1) 5
-                      :else nil)
-                (= exercise "Bench Press")
-                (cond (< fractional-orm 0.25) 0
-                      (< fractional-orm 0.5) 1
-                      (< fractional-orm 0.75) 2
-                      (< fractional-orm 1) 3
-                      (< fractional-orm 1.5) 4
-                      (>= fractional-orm 1.5) 5
-                      :else nil)
-                (= exercise "Barbell Row")
-                (cond (< fractional-orm 0.25) 0
-                      (< fractional-orm 0.4) 1
-                      (< fractional-orm 0.65) 2
-                      (< fractional-orm 0.9) 3
-                      (< fractional-orm 1.2) 4
-                      (>= fractional-orm 1.2) 5
-                      :else nil)
-                (= exercise "Back Squat")
-                (cond (< fractional-orm 0.5) 0
-                      (< fractional-orm 0.75) 1
-                      (< fractional-orm 1.25) 2
-                      (< fractional-orm 1.5) 3
-                      (< fractional-orm 2) 4
-                      (>= fractional-orm 2) 5
-                      :else nil)
-                (= exercise "Deadlift")
-                (cond (< fractional-orm 0.5) 0
-                      (< fractional-orm 1) 1
-                      (< fractional-orm 1.25) 2
-                      (< fractional-orm 1.75) 3
-                      (< fractional-orm 2.5) 4
-                      (>= fractional-orm 2.5) 5
-                      :else nil)
-                (= exercise "Barbell Bicep Curl")
-                (cond (< fractional-orm 0.1) 0
-                      (< fractional-orm 0.2) 1
-                      (< fractional-orm 0.4) 2
-                      (< fractional-orm 0.6) 3
-                      (< fractional-orm 0.85) 4
-                      (>= fractional-orm 0.85) 5
-                      :else nil)
-                :else nil)
-          :else (int (median [(measure-orm-level :exercise exercise
-                                                 :orm orm
-                                                 :bodyweight bodyweight
-                                                 :gender "male")
-                              (measure-orm-level :exercise exercise
-                                                 :orm orm
-                                                 :bodyweight bodyweight
-                                                 :gender "female")])))))
+        fractional-orm (/ orm bodyweight)
+        thresholds (cond
+                     (= gender "male")
+                     {"Overhead Press" [0.35 0.55 0.8 1.1 1.4]
+                      "Bench Press" [0.5 0.75 1.25 1.75 2]
+                      "Barbell Row" [0.5 0.75 1 1.5 1.75]
+                      "Back Squat" [0.75 1.25 1.5 2.25 2.75]
+                      "Deadlift" [1 1.5 2 2.5 3]
+                      "Barbell Bicep Curl" [0.2 0.4 0.6 0.85 1.15]}
+                     (= gender "female")
+                     {"Overhead Press" [0.2 0.35 0.5 0.75 1]
+                      "Bench Press" [0.25 0.5 0.75 1 1.5]
+                      "Barbell Row" [0.25 0.4 0.65 0.9 1.2]
+                      "Back Squat" [0.5 0.75 1.25 1.5 2]
+                      "Deadlift" [0.5 1 1.25 1.75 2.5]
+                      "Barbell Bicep Curl" [0.1 0.2 0.4 0.6 0.85]}
+                     :else nil)
+        get-score (fn [thresholds fractional-orm]
+                    (let [levels (map-indexed vector thresholds)
+                          find-level (fn [levels]
+                                       (first (drop-while #(<= fractional-orm (second %)) levels)))]
+                      (if-let [[level lower-bound] (find-level levels)]
+                        (+ level
+                           (if (zero? level)
+                             0
+                             (let [prev-bound (nth thresholds (dec level))]
+                               (/ (- fractional-orm prev-bound) (- lower-bound prev-bound)))))
+                        5)))]
+    (if thresholds
+      (get-score (thresholds exercise) fractional-orm)
+      (average [(measure-orm-level :exercise exercise
+                                   :orm orm
+                                   :bodyweight bodyweight
+                                   :gender "male")
+                (measure-orm-level :exercise exercise
+                                   :orm orm
+                                   :bodyweight bodyweight
+                                   :gender "female")])))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -296,16 +223,19 @@
    w * (1 + r/30)
    where w is the weight used, and r is the number of reps.
    
-   We take the most recent 10 sets, and use the average weight & reps for them."
+   "
   [& {:keys [logs exercise]}]
   (let [recent-logs (->> logs
                          (filter #(= (:exercise %) exercise)) ;; get logs for the exercise
-                         (sort-by :timestamp)
-                         (take-last 10))
-        recent-weights (map :kg recent-logs)
-        recent-reps (map :reps recent-logs)
-        recent-orms (map #(* % (+ 1 (/ % 30))) recent-weights)]
-    (int (average [(average recent-orms) (median recent-orms)]))))
+                         (sort-by :timestamp))
+        recent-weights (map :kg recent-logs) ;; get weights for each of the sets
+        recent-reps (map :reps recent-logs) ;; get reps for each of the sets
+        recent-orms (map #(int (* % (+ 1 (/ %2 30)))) recent-weights recent-reps) ;; calculate the orm for each set
+        ]
+    (->> recent-orms
+         (ewma) ;; calculate the ewma of the orms
+         (last) ;; return the last (most recent) ewma value
+         (int)))) ;; round to the nearest integer
 
 
 (defn sets-per-day
@@ -331,43 +261,18 @@
 (defn suggest-weight
   "Given a list of logs, a target rep count, & an exercise (as named args),
    return an integer value for the suggested weight.
-   
-   To get this, we:
-   1. Estimate your 1RM for the exercise (using 'estimate-orm').
-   2. Get a recent average of weight used for the exercise.
-   3. Get number of days since the exercise was last done.
-   4. Discount the 1RM estimate by a factor based on days since last done.
-        (This is to account for strength loss & detraining & reduce risk.)
-   5. Take the mean of the discounted 1RM and the recent weight used.
-   6. Discount the result to account for the target (5% less for each rep >1).
-   7. Round the result of (6) to the nearest whole number.
-   8. Get the latest weight used for the target rep count (if any).
-   9. Average the result of (7) and (8).
-   10. If the result is less than 20kg, use 20kg instead.
-
-   However, if we're not averaging a reasonable average number of sets per day,
-   we discount further to enable safe training for form.
-   
-   If bodyweight & gender are given, we also use the 'strength levels' to
-   determine a suggested weight."
+"
   [& {:keys [logs exercise target-reps bodyweight gender age]}]
-  (let [est-orm (estimate-orm :logs logs :exercise exercise)
-        recent-weight (recent-weight :logs logs :exercise exercise)
+  (let [est-orm (estimate-orm :logs logs :exercise exercise) ;; estimated 1RM for the exercise (using Epley formula)
         days-since (days-since-exercise :logs logs :exercise exercise)
         discount-factor (if (< days-since 7) 1
                             ;; discount by 4.5% for each day since last done
                             (- 1 (* (/ 45 1000) (- days-since 7))))
-        discounted-orm (* est-orm discount-factor)
-        avg-weight (average [discounted-orm recent-weight])
-        discounted-weight (* avg-weight (- 0.9 (* 0.05 (- target-reps 5))))
-        rounded-weight (int discounted-weight)
-        latest (latest-weight :logs logs
-                              :exercise exercise
-                              :target-reps target-reps)
-        best-guess (if latest
-                     (int (average [rounded-weight latest
-                                    (median [rounded-weight latest])]))
-                     rounded-weight)
+        discounted-orm (* est-orm discount-factor) ;; estimated orm discounted by days since last done
+        discounted-weight (* discounted-orm (- 0.75 (* 0.05 (- target-reps 4))))
+        latest (* (latest-weight :logs logs :exercise exercise :target-reps target-reps)
+                  discount-factor)
+        best-guess (int (median [discounted-weight latest]))
         form-safe (if (or (< (sets-per-day :logs logs :exercise exercise)
                              (cond (= exercise "Back Squat") (/ 12 7)
                                    (= exercise "Deadlift") (/ 3 7)
@@ -375,7 +280,12 @@
                           (> (sets-per-day :logs logs :exercise exercise) 3))
                     (int (* 0.8 best-guess)) ;; discount by 20%
                     best-guess)
-        final-weight (if (< form-safe 20) 20 form-safe)
+        final-weight (cond (< form-safe 20) 20
+                           (zero? (mod form-safe 5)) form-safe
+                           (> form-safe bodyweight) form-safe
+
+                           :else (+ (rand-nth [0 5])
+                                  (* 5 (inc (quot form-safe 5))))) ;; round up to nearest 5
         orm-level (measure-orm-level :exercise exercise
                                      :orm discounted-orm
                                      :gender gender
@@ -429,19 +339,22 @@
 
 (defn generate-workout-a
   "Generate a default 'Workout A' taskpaper based on logs."
-  [logs]
+  [logs bodyweight]
   (let [squat-weight (suggest-weight :logs logs
                                      :exercise "Back Squat"
-                                     :target-reps 5)
+                                     :target-reps 5
+                                     :bodyweight bodyweight)
         warmup-squat-weight (min (max (int (* 0.5 squat-weight)) 20) 60)
         press-weight (suggest-weight :logs logs
                                      :exercise "Overhead Press"
-                                     :target-reps 5)
+                                     :target-reps 5
+                                     :bodyweight bodyweight)
         warmup-press-weight (min (max (int (* 0.5 press-weight)) 20) 30)
         n-pullups (min (max (- (int (/ press-weight 10)) 1) 1) 5)
         deadlift-weight (suggest-weight :logs logs
                                         :exercise "Deadlift"
-                                        :target-reps 5)
+                                        :target-reps 5
+                                        :bodyweight bodyweight)
         warmup-deadlift-weight (min (max (int (* 0.5 deadlift-weight)) 40) 80)]
     (str "- Complete 'Workout A' @parallel(false) @autodone(true) @estimate(120m)\n"
          "\t- Get changed into workout gear @estimate(5m) @tags(Low, Home)\n"
@@ -452,8 +365,10 @@
          "\t- Dead hang for 10 seconds @estimate(1m) @tags(High, Home)\n"
          "\t- Overhead Press " warmup-press-weight "kg for 5 reps @estimate(3m) @tags(High, Home)\n"
          "\t- Do 1 pullup @estimate(1m) @tags(High, Home)\n"
-         "\t- Load squat bar to a total of " squat-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
-         "\t- Load overhead press bar to a total of " press-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
+         (if (> (- squat-weight warmup-squat-weight) 0)
+           (str
+            "\t- Add " (- squat-weight warmup-squat-weight) "kg to squat bar (for a total of " squat-weight "kgs) @estimate(5m) @tags(Medium, Home)\n"))
+         "\t- Add " (- press-weight warmup-press-weight) "kg to overhead press bar (for a total of " press-weight "kgs) @estimate(5m) @tags(Medium, Home)\n"
          (apply str
                 (into []
                       (for [i (range 1 6)]
@@ -465,7 +380,7 @@
                                (str "\t- Do 1 pullup @estimate(1m) @tags(High, Home)\n"))))))
          "\t- Load deadlift bar to a total of " warmup-deadlift-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
          "\t- Deadlift " warmup-deadlift-weight "kg for 5 reps @estimate(3m) @tags(High, Home)\n"
-         "\t- Load deadlift bar to a total of " deadlift-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
+         "\t- Add " (- deadlift-weight warmup-deadlift-weight) "kg to deadlift bar (for a total of " deadlift-weight "kgs) @estimate(5m) @tags(Medium, Home)\n"
          "\t- Deadlift " deadlift-weight "kg for 5 reps @estimate(3m) @tags(High, Home)\n"
          "\t- Stop workout tracking for Traditional Weightlifting @estimate(1m) @tags(Low, Home)\n"
          "\t- Have a cold shower @estimate(5m) @tags(Low, Home)\n")))
@@ -473,36 +388,32 @@
 
 (defn generate-workout-b
   "Generate a default 'Workout B' taskpaper based on logs."
-  [logs]
-  ;; WORKOUT B
-  ;; (warmup sets, then...)
-;; 5 sets of ->
-;;   "Back Squat Xkg for Y reps"
-;;   "Do 1 pullup"
-;; 5 sets of ->
-;;   "Bench Press Zkg for W reps"
-;;   "Barbell Row Qkg for R reps"
-;; 1 set of ->
-;;   "Barbell Bicep Curl Skg for T reps"
+  [logs bodyweight]
   (let [squat-weight (suggest-weight :logs logs
                                      :exercise "Back Squat"
-                                     :target-reps 5)
+                                     :target-reps 5
+                                     :bodyweight bodyweight)
         warmup-squat-weight (min (max (int (* 0.5 squat-weight)) 20) 60)
         press-weight (suggest-weight :logs logs
                                      :exercise "Bench Press"
-                                     :target-reps 5)
+                                     :target-reps 5
+                                     :bodyweight bodyweight)
         warmup-press-weight (min (max (int (* 0.5 press-weight)) 20) 30)
-        row-weight (suggest-weight :logs logs :exercise "Barbell Row" :target-reps 5)
+        row-weight (suggest-weight :logs logs :exercise "Barbell Row" :target-reps 5 :bodyweight bodyweight)
         n-pullups (min (max (- (int (/ press-weight 10)) 2) 1) 5)
         curl-weight (suggest-weight :logs logs
                                     :exercise "Barbell Bicep Curl"
-                                    :target-reps 5)]
+                                    :target-reps 5
+                                    :bodyweight bodyweight)]
     (str "- Complete 'Workout B' @parallel(false) @autodone(true) @estimate(120m)\n"
          "\t- Get changed into workout gear @estimate(5m) @tags(Low, Home)\n"
          "\t- Start workout tracking for Traditional Weightlifting @estimate(1m) @tags(Low, Home)\n"
          "\t- Load squat bar to a total of " warmup-squat-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
          "\t- Back Squat " warmup-squat-weight "kg for 5 reps @estimate(3m) @tags(High, Home)\n"
          "\t- Do 1 pullup @estimate(1m) @tags(High, Home)\n"
+         (if (> (- squat-weight warmup-squat-weight) 0)
+           (str
+            "\t- Add " (- squat-weight warmup-squat-weight) "kg to squat bar (for a total of " squat-weight "kgs) @estimate(5m) @tags(Medium, Home)\n"))
          (apply str
                 (into []
                       (for [i (range 1 6)]
@@ -512,7 +423,7 @@
                                (str "\t- Do 1 pullup @estimate(1m) @tags(High, Home)\n"))))))
          "\t- Load bench press bar to a total of " warmup-press-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
          "\t- Bench Press " warmup-press-weight "kg for 5 reps @estimate(3m) @tags(High, Home)\n"
-         "\t- Load bench press bar to a total of " press-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
+         "\t- Add " (- press-weight warmup-press-weight) "kg to bench press bar (for a total of " press-weight "kgs) @estimate(5m) @tags(Medium, Home)\n"
          "\t- Load barbell row bar to a total of " row-weight "kgs @estimate(5m) @tags(Medium, Home)\n"
          (apply str
                 (into []
@@ -554,11 +465,12 @@
   "Generate a workout given a list of logs, a workout type (a or b or cardio).
    Returns a string of taskpaper-formatted text. If it's a lifting workout, also
    add cardio at the end ~25% of the time."
-  ([logs] (generate-workout logs EXERCISES))
-  ([logs exercises]
+  ([logs] (generate-workout logs EXERCISES 85))
+  ([logs exercises] (generate-workout logs exercises 85))
+  ([logs exercises bodyweight]
    (let [workout-type (which-workout logs exercises)
-         primary-workout (cond (= workout-type :a) (generate-workout-a logs)
-                               (= workout-type :b) (generate-workout-b logs)
+         primary-workout (cond (= workout-type :a) (generate-workout-a logs bodyweight)
+                               (= workout-type :b) (generate-workout-b logs bodyweight)
                                (= workout-type :cardio) (generate-workout-cardio))]
      (if (= workout-type :cardio)
        primary-workout
@@ -576,7 +488,7 @@
   {:input {:default "~/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Logs/Fitness/Lifting/"
            :help "The input directory to process."
            :parse-fn str}
-   :bodyweight {:default nil
+   :bodyweight {:default 85
                 :help "Your bodyweight in kg."
                 :parse-fn int}
    :gender {:default nil
@@ -585,6 +497,9 @@
    :cardio {:default false
             :help "Generate a cardio workout instead of a lifting workout."
             :parse-fn :boolean}
+   :n      {:default 1
+            :help "Number of workouts to generate."
+            :parse-fn int}
    :help {:coerce :boolean}})
 
 (def cli-aliases ;; CLI argument aliases for convenience.
@@ -607,21 +522,21 @@
                  (fs/expand-home)
                  (fs/unixify)
                  list-json-files
-                 read-logs)]
-    ;; ;; QUICK REPORT
-    ;; (doseq [exercise EXERCISES]
-    ;;   (println exercise)
-    ;;   (println "  Estimated 1RM: " (estimate-orm :logs logs :exercise exercise))
-    ;;   (println "  1RM Score: " (measure-orm-level :exercise exercise
-    ;;                                               :orm (estimate-orm :logs logs :exercise exercise)
-    ;;                                               :bodyweight (:bodyweight opts)
-    ;;                                               :gender (:gender opts)))
-    ;;   (println "  Days since last exercise: " (days-since-exercise :logs logs :exercise exercise))
-    ;;   (println "  Suggested weight for 5 reps: " (suggest-weight :logs logs :exercise exercise :target-reps 5))
-    ;;   (println "  Average sets per day: " (sets-per-day :logs logs :exercise exercise))
-    ;;   (println ""))
-    (if (:cardio opts)
-      (println (generate-workout-cardio))
-      (println (generate-workout logs)))))
+                 read-logs)
+        bodyweight (:bodyweight opts)]
+    (cond
+      (zero? (:n opts))
+      (println "No workouts to generate.")
+      (> (:n opts) 1) ;; if more than 1, cycle through workout A, B, cardio
+      (println (str/join "\n"
+                         (take (:n opts)
+                               (cycle [(generate-workout-a logs bodyweight)
+                                       (generate-workout-cardio)
+                                       (generate-workout-b logs bodyweight)
+                                       (generate-workout-cardio)]))))
+      :else ;; otherwise, just generate one workout
+      (if (:cardio opts)
+        (println (generate-workout-cardio))
+        (println (generate-workout logs))))))
 
-(-main)
+  (-main)

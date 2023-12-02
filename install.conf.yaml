@@ -130,12 +130,17 @@
   # Run a 'check in' shortcut every five minutes (prompting to log activity, or exercise, or mood, or whatever)
   - cron: "*/5 * * * *"
     command: shortcuts run "Every Five Minutes"
+  # Run a misc 'every day' shortcut every day at 4am
+  - cron: "0 4 * * *"
+    command: shortcuts run "Every Day"
   # run a shortcut to clean up the desktop (move screenshots to photos etc)
   - cron: "45 9-17 * * *"
     command: shortcuts run "Clean Up Desktop"
   # run a shortcut to log the email inbox
   - cron: "59 * * * *"
     command: shortcuts run "Save Email Report"
+  - cron: "11 * * * *"
+    command: shortcuts run "Log Net Worth"
   # save a list of the current vscode extensions to a file for easy reinstallation
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh

@@ -105,6 +105,7 @@
     (ffmpeg-downsample (str outpath fs/file-separator "out.mp3")
                        (str outpath fs/file-separator "out_small.mp3"))
     (println (str "Deleting " outpath fs/file-separator "out.mp3..."))
+    (fs/delete (str outpath fs/file-separator "out.mp3"))
     (println (str "Renaming " outpath fs/file-separator
                   "out_small.mp3 to " (fs/file-name inpath) ".mp3"))
     (fs/move (str outpath fs/file-separator "out_small.mp3")

@@ -19,9 +19,6 @@
     "editor.fontLigatures": true,
     "security.workspace.trust.untrustedFiles": "open",
     "workbench.statusBar.visible": true,
-    "breadcrumbs.enabled": false,
-    "editor.renderWhitespace": "none",
-    "editor.renderControlCharacters": false,
     "window.autoDetectColorScheme": true,
     "[clojure]": {
         "editor.formatOnSave": true
@@ -127,16 +124,13 @@
             ]
         }
     },
-    "workbench.layoutControl.enabled": false,
     "calva.prettyPrintingOptions": {
         "printEngine": "pprint",
         "enabled": false,
         "width": 120,
         "maxLength": 50
     },
-    "terminal.integrated.commandsToSkipShell": [
-        "language-julia.interrupt"
-    ],
-    "julia.symbolCacheDownload": true,
     "workbench.activityBar.location": "hidden",
+    "workbench.layoutControl.enabled": false,
+    "window.commandCenter": false,
 }

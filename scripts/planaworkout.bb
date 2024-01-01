@@ -325,17 +325,21 @@
 
 (defn which-workout?
   "Given a list of logs, decides which workout to do next. Returns a keyword.
-   Either: :a, :b, or :cardio."
+   Cycles through A, Cardio, B, Cardio, A, Cardio, B, Cardio, etc.
+   Using the unix day (mod 4) by default
+   "
   ([logs] (which-workout? logs EXERCISES))
   ([logs exercises]
-   (let [days-since-last-lift (days-since-last-lifting-workout logs exercises)
-         days-since-a (days-since-last-lifting-workout logs ["Overhead Press"])
-         days-since-b (days-since-last-lifting-workout logs ["Bench Press"])]
-     (cond (>= (count-lifting-days-in-n-days logs 7) 4) :cardio
+   (let [unix-now (quot (System/currentTimeMillis) 1000) ;; timestamp seconds
+         unix-day (quot unix-now 86400)] ;; timestamp days
+     (cond (>= (count-lifting-days-in-n-days logs 2) 2) :cardio
            (>= (count-lifting-days-in-n-days logs 14) 8) :cardio
            (>= (count-lifting-days-in-n-days logs 21) 12) :cardio
            (>= (count-lifting-days-in-n-days logs 28) 16) :cardio
-           (> days-since-a days-since-b) :a
+           (= (mod unix-day 4) 0) :a
+           (= (mod unix-day 4) 1) :cardio
+           (= (mod unix-day 4) 2) :b
+           (= (mod unix-day 4) 3) :cardio
            :else :b))))
 
 (defn build-task
@@ -540,7 +544,8 @@
   "Generate a cardio taskpaper workout."
   []
   (let [day-of-week (-> (java.util.Date.) (.getDay))] ;; 0 = Sun, 1 = Mon, etc.
-    (if (or (= day-of-week 6) (= day-of-week 0)) ;; if it's the weekend, do a long run!
+    (if 
+     (or (= day-of-week 6) (= day-of-week 0)) ;; if it's the weekend, do a long run!
       (str "- Go for a long run @parallel(false) @autodone(true) @estimate(110m) @due(5pm) @defer(4am)\n"
            "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
            "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
@@ -561,26 +566,20 @@
   ([logs] (generate-workout logs EXERCISES 85))
   ([logs exercises] (generate-workout logs exercises 85))
   ([logs exercises bodyweight]
-   (let [workout-type (which-workout? logs exercises)
-         main-workout (cond (= workout-type :a) (generate-workout-a logs bodyweight)
+   (let [workout-type (which-workout? logs exercises)]
+     (generate-workout logs exercises bodyweight workout-type)))
+  ([logs exercises bodyweight workout-type]
+   (let [main-workout (cond (= workout-type :a) (generate-workout-a logs bodyweight)
                             (= workout-type :b) (generate-workout-b logs bodyweight)
                             (= workout-type :cardio) (generate-workout-cardio))
-         random-distance (+ 2 (rand-int 3))
-         day-of-week (-> (java.util.Date.) (.getDay)) ;; 0 = Sun, 1 = Mon, etc.
-         weekend? (or (= day-of-week 6) (= day-of-week 0))]
+         random-distance (+ 2 (rand-int 3))]
      (if (not (workout-type :cardio))
        (str (str "- Go for a short run @parallel(false) @autodone(true) @estimate(60m) @due(5pm) @defer(4am)\n"
                  "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
                  "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
                  "\t- Go for a " random-distance "km run @estimate(" (+ 15 (* 6 random-distance)) "m) @tags(High, Home, Fitness)\n")
             main-workout)
-       (if weekend?
-         main-workout
-         (str (str "- Go for a short run @parallel(false) @autodone(true) @estimate(60m) @due(5pm) @defer(4am)\n"
-                   "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
-                   "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
-                   "\t- Go for a " random-distance "km run @estimate(" (+ 15 (* 6 random-distance)) "m) @tags(High, Home, Fitness)\n")
-              main-workout))))))
+       main-workout))))
 
 
 
@@ -655,17 +654,15 @@
                  list-json-files
                  read-logs)
         bodyweight (:bodyweight opts)]
-    
-    (cond 
-          (:report opts) (println (generate-report logs EXERCISES))
-          :else (println (generate-workout logs EXERCISES bodyweight)))
-    
-    ;; (println (generate-workout logs EXERCISES bodyweight))
-    ;; (cond
-    ;;   (zero? (:n opts))
-    ;;   (println "No workouts to generate.")
-    ;;   :else (println (generate-workout logs)))
-    ))
+
+    (cond (:report opts) (println (generate-report logs EXERCISES))
+          (= (:n opts) 1) (println (generate-workout logs EXERCISES bodyweight))
+          :else ;; loop through :a, :cardio, :b, :cardio, :a, :cardio, etc. for n times, generating a workout for each, and stitch together into a single string to print
+          (println (apply str (take (* (:n opts) 2)
+                                    (interleave
+                                     (map #(generate-workout logs EXERCISES bodyweight %)
+                                          (cycle [:a :cardio :b :cardio]))
+                                     (repeat "\n"))))))))
 
 
 (-main)

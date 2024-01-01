@@ -1,16 +1,36 @@
 #!/bin/sh
 
+
+###############################################################################
+############################## OBSIDIAN -> POSTS ##############################
+###############################################################################
+
 # Extract posts from Obsidian Notes folder to _posts folder
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_obsidian_posts.py ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_posts
+# /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_obsidian_posts.py ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_posts
 
-# Backup all of Obsidian Notes folder to _archive folder of blog repo
-cp -a ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_archive/obsidian
 
+
+###############################################################################
+############################# OBSIDIAN -> ARCHIVE #############################
+###############################################################################
+
+# Override & Backup all of Obsidian 'Notes' dir in '_archive' dir of blog repo
+rm -rf ~/Documents/blog/_archive/obsidian/notes/
+cp -a ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_archive/obsidian/notes
+
+
+
+###############################################################################
+################################# DATA EXPORT #################################
+###############################################################################
 
 # Export data from Apple Health (exported as shortcut logs in iCloud) to public CSV and _data YAML files
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/Weight ~/Documents/blog/_data/health/weight.yml ~/Documents/blog/public/logs/weight.csv
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/VO2\ Max ~/Documents/blog/_data/health/vo2_max.yml ~/Documents/blog/public/logs/vo2_max.csv
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/Resting\ Heart\ Rate ~/Documents/blog/_data/health/resting_heart_rate.yml ~/Documents/blog/public/logs/resting_heart_rate.csv
+
+# Extract lifting logs from iCloud to a CSV file in public data folder
+/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_lifting_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Fitness/Lifting  ~/Documents/blog/public/logs/lifts.csv
 
 # Export Aranet4 C02 data logs from iCloud to a CSV file in _data
 python3 ~/Documents/blog/bin/extract_aranet_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Aranet4/ ~/Documents/blog/_data/co2/aranet4_logs.csv
@@ -20,6 +40,8 @@ python3 ~/Documents/blog/bin/extract_aranet_logs.py ~/Library/Mobile\ Documents/
 /opt/homebrew/bin/strava-offline gpx
 # copy the current strava-offline sqlite db to public/strava folder
 cp ~/Library/Application\ Support/strava_offline/strava.sqlite ~/Documents/blog/public/strava
+# delete existing files in public/strava/activities folder
+rm -rf ~/Documents/blog/public/strava/activities/*
 # copy gpx files to public/strava/activities folder
 cp -a ~/Library/Application\ Support/strava_offline/activities/. ~/Documents/blog/public/strava/activities
 # build run log (in public/logs/running.csv) from strava data stored in sqlite database
@@ -33,5 +55,13 @@ cp -a ~/Library/Application\ Support/strava_offline/activities/. ~/Documents/blo
 # Extract media log data
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_music_log.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv ~/Documents/blog/_data/media/music.yml
 
+# Finances
+
+
+
+###############################################################################
+################################ ADD TO COMMIT ################################
+###############################################################################
+
 # Add the updated log & data & post files to the commit
-git add ~/Documents/blog/_data ~/Documents/blog/public ~/Documents/blog/_posts
+git add ~/Documents/blog/_data ~/Documents/blog/public ~/Documents/blog/_posts ~/Documents/blog/_archive

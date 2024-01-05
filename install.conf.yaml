@@ -120,7 +120,7 @@
 - crontab:
   # commit any changes to a thesis chapter in the last five minutes automatically
   - cron: "*/5 * * * *"
-    command: /opt/homebrew/bin/git -C /Users/g/Documents/thesis add ./chapters; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
+    command: rsync ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes/Thesis/* ~/Documents/thesis/chapters/ ; /opt/homebrew/bin/git -C /Users/g/Documents/thesis add ./chapters; /opt/homebrew/bin/git -C /Users/g/Documents/thesis/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/thesis push origin master >/dev/null 2>&1
   # commit any blog changes in the last ten minutes automatically
   - cron: "*/10 * * * *"
     command: /opt/homebrew/bin/git -C /Users/g/Documents/blog add .; /opt/homebrew/bin/git -C /Users/g/Documents/blog/ commit -m 'Auto-commit'; /opt/homebrew/bin/git -C /Users/g/Documents/blog push origin master >/dev/null 2>&1

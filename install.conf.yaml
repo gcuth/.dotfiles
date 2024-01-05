@@ -92,8 +92,6 @@
 - brew:
   - iterm2-beta
 - shell:
-  - [ test -e `which toggl` || pip install togglCli ]
-- shell:
   - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
 
 
@@ -136,11 +134,9 @@
   # run a shortcut to clean up the desktop (move screenshots to photos etc)
   - cron: "45 9-17 * * *"
     command: shortcuts run "Clean Up Desktop"
-  # run a shortcut to log the email inbox
+  # run 'every hour' shortcut every hour at 59 minutes past
   - cron: "59 * * * *"
-    command: shortcuts run "Save Email Report"
-  - cron: "11 * * * *"
-    command: shortcuts run "Log Net Worth"
+    command: shortcuts run "Every Hour"
   # save a list of the current vscode extensions to a file for easy reinstallation
   - cron: "0 9 * * *"
     command: /Users/g/.dotfiles/scripts/list_vscode_extensions.sh

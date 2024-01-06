@@ -7,6 +7,9 @@ defaults write com.apple.dock static-only -bool true
 # remove dock autohide delay
 defaults write com.apple.dock autohide-delay -float 0 && defaults write com.apple.dock autohide-time-modifier -float 0.4
 
+# Make sure app switcher is shown on all connected displays
+defaults write com.apple.Doc appswitcher-all-displays -bool true
+
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 

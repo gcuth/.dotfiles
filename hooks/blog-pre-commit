@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+# A git hook script that backs up (& processes) data from elsewhere into
+# (limited) backup in the blog repository. These data are then used for
+# some jekyll-built static pages.
 
 
 ###############################################################################
@@ -36,14 +40,13 @@ cp -a ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documen
 python3 ~/Documents/blog/bin/extract_aranet_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Aranet4/ ~/Documents/blog/_data/co2/aranet4_logs.csv
 
 # Try to get an updated copy of strava data from 'strava-offline' (see https://github.com/liskin/strava-offline)
-/opt/homebrew/bin/strava-offline sqlite
-/opt/homebrew/bin/strava-offline gpx
+/opt/homebrew/bin/strava-offline sqlite --config ~/.config/strava_offline/config.yaml
+/opt/homebrew/bin/strava-offline gpx --config ~/.config/strava_offline/config.yaml
+
 # copy the current strava-offline sqlite db to public/strava folder
 cp ~/Library/Application\ Support/strava_offline/strava.sqlite ~/Documents/blog/public/strava
-# delete existing files in public/strava/activities folder
-rm -rf ~/Documents/blog/public/strava/activities/*
 # copy gpx files to public/strava/activities folder
-cp -a ~/Library/Application\ Support/strava_offline/activities/. ~/Documents/blog/public/strava/activities
+cp ~/Library/Application\ Support/strava_offline/activities/* ~/Documents/blog/public/strava/activities
 # build run log (in public/logs/running.csv) from strava data stored in sqlite database
 /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_strava_logs.py ~/Library/Application\ Support/strava_offline/strava.sqlite ~/Documents/blog/public/logs/running.csv
 # build updated YAML file from running.csv
@@ -57,6 +60,13 @@ cp -a ~/Library/Application\ Support/strava_offline/activities/. ~/Documents/blo
 
 # Finances
 
+
+
+###############################################################################
+################################ TREND REPORT #################################
+###############################################################################
+
+/opt/homebrew/bin/python3 ~/Documents/blog/bin/trends.py ~/Documents/blog/public/logs/ ~/Documents/blog/_data/trends.json
 
 
 ###############################################################################

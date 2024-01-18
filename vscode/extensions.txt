@@ -2,6 +2,7 @@ betterthantomorrow.calva
 betterthantomorrow.calva-spritz
 fabiospampinato.vscode-highlight
 GitHub.copilot
+GitHub.copilot-chat
 ms-python.python
 ms-python.vscode-pylance
 ms-vscode-remote.remote-ssh

@@ -83,6 +83,7 @@
   - obsidian
   - sqlcipher
   - visual-studio-code
+  - postgresql
 - tap:
   - homebrew/cask-fonts
 - brew:

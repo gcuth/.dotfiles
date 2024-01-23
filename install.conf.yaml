@@ -84,6 +84,7 @@
   - sqlcipher
   - visual-studio-code
   - postgresql
+  - coreutils # the missing GNU coreutils, macOS style
 - tap:
   - homebrew/cask-fonts
 - brew:
@@ -93,6 +94,10 @@
   - homebrew/cask-versions
 - brew:
   - iterm2-beta
+- tap:
+  - heroku/brew
+- brew:
+  - heroku
 - shell:
   - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
 

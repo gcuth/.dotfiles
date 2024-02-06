@@ -151,7 +151,7 @@ def main():
     if args.rgb is not None and len(args.rgb) != 6:
         parser.error("RGB value must be a 6-character hex string")
     for light in LIGHTS:
-        if light is "Desk Left" or "Desk Right": # these don't support rgb
+        if light == "Desk Left" or light == "Desk Right": # these don't support rgb
             bump_light(light, args.direction, None)
         else:
             bump_light(light, args.direction, args.rgb)

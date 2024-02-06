@@ -98,6 +98,10 @@
   - heroku/brew
 - brew:
   - heroku
+- tap:
+  - openhue/cli
+- brew:
+  - openhue-cli
 - shell:
   - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
 

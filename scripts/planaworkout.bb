@@ -560,6 +560,42 @@
            "\t- Have a cold shower @estimate(5m) @tags(Low, Home, Mindfulness)\n"))))
 
 
+(defn generate-quick-workout
+  "Generate a quick workout for when you're short on time.
+   Assumes you have all the equipment at home (and roughly set up already)."
+  [logs bodyweight]
+  (let [bench (suggest-weight :logs logs
+                              :exercise "Bench Press"
+                              :target-reps 5
+                              :bodyweight bodyweight)
+        ohead (suggest-weight :logs logs
+                              :exercise "Overhead Press"
+                              :target-reps 5
+                              :bodyweight bodyweight)
+        dlift (suggest-weight :logs logs
+                              :exercise "Deadlift"
+                              :target-reps 5
+                              :bodyweight bodyweight)
+        squat (suggest-weight :logs logs
+                              :exercise "Back Squat"
+                              :target-reps 5
+                              :bodyweight bodyweight)]
+    (str "- Complete a quick workout @parallel(false) @autodone(true) @estimate(45m) @due(5pm) @defer(4am)\n"
+         "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
+         "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
+         "\t- Go for a 3km run @estimate(15m) @tags(High, Home, Fitness)\n"
+         "\t- Check that bench press bar is loaded to a total of " bench "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
+         "\t- Check that overhead press bar is loaded to a total of " ohead "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
+         "\t- Check that deadlift bar is loaded to a total of " dlift "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
+         "\t- Bench Press " bench "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
+         "\t- Overhead Press " ohead "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
+         "\t- Deadlift " dlift "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
+         "\t- Check that squat bar is loaded to a total of " squat "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
+         "\t- Back Squat " squat "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
+         "\t- Do AMRAP pullups @estimate(3m) @tags(High, Home, Fitness)\n"
+         "\t- Have a cold shower @estimate(5m) @tags(Low, Home, Mindfulness)\n")))
+
+
 (defn generate-workout
   "Generate a workout given a list of logs, a workout type (a or b or cardio).
    Returns a string of taskpaper-formatted text."
@@ -618,6 +654,9 @@
       :gender {:default nil
                :help "Your gender (opts: male or female)"
                :parse-fn str}
+      :quick {:default false
+              :help "Generate a quick workout instead of a full workout."
+              :parse-fn :boolean}
       :cardio {:default false
                :help "Generate a cardio workout instead of a lifting workout."
                :parse-fn :boolean}
@@ -656,6 +695,7 @@
         bodyweight (:bodyweight opts)]
 
     (cond (:report opts) (println (generate-report logs EXERCISES))
+          (:quick opts) (println (generate-quick-workout logs bodyweight))
           (= (:n opts) 1) (println (generate-workout logs EXERCISES bodyweight))
           :else ;; loop through :a, :cardio, :b, :cardio, :a, :cardio, etc. for n times, generating a workout for each, and stitch together into a single string to print
           (println (apply str (take (* (:n opts) 2)

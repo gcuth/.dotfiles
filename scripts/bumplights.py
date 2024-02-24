@@ -12,7 +12,7 @@ import datetime
 import argparse
 
 OPENHUE = "/opt/homebrew/bin/openhue" # The path to the openhue cli tool
-LIGHTS = ["Desk Left", "Desk Right"] # Lights to control
+LIGHTS = ["Desk Left", "Desk Right", "Desk Strip"] # Lights to control
 LOGPATH = os.path.expanduser("~/.bumplights.json") # Log file path
 
 
@@ -47,6 +47,8 @@ def write_log(log: dict, logpath=LOGPATH) -> None:
 
 def set_light_status(name: str, brightness: int, rgb: str, logpath=LOGPATH) -> None:
     """Set the status of a light. Log the target given to a json file."""
+    if rgb is not None and len(rgb) != 7:
+        raise ValueError("RGB value must be a 7-character hex string")
     log = {
         "name": name,
         "brightness": brightness,
@@ -55,8 +57,8 @@ def set_light_status(name: str, brightness: int, rgb: str, logpath=LOGPATH) -> N
     }
     if brightness < 0 or brightness > 100:
         raise ValueError("Brightness must be between 0 and 100")
-    if rgb is not None and len(rgb) != 6:
-        cmd = f"{OPENHUE} set light \"{name}\" --brightness {brightness} --rgb {rgb}"
+    if rgb is not None and len(rgb) == 7 and rgb.startswith("#"):
+        cmd = f"{OPENHUE} set light \"{name}\" --brightness {brightness} --rgb \"{rgb}\""
     else:
         cmd = f"{OPENHUE} set light \"{name}\" --brightness {brightness}"
     os.system(cmd)
@@ -72,9 +74,9 @@ def set_light_status(name: str, brightness: int, rgb: str, logpath=LOGPATH) -> N
 def compute_new_brightness(current: int, direction: str, n=1) -> int:
     """Compute the new brightness value based on the given direction."""
     if direction == "up":
-        return max(0, min(current + 1, 100))
+        return max(1, min(current + n, 100))
     elif direction == "down":
-        return max(0, min(current - 1, 100))
+        return max(1, min(current - n, 100))
     else:
         raise ValueError("Direction must be 'up' or 'down'")
 
@@ -83,6 +85,10 @@ def compute_new_rgb(current: str, target: str, n=1) -> str:
     """
     Compute the new rgb value (as a hex string) in the direction of the target.
     """
+    if current is not None:
+        current = current.lstrip("#")
+    if target is not None:
+        target = target.lstrip("#")
     if current == target:
         return current
     if current is None:
@@ -93,31 +99,32 @@ def compute_new_rgb(current: str, target: str, n=1) -> str:
     tr = int(target[:2], 16)
     tg = int(target[2:4], 16)
     tb = int(target[4:], 16)
-    # bump the rgb values by 1 in the direction of the target
+    # bump the rgb values by n in the direction of the target
     if cr < tr:
-        cr += 1
+        cr += n
     elif cr > tr:
-        cr -= 1
+        cr -= n
     if cg < tg:
-        cg += 1
+        cg += n
     elif cg > tg:
-        cg -= 1
+        cg -= n
     if cb < tb:
-        cb += 1
+        cb += n
     elif cb > tb:
-        cb -= 1
+        cb -= n
     # make sure the new values are bound by 0 and 255
     cr = max(0, min(255, cr))
     cg = max(0, min(255, cg))
     cb = max(0, min(255, cb))
     # return the new rgb value as a hex string
-    return f"{cr:02x}{cg:02x}{cb:02x}"
+    new_rgb = f"{cr:02x}{cg:02x}{cb:02x}"
+    return "#" + new_rgb
 
 
-def bump_light(name: str, direction: str, rgb: str, logpath=LOGPATH) -> None:
+def bump_light(name: str, direction: str, rgb: str, n=1, logpath=LOGPATH) -> None:
     """
     Get the current status of a light. If *and only if* on, bump the light up
-    or down in brightness by 1%. If the light supports rgb colour, nudge the
+    or down in brightness by n%. If the light supports rgb colour, nudge the
     colour in the given direction as well (from wherever it is now).
     """
     status = get_light_status(name)
@@ -126,6 +133,7 @@ def bump_light(name: str, direction: str, rgb: str, logpath=LOGPATH) -> None:
     current_log = read_log(logpath)
     current_log = [l for l in current_log if l["name"] == name]
     current_log = [l for l in current_log if l["success"]]
+    current_log = sorted(current_log, key=lambda x: x["timestamp"])
     if len(current_log) > 0:
         last = current_log[-1]
         current_brightness = last["brightness"]
@@ -133,12 +141,22 @@ def bump_light(name: str, direction: str, rgb: str, logpath=LOGPATH) -> None:
     else:
         current_brightness = 1
         current_rgb = None
-    new_brightness = compute_new_brightness(current_brightness, direction)
-    new_rgb = compute_new_rgb(current_rgb, rgb)
+    new_brightness = compute_new_brightness(current_brightness, direction, n=n)
+    new_rgb = compute_new_rgb(current_rgb, rgb, n=n)
     if rgb is not None:
         set_light_status(name, new_brightness, new_rgb)
     else:
         set_light_status(name, new_brightness, None)
+
+
+def clean_log(logpath=LOGPATH, days=7) -> None:
+    """
+    Remove all log entries from the log file with timestamps older than days.
+    """
+    logs = read_log(logpath)
+    logs = [log for log in logs if (datetime.datetime.now() - datetime.datetime.fromisoformat(log["timestamp"])).days < days]
+    with open(logpath, "w+") as f:
+        json.dump(logs, f)
 
 
 def main():
@@ -146,15 +164,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("direction", choices=["up", "down"], help="The direction to bump the light")
     parser.add_argument("--rgb", help="The target rgb value for the light")
+    parser.add_argument("--n", type=int, default=1, help="The amount to bump the light by")
     args = parser.parse_args()
     # check that the arguments are valid
-    if args.rgb is not None and len(args.rgb) != 6:
-        parser.error("RGB value must be a 6-character hex string")
+    if args.rgb is not None and len(args.rgb) != 7:
+        parser.error("RGB value must be a 7-character hex string (eg '#FF0000')")
     for light in LIGHTS:
         if light == "Desk Left" or light == "Desk Right": # these don't support rgb
-            bump_light(light, args.direction, None)
+            bump_light(light, args.direction, None, n=args.n)
         else:
-            bump_light(light, args.direction, args.rgb)
+            bump_light(light, args.direction, args.rgb, n=args.n)
 
 if __name__ == "__main__":
     main()

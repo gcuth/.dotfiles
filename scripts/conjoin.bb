@@ -7,8 +7,6 @@
 (require '[babashka.cli :as cli])
 (require '[clojure.java.shell :refer [sh]])
 
-(def TESTINPATH (fs/expand-home "~/Downloads/Gravity's Rainbow/"))
-(def TESTOUTPATH (fs/expand-home "~/Desktop"))
 
 (defn list-mp3s
   "List all mp3s in a given directory."

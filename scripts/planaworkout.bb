@@ -121,27 +121,27 @@
                              :else 70))
         fractional-orm (/ orm bodyweight)
         all-thresholds (cond
-                     (= gender "male")
-                     {"Overhead Press" [0.35 0.55 0.8 1.1 1.4]
-                      "Bench Press" [0.5 0.75 1.25 1.75 2]
-                      "Barbell Row" [0.5 0.75 1 1.5 1.75]
-                      "Back Squat" [0.75 1.25 1.5 2.25 2.75]
-                      "Deadlift" [1 1.5 2 2.5 3]
-                      "Barbell Bicep Curl" [0.2 0.4 0.6 0.85 1.15]}
-                     (= gender "female")
-                     {"Overhead Press" [0.2 0.35 0.5 0.75 1]
-                      "Bench Press" [0.25 0.5 0.75 1 1.5]
-                      "Barbell Row" [0.25 0.4 0.65 0.9 1.2]
-                      "Back Squat" [0.5 0.75 1.25 1.5 2]
-                      "Deadlift" [0.5 1 1.25 1.75 2.5]
-                      "Barbell Bicep Curl" [0.1 0.2 0.4 0.6 0.85]}
-                     :else ;; halfway between the above
-                     {"Overhead Press" [0.275 0.45 0.65 0.925 1.2]
-                      "Bench Press" [0.375 0.625 1 1.375 1.75]
-                      "Barbell Row" [0.375 0.575 0.825 1.2 1.475]
-                      "Back Squat" [0.625 1 1.375 1.875 2.375]
-                      "Deadlift" [0.75 1.25 1.625 2.125 2.75]
-                      "Barbell Bicep Curl" [0.15 0.3 0.5 0.725 1]})
+                         (= gender "male")
+                         {"Overhead Press" [0.35 0.55 0.8 1.1 1.4]
+                          "Bench Press" [0.5 0.75 1.25 1.75 2]
+                          "Barbell Row" [0.5 0.75 1 1.5 1.75]
+                          "Back Squat" [0.75 1.25 1.5 2.25 2.75]
+                          "Deadlift" [1 1.5 2 2.5 3]
+                          "Barbell Bicep Curl" [0.2 0.4 0.6 0.85 1.15]}
+                         (= gender "female")
+                         {"Overhead Press" [0.2 0.35 0.5 0.75 1]
+                          "Bench Press" [0.25 0.5 0.75 1 1.5]
+                          "Barbell Row" [0.25 0.4 0.65 0.9 1.2]
+                          "Back Squat" [0.5 0.75 1.25 1.5 2]
+                          "Deadlift" [0.5 1 1.25 1.75 2.5]
+                          "Barbell Bicep Curl" [0.1 0.2 0.4 0.6 0.85]}
+                         :else ;; halfway between the above
+                         {"Overhead Press" [0.275 0.45 0.65 0.925 1.2]
+                          "Bench Press" [0.375 0.625 1 1.375 1.75]
+                          "Barbell Row" [0.375 0.575 0.825 1.2 1.475]
+                          "Back Squat" [0.625 1 1.375 1.875 2.375]
+                          "Deadlift" [0.75 1.25 1.625 2.125 2.75]
+                          "Barbell Bicep Curl" [0.15 0.3 0.5 0.725 1]})
         thresholds (all-thresholds exercise)
         interpolate-score (fn [fractional-orm thresholds]
                             ;; given the fractional orm and relevant thresholds
@@ -149,11 +149,8 @@
                             ;; between thresholds. (ie, if the fractional orm
                             ;; is 0.3, and the thresholds are [0.2 0.35 0.5 0.75 1],
                             ;; then the score is )
-
-                            
-                            
                             )]
-    
+
 
     thresholds))
 
@@ -544,7 +541,7 @@
   "Generate a cardio taskpaper workout."
   []
   (let [day-of-week (-> (java.util.Date.) (.getDay))] ;; 0 = Sun, 1 = Mon, etc.
-    (if 
+    (if
      (or (= day-of-week 6) (= day-of-week 0)) ;; if it's the weekend, do a long run!
       (str "- Go for a long run @parallel(false) @autodone(true) @estimate(110m) @due(5pm) @defer(4am)\n"
            "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
@@ -633,7 +630,7 @@
                                                                  :exercise exercise)
                                               :gender "male"
                                               :bodyweight 82.1) "\n"))))
-   
+
 
 
 
@@ -642,31 +639,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CLI ARGUMENTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
 
-   (def cli-spec ;; CLI argument spec.
-     {:input {:default "~/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Logs/Fitness/Lifting/"
-              :help "The input directory to process."
-              :parse-fn str}
-      :bodyweight {:default 85
-                   :help "Your bodyweight in kg."
-                   :parse-fn int}
-      :gender {:default nil
-               :help "Your gender (opts: male or female)"
-               :parse-fn str}
-      :quick {:default false
-              :help "Generate a quick workout instead of a full workout."
-              :parse-fn :boolean}
-      :cardio {:default false
-               :help "Generate a cardio workout instead of a lifting workout."
-               :parse-fn :boolean}
-      :n      {:default 1
-               :help "Number of workouts to generate."
-               :parse-fn int}
-      :report {:default false
-               :help "Generate a report of recent workouts."
-               :parse-fn :boolean}
-      :help {:coerce :boolean}})
+
+(def cli-spec ;; CLI argument spec.
+  {:input {:default "~/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Logs/Fitness/Lifting/"
+           :help "The input directory to process."
+           :parse-fn str}
+   :bodyweight {:default 85
+                :help "Your bodyweight in kg."
+                :parse-fn int}
+   :gender {:default nil
+            :help "Your gender (opts: male or female)"
+            :parse-fn str}
+   :quick {:default false
+           :help "Generate a quick workout instead of a full workout."
+           :parse-fn :boolean}
+   :cardio {:default false
+            :help "Generate a cardio workout instead of a lifting workout."
+            :parse-fn :boolean}
+   :n      {:default 1
+            :help "Number of workouts to generate."
+            :parse-fn int}
+   :report {:default false
+            :help "Generate a report of recent workouts."
+            :parse-fn :boolean}
+   :help {:coerce :boolean}})
 
 
 (def cli-aliases ;; CLI argument aliases for convenience.

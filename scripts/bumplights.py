@@ -90,9 +90,9 @@ def compute_new_rgb(current: str, target: str, n=1) -> str:
     if target is not None:
         target = target.lstrip("#")
     if current == target:
-        return current
+        return "#" + current
     if current is None:
-        return target
+        return "#" + target
     cr = int(current[:2], 16)
     cg = int(current[2:4], 16)
     cb = int(current[4:], 16)
@@ -140,10 +140,10 @@ def bump_light(name: str, direction: str, rgb: str, n=1, logpath=LOGPATH) -> Non
         current_rgb = last["rgb"]
     else:
         current_brightness = 1
-        current_rgb = None
+        current_rgb = "#FFFFFF"
     new_brightness = compute_new_brightness(current_brightness, direction, n=n)
     new_rgb = compute_new_rgb(current_rgb, rgb, n=n)
-    if rgb is not None:
+    if new_rgb is not None:
         set_light_status(name, new_brightness, new_rgb)
     else:
         set_light_status(name, new_brightness, None)
@@ -170,10 +170,8 @@ def main():
     if args.rgb is not None and len(args.rgb) != 7:
         parser.error("RGB value must be a 7-character hex string (eg '#FF0000')")
     for light in LIGHTS:
-        if light == "Desk Left" or light == "Desk Right": # these don't support rgb
-            bump_light(light, args.direction, None, n=args.n)
-        else:
-            bump_light(light, args.direction, args.rgb, n=args.n)
+        bump_light(light, args.direction, args.rgb, n=args.n)
+    clean_log(days=3)
 
 if __name__ == "__main__":
     main()

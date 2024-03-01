@@ -102,6 +102,10 @@
   - openhue/cli
 - brew:
   - openhue-cli
+- tap:
+  - basictex
+- brew:
+  - basictex
 - shell:
   - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
 

@@ -98,6 +98,9 @@
    :answer {:default nil
             :help "The answer to save as an anki card."
             :parse-fn str}
+   :tags {:default ""
+          :help "The tags to save for the anki card."
+          :parse-fn str}
    :source {:default ""
             :help "The source to save for the anki card."
             :parse-fn str}
@@ -129,7 +132,8 @@
         answer (or (:answer opts) (get-input "Answer: "))
         card (create-card {:question question
                            :answer answer
-                           :source (:source opts)})
+                           :source (:source opts)
+                           :tags (:tags opts)}) 
         output (or (:output opts) DEFAULT-OUTPATH)
         filename (generate-filename)]
     (cond (:help opts) (println "Help text here TK.")

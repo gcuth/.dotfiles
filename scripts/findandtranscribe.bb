@@ -19,10 +19,10 @@
 (defn list-audio-files
   "Walk the given directory and return a list of all audio files found."
   ([dir]
-   (list-audio-files dir ["mp3" "m4a" "wav"]))
+   (list-audio-files dir ["mp3" "m4a" "wav" "WAV"]))
   ([dir exts]
    (let [exts (set exts)
-         files (map fs/unixify (fs/list-dir (fs/expand-home dir)))]
+         files (map fs/unixify (fs/glob (fs/expand-home dir) "**" {:recursive true}))]
      (filter #(contains? exts (fs/extension %)) files))))
 
 
@@ -30,6 +30,11 @@
   "Check if a transcription file already exists for the given audio file."
   [fp]
   (fs/exists? (str (s/replace fp #"\.\w+$" ".txt"))))
+
+(defn has-json?
+  "Check if a json file already exists for the given audio file."
+  [fp]
+  (fs/exists? (str (s/replace fp #"\.\w+$" ".json"))))
 
 
 (defn is-new?
@@ -120,21 +125,28 @@
   (enforce-availability "ffmpeg" "whisper" "whisper-mps")
   (let [dir (first *command-line-args*)
         audio-files (list-audio-files dir)
-        transcribable (sort-by-size
+        transcribable (shuffle
                        (filter #(and (not (has-transcription? %))
+                                     (not (has-json? %))
                                      (not (is-new? %))) audio-files))]
+    (println (str "Input Directory: " dir))
+    (println (str "Total audio files found: " (count audio-files)))
     (println (str "Total transcribable files: " (count transcribable)))
     ;; for each transcribable file ...
     (doseq [f transcribable]
       (fs/with-temp-dir [tmp-dir]
         (println (str "Temp Directory: " tmp-dir))
         (println (str "Transcribing: " f))
-        (let [base-name (fs/strip-ext (fs/file-name f))
-              mono-path (make-mono f tmp-dir)
-              temp-transcription-path (transcribe mono-path tmp-dir)]
-          (fs/move temp-transcription-path (str dir "/" base-name ".json"))
-          (json->txt (str dir "/" base-name ".json")
-                     (str dir "/" base-name ".txt")))))))
+        (try
+          (let [base-name (fs/strip-ext (fs/file-name f))
+                mono-path (make-mono f tmp-dir)
+                temp-transcription-path (transcribe mono-path tmp-dir)]
+            (fs/move temp-transcription-path (str dir "/" base-name ".json"))
+            (println "Saved json file to " (str dir "/" base-name ".json"))
+            (json->txt (str dir "/" base-name ".json")
+                       (str dir "/" base-name ".txt")))
+          (catch Exception e
+            (println (str "Error transcribing " f ": " (.getMessage e)))))))))
 
 
 (-main)

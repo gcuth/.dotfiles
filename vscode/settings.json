@@ -133,4 +133,5 @@
     "workbench.activityBar.location": "hidden",
     "workbench.layoutControl.enabled": false,
     "window.commandCenter": false,
+    "editor.stickyScroll.enabled": false,
 }

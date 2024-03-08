@@ -218,7 +218,7 @@ def get_question_list(files: list, note_type='basic') -> list:
         raw = load_question_file(file)
         # check note type and extract data accordingly
         if note_type == 'basic':
-            if 'question' in raw and 'answer' in raw:
+            if 'question' in raw and 'answer' in raw and 'options' not in raw:
                 data = {'unique_id': unique_id,
                         'question': raw['question'],
                         'answer': raw['answer'],
@@ -236,9 +236,10 @@ def get_question_list(files: list, note_type='basic') -> list:
                         'answer': raw['answer'],
                         'source': raw.get('source', ''),
                         'tags': raw.get('tags', '')}
-                data['tags'] = data['tags'].split(",") if data['tags'] else []
-                data['tags'] = [t.strip() for t in data['tags']]
-                data['tags'] = [t.replace(" ", "_") for t in data['tags']]
+                if isinstance(data['tags'], str):
+                    data['tags'] = data['tags'].split(",")
+                    data['tags'] = [t.strip() for t in data['tags']]
+                    data['tags'] = [t.replace(" ", "_") for t in data['tags']]
                 if len(data['options']) == 4: # only add if there are 4 options
                     if data['answer'] in data['options']: # and answer is there
                         questions.append(data)
@@ -267,6 +268,11 @@ def clean_question_data(data: dict) -> dict:
     return data
 
 
+def mdify(s: str) -> str:
+    """Convert a string to markdown."""
+    return md.markdown(html.escape(s))
+
+
 ###############################################################################
 ############################### ANKI FUNCTIONS ################################
 ###############################################################################
@@ -276,30 +282,30 @@ def build_basic_note(data: dict) -> anki.Note:
     return anki.Note(
         model=BASIC_MODEL,
         fields=[str(data['unique_id']),
-                str(md.markdown(data['question'])),
-                str(md.markdown(data['answer'])),
-                str(data['source'])],
+                str(mdify(data['question'])),
+                str(mdify(data['answer'])),
+                str(mdify(data['source']))],
         tags=data['tags'])
 
 
 def build_choice_note(data: dict) -> anki.Note:
     """Build a multiple choice note from a dictionary of question data."""
     # identify the correct answer and wrap it in a span with the correct class
-    options = [str(md.markdown(o)) for o in data['options']]
+    options = [str(mdify(o)) for o in data['options']]
     answers = []
     for option in data['options']:
         if option == data['answer']:
-            answers.append(f'<span class="correct">{str(md.markdown(option))}</span>')
+            answers.append(f'<span class="correct">{str(mdify(option))}</span>')
         else:
-            answers.append(f'<span class="incorrect">{str(md.markdown(option))}</span>')
+            answers.append(f'<span class="incorrect">{str(mdify(option))}</span>')
     return anki.Note(
         model=MULTIPLE_CHOICE_MODEL,
         fields=[str(data['unique_id']),
-                str(md.markdown(data['question'])),
+                str(mdify(data['question'])),
                 options[0], options[1], options[2], options[3],
                 answers[0], answers[1], answers[2], answers[3],
-                str(md.markdown(data['answer'])),
-                str(data['source'])],
+                str(mdify(data['answer'])),
+                str(mdify(data['source']))],
         tags=data['tags'])
 
 
@@ -336,13 +342,16 @@ def main():
     basic_questions = get_question_list(question_files, note_type='basic')
     basic_questions = [clean_question_data(q) for q in basic_questions]
     basic_notes = [build_basic_note(q) for q in basic_questions]
+    print(f"Built {len(basic_notes)} basic notes.")
     # get multiple choice questions and build choice notes
     choice_questions = get_question_list(question_files, note_type='choice')
     choice_questions = [clean_question_data(q) for q in choice_questions]
     choice_notes = [build_choice_note(q) for q in choice_questions]
+    print(f"Built {len(choice_notes)} multiple choice notes.")
     # combine notes and build deck
     all_notes = basic_notes + choice_notes
     deck = build_deck(all_notes)
+    print(f"Writing deck to {args.output}.")
     anki.Package(deck).write_to_file(args.output)
 
 

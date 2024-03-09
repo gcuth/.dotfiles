@@ -224,9 +224,6 @@ def get_question_list(files: list, note_type='basic') -> list:
                         'answer': raw['answer'],
                         'source': raw.get('source', ''),
                         'tags': raw.get('tags', '')}
-                data['tags'] = data['tags'].split(",") if data['tags'] else []
-                data['tags'] = [t.strip() for t in data['tags']]
-                data['tags'] = [t.replace(" ", "_") for t in data['tags']]
                 questions.append(data)
         elif note_type == 'choice':
             if 'question' in raw and 'options' in raw and 'answer' in raw:
@@ -236,10 +233,6 @@ def get_question_list(files: list, note_type='basic') -> list:
                         'answer': raw['answer'],
                         'source': raw.get('source', ''),
                         'tags': raw.get('tags', '')}
-                if isinstance(data['tags'], str):
-                    data['tags'] = data['tags'].split(",")
-                    data['tags'] = [t.strip() for t in data['tags']]
-                    data['tags'] = [t.replace(" ", "_") for t in data['tags']]
                 if len(data['options']) == 4: # only add if there are 4 options
                     if data['answer'] in data['options']: # and answer is there
                         questions.append(data)

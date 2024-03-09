@@ -561,26 +561,22 @@
   "Generate a quick workout for when you're short on time.
    Assumes you have all the equipment at home (and roughly set up already)."
   [logs bodyweight]
-  (let [bench (suggest-weight :logs logs
-                              :exercise "Bench Press"
-                              :target-reps 5
-                              :bodyweight bodyweight)
-        ohead (suggest-weight :logs logs
-                              :exercise "Overhead Press"
-                              :target-reps 5
-                              :bodyweight bodyweight)
-        dlift (suggest-weight :logs logs
-                              :exercise "Deadlift"
-                              :target-reps 5
-                              :bodyweight bodyweight)
-        squat (suggest-weight :logs logs
-                              :exercise "Back Squat"
-                              :target-reps 5
-                              :bodyweight bodyweight)]
-    (str "- Complete a quick workout @parallel(false) @autodone(true) @estimate(45m) @due(5pm) @defer(4am)\n"
+  (let [bench (latest-weight :logs logs
+                             :exercise "Bench Press"
+                             :target-reps 5)
+        ohead (latest-weight :logs logs
+                             :exercise "Overhead Press"
+                             :target-reps 5)
+        dlift (latest-weight :logs logs
+                             :exercise "Deadlift"
+                             :target-reps 5)
+        squat (latest-weight :logs logs
+                             :exercise "Back Squat"
+                             :target-reps 5)]
+    (str "- Complete a quick workout @parallel(false) @autodone(true) @estimate(55m) @due(5pm) @defer(4am)\n"
          "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
          "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
-         "\t- Go for a 3km run @estimate(15m) @tags(High, Home, Fitness)\n"
+         "\t- Go for a 4km run @estimate(25m) @tags(High, Home, Fitness)\n"
          "\t- Check that bench press bar is loaded to a total of " bench "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
          "\t- Check that overhead press bar is loaded to a total of " ohead "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
          "\t- Check that deadlift bar is loaded to a total of " dlift "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
@@ -589,7 +585,7 @@
          "\t- Deadlift " dlift "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
          "\t- Check that squat bar is loaded to a total of " squat "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
          "\t- Back Squat " squat "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
-         "\t- Do AMRAP pullups @estimate(3m) @tags(High, Home, Fitness)\n"
+         "\t- Pullups for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
          "\t- Have a cold shower @estimate(5m) @tags(Low, Home, Mindfulness)\n")))
 
 

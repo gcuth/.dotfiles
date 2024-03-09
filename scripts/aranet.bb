@@ -11,7 +11,8 @@
          '[cheshire.core :as json])
 
 (def OUTPATH (fs/unixify (fs/expand-home "~/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Logs/Aranet4/Snapshots/")))
-(def CLARANETPATH (or (fs/which "claranet4") "/opt/homebrew/bin/claranet4"))
+(def CLARANETPATH (or (fs/unixify (fs/which "claranet4"))
+                      "/opt/homebrew/bin/claranet4"))
 
 (defn get-snapshot
   "Get the raw data from the 'claranet4' command line tool."

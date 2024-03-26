@@ -150,8 +150,6 @@
                             ;; is 0.3, and the thresholds are [0.2 0.35 0.5 0.75 1],
                             ;; then the score is )
                             )]
-
-
     thresholds))
 
 
@@ -210,6 +208,19 @@
        (ewma) ;; calculate the ewma of the reps
        (last) ;; return the last (most recent) ewma value
        (int))) ;; round to the nearest integer
+
+
+(defn latest-reps
+  "Given a list of logs, an exercise, and a target weight (passed as named
+   args) return the most recent reps used for that exercise at the weight.
+   If none exists, return nil."
+  [& {:keys [logs exercise target-kg]}]
+  (->> logs
+       (filter #(= (:exercise %) exercise)) ;; get logs for the exercise
+       (filter #(= (:kg %) target-kg)) ;; get logs for the target weight
+       (sort-by :timestamp)
+       (last)
+       :reps))
 
 
 (defn estimate-orm
@@ -320,25 +331,6 @@
          (count)))) ;; count the number of days in the seq
 
 
-(defn which-workout?
-  "Given a list of logs, decides which workout to do next. Returns a keyword.
-   Cycles through A, Cardio, B, Cardio, A, Cardio, B, Cardio, etc.
-   Using the unix day (mod 4) by default
-   "
-  ([logs] (which-workout? logs EXERCISES))
-  ([logs exercises]
-   (let [unix-now (quot (System/currentTimeMillis) 1000) ;; timestamp seconds
-         unix-day (quot unix-now 86400)] ;; timestamp days
-     (cond (>= (count-lifting-days-in-n-days logs 2) 2) :cardio
-           (>= (count-lifting-days-in-n-days logs 14) 8) :cardio
-           (>= (count-lifting-days-in-n-days logs 21) 12) :cardio
-           (>= (count-lifting-days-in-n-days logs 28) 16) :cardio
-           (= (mod unix-day 4) 0) :a
-           (= (mod unix-day 4) 1) :cardio
-           (= (mod unix-day 4) 2) :b
-           (= (mod unix-day 4) 3) :cardio
-           :else :b))))
-
 (defn build-task
   "Given a map, build a taskpaper task."
   [task]
@@ -346,6 +338,7 @@
        (if (:estimate task) (str " @estimate(" (:estimate task) "m)") "")
        (if (:tags task) (str " @tags(" (str/join ", " (:tags task)) ")") "")
        "\n"))
+
 
 (defn generate-ladder
   "Given a target weight, generate a 'ladder' of n increasing weights.
@@ -371,190 +364,9 @@
     (conj (rest (reverse (conj (take (dec n) steps) target-weight))) 20)))
 
 
-(defn generate-workout-a
-  "Generate a default 'Workout A' taskpaper based on logs."
-  ([logs] (generate-workout-a logs 85))
-  ([logs bodyweight]
-   (let [squat-kg (suggest-weight :logs logs
-                                  :exercise "Back Squat"
-                                  :target-reps 5
-                                  :bodyweight bodyweight)
-         squat-weights (generate-ladder 35 6)
-         press-kg (suggest-weight :logs logs
-                                  :exercise "Overhead Press"
-                                  :target-reps 5
-                                  :bodyweight bodyweight)
-         press-weights (generate-ladder press-kg 6)
-         n-pullups (min (max (- (int (/ press-kg 10)) 1) 2) 5)
-         deadlift-kg (suggest-weight :logs logs
-                                     :exercise "Deadlift"
-                                     :target-reps 5
-                                     :bodyweight bodyweight)
-         start-tasks [{:text "Start workout tracking for Weightlifting"
-                       :estimate 1
-                       :tags ["Low" "Home"]}]
-         end-tasks [{:text "Stop workout tracking for Weightlifting"
-                     :estimate 1
-                     :tags ["Low" "Home"]}
-                    {:text "Have a cold shower"
-                     :estimate 5
-                     :tags ["Low" "Home" "Mindfulness"]}]
-         exercises (remove nil?
-                           (concat
-                            (flatten (for [i (range 0 6)]
-                                       (let [squat (nth squat-weights i)
-                                             press (nth press-weights i)]
-                                         [(when (and (> i 0) (pos? (- squat (nth squat-weights (dec i)))))
-                                            (let [each-side (/ (- squat (nth squat-weights (dec i))) 2)
-                                                  to-add (if (integer? each-side)
-                                                           (int each-side)
-                                                           (float each-side))]
-                                              {:text (str "Add " to-add "kg to each side of the squat bar")
-                                               :estimate 5
-                                               :tags ["Medium" "Home" "Fitness"]}))
-                                          {:text (str "Check that squat bar is loaded to a total of " squat "kgs")
-                                           :estimate 1
-                                           :tags ["Low" "Home" "Fitness"]}
-                                          {:text (str "Back Squat " squat "kg for 5 reps")
-                                           :estimate 3
-                                           :tags ["High" "Home" "Fitness"]}
-                                          {:text (str "Do " n-pullups " pullups")
-                                           :estimate 1
-                                           :tags ["High" "Home" "Fitness"]}
-                                          (when (and (> i 0) (pos? (- press (nth press-weights (dec i)))))
-                                            (let [each-side (/ (- press (nth press-weights (dec i))) 2)
-                                                  to-add (if (integer? each-side)
-                                                           (int each-side)
-                                                           (float each-side))]
-                                              {:text (str "Add " to-add "kg to each side of the overhead press bar")
-                                               :estimate 5
-                                               :tags ["Medium" "Home" "Fitness"]}))
-                                          {:text (str "Check that overhead press bar is loaded to a total of " press "kgs")
-                                           :estimate 1
-                                           :tags ["Low" "Home" "Fitness"]}
-                                          {:text (str "Overhead Press " press "kg for 5 reps")
-                                           :estimate 3
-                                           :tags ["High" "Home" "Fitness"]}])))
-                            [{:text (str "Check that deadlift bar is loaded to a total of " deadlift-kg "kgs")
-                              :estimate 1
-                              :tags ["Low" "Home" "Fitness"]}
-                             {:text (str "Deadlift " deadlift-kg "kg for 5 reps")
-                              :estimate 3
-                              :tags ["High" "Home" "Fitness"]}
-                             {:text (str "Remove all weights from overhead press bar")
-                              :estimate 1
-                              :tags ["Low" "Home" "Fitness"]}
-                             {:text (str "Remove all weights from squat bar")
-                              :estimate 1
-                              :tags ["Low" "Home" "Fitness"]}]))
-         tasks (concat start-tasks exercises end-tasks)
-         total-time (reduce + (map :estimate tasks))]
-     (str "- Complete 'Workout A' @parallel(false) @autodone(true) @estimate(" (+ 15 total-time) "m) @due(5pm) @defer(4am)\n"
-          (apply str (map #(str "\t" %) (map build-task tasks)))))))
-
-
-(defn generate-workout-b
-  "Generate a default 'Workout B' taskpaper based on logs."
-  ([logs] (generate-workout-b logs 85))
-  ([logs bodyweight]
-   (let [squat-kg (suggest-weight :logs logs
-                                  :exercise "Back Squat"
-                                  :target-reps 5
-                                  :bodyweight bodyweight)
-         squat-weights (generate-ladder 35 6)
-         press-kg (suggest-weight :logs logs
-                                  :exercise "Bench Press"
-                                  :target-reps 5
-                                  :bodyweight bodyweight)
-         press-weights (generate-ladder press-kg 6)
-         n-pullups (min (max (- (int (/ press-kg 10)) 1) 2) 5)
-         curl-kg (suggest-weight :logs logs
-                                 :exercise "Barbell Bicep Curl"
-                                 :target-reps 5
-                                 :bodyweight bodyweight)
-         start-tasks [{:text "Start workout tracking for Weightlifting"
-                       :estimate 1
-                       :tags ["Low" "Home"]}]
-         end-tasks [{:text "Stop workout tracking for Weightlifting"
-                     :estimate 1
-                     :tags ["Low" "Home"]}
-                    {:text "Have a cold shower"
-                     :estimate 5
-                     :tags ["Low" "Home" "Mindfulness"]}]
-         exercises (remove nil?
-                           (concat
-                            (flatten (for [i (range 0 6)]
-                                       (let [squat (nth squat-weights i)
-                                             press (nth press-weights i)]
-                                         [(when (and (> i 0) (pos? (- squat (nth squat-weights (dec i)))))
-                                            (let [each-side (/ (- squat (nth squat-weights (dec i))) 2)
-                                                  to-add (if (integer? each-side)
-                                                           (int each-side)
-                                                           (float each-side))]
-                                              {:text (str "Add " to-add "kg to each side of the squat bar")
-                                               :estimate 5
-                                               :tags ["Medium" "Home" "Fitness"]}))
-                                          {:text (str "Check that squat bar is loaded to a total of " squat "kgs")
-                                           :estimate 1
-                                           :tags ["Low" "Home" "Fitness"]}
-                                          {:text (str "Back Squat " squat "kg for 5 reps")
-                                           :estimate 3
-                                           :tags ["High" "Home" "Fitness"]}
-                                          {:text (str "Do " n-pullups " pullups")
-                                           :estimate 1
-                                           :tags ["High" "Home" "Fitness"]}])))
-                            [{:text (str "Remove all weights from the squat bar")
-                              :estimate 1
-                              :tags ["Low" "Home" "Fitness"]}
-                             {:text (str "Shift squat barbell to bench press position")
-                              :estimate 1
-                              :tags ["Low" "Home" "Fitness"]}]
-                            (flatten (for [i (range 0 6)]
-                                       (let [press (nth press-weights i)]
-                                         [(when (and (> i 0) (pos? (- press (nth press-weights (dec i)))))
-                                            (let [each-side (/ (- press (nth press-weights (dec i))) 2)
-                                                  to-add (if (integer? each-side)
-                                                           (int each-side)
-                                                           (float each-side))]
-                                              {:text (str "Add " to-add "kg to each side of the bench press bar")
-                                               :estimate 5
-                                               :tags ["Medium" "Home" "Fitness"]}))
-                                          {:text (str "Check that bench press bar is loaded to a total of " press "kgs")
-                                           :estimate 1
-                                           :tags ["Low" "Home" "Fitness"]}
-                                          {:text (str "Bench Press " press "kg for 5 reps")
-                                           :estimate 3
-                                           :tags ["High" "Home" "Fitness"]}])))
-                            [{:text (str "Remove all weights from the bench press bar")
-                              :estimate 1
-                              :tags ["Low" "Home" "Fitness"]}
-                             {:text (str "Shift bench press barbell to squat position")
-                              :estimate 1
-                              :tags ["Low" "Home" "Fitness"]}]))
-         tasks (concat start-tasks exercises end-tasks)
-         total-time (reduce + (map :estimate tasks))]
-     (str "- Complete 'Workout B' @parallel(false) @autodone(true) @estimate(" (+ 15 total-time) "m) @defer(4am) @due(5pm)\n"
-          (apply str (map #(str "\t" %) (map build-task tasks)))))))
-
-
-(defn generate-workout-cardio
-  "Generate a cardio taskpaper workout."
-  []
-  (let [day-of-week (-> (java.util.Date.) (.getDay))] ;; 0 = Sun, 1 = Mon, etc.
-    (if
-     (or (= day-of-week 6) (= day-of-week 0)) ;; if it's the weekend, do a long run!
-      (str "- Go for a long run @parallel(false) @autodone(true) @estimate(110m) @due(5pm) @defer(4am)\n"
-           "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
-           "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
-           "\t- Go for a 10km run @estimate(90m) @tags(High, Home, Fitness)\n"
-           "\t- Have a cold shower @estimate(5m) @tags(Low, Home, Mindfulness)\n")
-      ;; if it's a weekday do a zone 2 indoor cycle
-      (str "- Complete a 'Zone 2' Workout @parallel(false) @autodone(true) @estimate(120m) @due(5pm) @defer(4am)\n"
-           "\t- Get changed into workout gear @estimate(5m) @tags(Low, Home)\n"
-           "\t- Start workout tracking for Indoor Cycle @estimate(1m) @tags(Low, Home)\n"
-           "\t- Assault Bike for 90 minutes @estimate(100m) @tags(High, Home, Fitness)\n"
-           "\t- Stop workout tracking @estimate(1m) @tags(Low, Home)\n"
-           "\t- Have a cold shower @estimate(5m) @tags(Low, Home, Mindfulness)\n"))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; ACTUAL WORKOUT GENERATION ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defn generate-quick-workout
@@ -589,49 +401,6 @@
          "\t- Have a cold shower @estimate(5m) @tags(Low, Home, Mindfulness)\n")))
 
 
-(defn generate-workout
-  "Generate a workout given a list of logs, a workout type (a or b or cardio).
-   Returns a string of taskpaper-formatted text."
-  ([logs] (generate-workout logs EXERCISES 85))
-  ([logs exercises] (generate-workout logs exercises 85))
-  ([logs exercises bodyweight]
-   (let [workout-type (which-workout? logs exercises)]
-     (generate-workout logs exercises bodyweight workout-type)))
-  ([logs exercises bodyweight workout-type]
-   (let [main-workout (cond (= workout-type :a) (generate-workout-a logs bodyweight)
-                            (= workout-type :b) (generate-workout-b logs bodyweight)
-                            (= workout-type :cardio) (generate-workout-cardio))
-         random-distance (+ 2 (rand-int 3))]
-     (if (not (workout-type :cardio))
-       (str (str "- Go for a short run @parallel(false) @autodone(true) @estimate(60m) @due(5pm) @defer(4am)\n"
-                 "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
-                 "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
-                 "\t- Go for a " random-distance "km run @estimate(" (+ 15 (* 6 random-distance)) "m) @tags(High, Home, Fitness)\n")
-            main-workout)
-       main-workout))))
-
-
-
-
-(defn generate-report
-  "Generate a report of recent workouts."
-  [logs exercises]
-  (flatten
-   (for [exercise exercises]
-     (str exercise "\n"
-          "\t- " "Last Done: " (days-since-exercise :logs logs :exercise exercise) " days ago\n"
-          "\t- " "Estimated 1RM: " (estimate-orm :logs logs :exercise exercise) "kg 1RM\n"
-          "\t- " "Level: " (measure-orm-level :exercise exercise
-                                              :orm (estimate-orm :logs logs
-                                                                 :exercise exercise)
-                                              :gender "male"
-                                              :bodyweight 82.1) "\n"))))
-
-
-
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CLI ARGUMENTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -650,15 +419,9 @@
    :quick {:default false
            :help "Generate a quick workout instead of a full workout."
            :parse-fn :boolean}
-   :cardio {:default false
-            :help "Generate a cardio workout instead of a lifting workout."
-            :parse-fn :boolean}
    :n      {:default 1
             :help "Number of workouts to generate."
             :parse-fn int}
-   :report {:default false
-            :help "Generate a report of recent workouts."
-            :parse-fn :boolean}
    :help {:coerce :boolean}})
 
 
@@ -687,15 +450,7 @@
                  read-logs)
         bodyweight (:bodyweight opts)]
 
-    (cond (:report opts) (println (generate-report logs EXERCISES))
-          (:quick opts) (println (generate-quick-workout logs bodyweight))
-          (= (:n opts) 1) (println (generate-workout logs EXERCISES bodyweight))
-          :else ;; loop through :a, :cardio, :b, :cardio, :a, :cardio, etc. for n times, generating a workout for each, and stitch together into a single string to print
-          (println (apply str (take (* (:n opts) 2)
-                                    (interleave
-                                     (map #(generate-workout logs EXERCISES bodyweight %)
-                                          (cycle [:a :cardio :b :cardio]))
-                                     (repeat "\n"))))))))
+    (println (generate-quick-workout logs bodyweight))))
 
 
 (-main)

@@ -128,7 +128,7 @@
         transcribable (shuffle
                        (filter #(and (not (has-transcription? %))
                                      (not (has-json? %))
-                                     (not (is-new? %))) audio-files))]
+                                     (not (is-new? % 1))) audio-files))]
     (println (str "Input Directory: " dir))
     (println (str "Total audio files found: " (count audio-files)))
     (println (str "Total transcribable files: " (count transcribable)))

@@ -20,13 +20,14 @@
 ;; By default, the script will look for files in the target dir, using the
 ;; history to determine a suitable next set/rep/exercise group. It will then
 ;; generate a complete workout.
+;;
 
 
-(require '[babashka.fs :as fs]
-         '[cheshire.core :as json]
-         '[babashka.cli :as cli]
-         '[clojure.string :as str]
-         '[clojure.instant :as inst])
+ (require '[babashka.fs :as fs]
+          '[cheshire.core :as json]
+          '[babashka.cli :as cli]
+          '[clojure.string :as str]
+          '[clojure.instant :as inst])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -85,7 +86,7 @@
   (map #(fs/unixify %) (fs/glob path "*.json")))
 
 
-(defn read-logs
+(defn read-lifting-logs
   "Read a list of JSON file paths into a list of maps."
   [files]
   (->> files
@@ -96,8 +97,39 @@
                     (first (str/split (:datetime %) #"T"))))))
 
 
+(defn read-run-log
+  "Read a CSV file (representing a log of runs) into a list of maps."
+  [path]
+  (->> (slurp path)
+       (str/split-lines)
+       (rest)
+       (map #(zipmap [:date :time :distance :pace] (str/split % #",")))))
+
+
+(defn days
+  "Generate a list of days in the format 'YYYY-MM-DD' for the next n days."
+  [n]
+  (let [fmt (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd")
+        today (java.time.LocalDate/now)]
+    (map #(str (.format (.plusDays today %) fmt)) (range n))))
+
+
+(defn today
+  "Get the current date in the format 'YYYY-MM-DD'."
+  []
+  (first (days 1)))
+
+
+(defn days-between
+  "Calculate the number of days between two dates given as YYYY-MM-DD strings."
+  [start end]
+  (let [start-date (java.time.LocalDate/parse start)
+        end-date (java.time.LocalDate/parse end)]
+    (Math/abs (.between java.time.temporal.ChronoUnit/DAYS start-date end-date))))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;; EXERCISE STANDARDS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;; STRENGTH EXERCISE STANDARDS ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -142,24 +174,56 @@
                           "Back Squat" [0.625 1 1.375 1.875 2.375]
                           "Deadlift" [0.75 1.25 1.625 2.125 2.75]
                           "Barbell Bicep Curl" [0.15 0.3 0.5 0.725 1]})
-        thresholds (all-thresholds exercise)
-        interpolate-score (fn [fractional-orm thresholds]
-                            ;; given the fractional orm and relevant thresholds
-                            ;; return a score between 0 and 5. Interpolate
-                            ;; between thresholds. (ie, if the fractional orm
-                            ;; is 0.3, and the thresholds are [0.2 0.35 0.5 0.75 1],
-                            ;; then the score is )
-                            )]
+        thresholds (all-thresholds exercise)]
     thresholds))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;; EXERCISE SUGGESTIONS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;; RUNNING ANALYTICS & UTILS ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn average-daily-kms
+  "Given a run log (as list of maps), return the average kms run per day.
+   (This takes into account all days between first and last run in the log.)"
+  [runs]
+  (let [distances (map :distance runs) ;; get distances for each run 
+        distances (map #(Float/parseFloat %) distances) ;; as floats
+        total-kms (reduce + distances) ;; sum the total kms in the entire log
+        total-days (days-between (first (map :date runs))
+                                 (last (map :date runs)))]
+    (/ total-kms total-days)))
+
+
+(defn average-kms-when-run
+  "Given a run log (as list of maps), return the average kms run per workout."
+  [runs]
+  (let [distances (map :distance runs) ;; get distances for each run
+        distances (map #(Float/parseFloat %) distances) ;; as floats
+        total-kms (reduce + distances) ;; sum the total kms in the entire log
+        total-runs (count distances)]
+    (/ total-kms total-runs)))
+
+
+(defn recent-kms
+  "Given a run log (as list of maps), return an estimate of the recent kms run.
+   Calculated as the average of the last n runs in the log (default 21)."
+  ([runs] (recent-kms runs 21))
+  ([runs n]
+   (let [distances (map :distance runs) ;; get distances for each run
+         distances (map #(Float/parseFloat %) distances) ;; as floats
+         recent-distances (take n (reverse distances)) ;; get last n distances
+         total-kms (reduce + recent-distances) ;; sum total kms in recent log
+         total-runs (count recent-distances)]
+     (/ total-kms total-runs))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EXERCISE SUGGESTION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defn days-since-exercise
-  "Given a list of logs & an exercise (passed as named args),
+  "Given a list of lifting logs & a specific exercise (passed as named args),
    return number of days since last done."
   [& {:keys [logs exercise]}]
   (let [now (quot (System/currentTimeMillis) 1000)]
@@ -174,8 +238,8 @@
 
 
 (defn recent-weight
-  "Given a list of logs & an exercise (passed as named args), return an integer
-   value of the most recent weight used for that exercise (calc using ewma)."
+  "Given a list of lifting logs & an exercise (passed as named args), return an
+   integer value of the recent weight used for that exercise (using ewma)."
   [& {:keys [logs exercise]}]
   (->> logs
        (filter #(= (:exercise %) exercise)) ;; get logs for the exercise
@@ -239,10 +303,18 @@
                      #(int (* % (+ 1 (/ %2 30))))
                      recent-weights
                      recent-reps)]
-    (->> recent-orms
-         (ewma) ;; calculate the ewma of the orms
-         (last) ;; return the last (most recent) ewma value
-         (int)))) ;; round to the nearest integer
+    (if (empty? recent-orms)
+      0
+      (->> recent-orms
+           (ewma) ;; calculate the ewma of the orms
+           (last) ;; return the last (most recent) ewma value
+           (int))))) ;; round to the nearest integer
+
+
+(defn discount-orm
+  "Discount an estimated 1RM for a target rep count."
+  [orm reps]
+  (* orm (- 1 (/ reps 30))))
 
 
 (defn sets-per-day
@@ -265,70 +337,52 @@
     (/ total-sets days-since-first)))
 
 
-(defn suggest-weight
-  "Given a list of logs, a target rep count, & an exercise (as named args),
-   return an integer value for the suggested weight."
-  [& {:keys [logs exercise target-reps bodyweight gender age]}]
-  (let [est-orm (estimate-orm :logs logs :exercise exercise) ;; estimated 1RM
-        days-since (days-since-exercise :logs logs :exercise exercise)
-        discount-factor (if (< days-since 7) 1
-                            ;; discount by 4.5% for each day since last done
-                            (- 1 (* (/ 45 1000) (- days-since 7))))
-        discounted-orm (* est-orm discount-factor) ;; discount days since done
-        discounted-weight (* discounted-orm (- 0.75 (* 0.05 (- target-reps 4))))
-        latest (* (latest-weight
-                   :logs logs
-                   :exercise exercise
-                   :target-reps target-reps)
-                  discount-factor)
-        best-guess (int (median [discounted-weight latest]))
-        form-safe (if (or (< (sets-per-day :logs logs :exercise exercise)
-                             (cond (= exercise "Back Squat") (/ 12 7)
-                                   (= exercise "Deadlift") (/ 3 7)
-                                   :else (/ 8 7)))
-                          (> (sets-per-day :logs logs :exercise exercise) 3))
-                    (int (* 0.8 best-guess)) ;; discount by 20%
-                    best-guess)
-        final-weight (cond (< form-safe 20) 20
-                           (zero? (mod form-safe 5)) form-safe
-                           (> form-safe bodyweight) form-safe
-                           :else (+ (rand-nth [0 5])
-                                    (* 5 (inc (quot form-safe 5)))))
-        orm-level (measure-orm-level :exercise exercise
-                                     :orm discounted-orm
-                                     :gender gender
-                                     :bodyweight bodyweight
-                                     :age age)]
-    final-weight))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;; WORKOUT GENERATION UTILS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn days-since-last-lifting-workout
-  "Get the minimum number of days since any set was recorded for any exercises
-   in the given list."
-  ([logs]
-   (days-since-last-lifting-workout logs EXERCISES))
-  ([logs exercises]
-   (apply min (map #(days-since-exercise :logs logs :exercise %) exercises))))
+(defn which-workout?
+  "Given a date as a YYYY-MM-DD string, return a keyword representing the
+   workout type for that day. The year cycles through a sequence of workouts
+   on a fortnightly basis (with long run always on Saturdays!):
+   [:run :upper :run :lower :short-run :long-run :recovery
+   [:run :lower :run :upper :short-run :long-run :recovery]"
+  [date]
+  (let [sequence [:run :upper :run :lower :short-run :long-run :recovery
+                  :run :lower :run :upper :short-run :long-run :recovery]
+        day-of-week (mod (- (days-between "2023-01-01" date) 1) 14)]
+    (nth sequence day-of-week)))
 
 
-(defn count-lifting-days-in-n-days
-  "Get the number of days in the last n days that a lifting workout was done."
-  [logs n]
-  (let [now (quot (System/currentTimeMillis) 1000)]
-    (->> logs
-         (map :timestamp) ;; get timestamps for each set
-         (map #(quot % 1000)) ;; strip milliseconds
-         (map #(- now %)) ;; subtract from current timestamp
-         (map #(quot % 86400)) ;; convert to days
-         (distinct) ;; remove duplicates
-         (sort) ;; sort the list of days
-         (take-while #(<= % (- n 1))) ;; distinct days in seq less than n ago
-         (count)))) ;; count the number of days in the seq
+(defn strength-targets
+  "Given a list of logs, return a map of realistic current set/rep targets for
+   all major exercises based on recent performance (if available). "
+  [& {:keys [logs bodyweight]}]
+  (let [target (fn [logs exercise reps]
+                 ;; randomly add 1kg every 1/20th of the time
+                 (+ (if (zero? (mod (rand-int 20) 20)) 1 0)
+                    (int (discount-orm
+                          (estimate-orm :logs logs :exercise exercise)
+                          reps))))]
+    {:tibialis {:kg (or (target logs "Tibialis Raises" 10) 0)
+                :reps 10}
+     :calf {:kg (or (target logs "Single Leg Calf Raises" 10) 0)
+            :reps 10}
+     :squat {:kg (or (target logs "Back Squat" 10) 20)
+             :reps 10}
+     :split {:kg (or (target logs "Split Squat" 10) 0)
+             :reps 10}
+     :jefferson {:kg (or (target logs "Jefferson Curl" 10) 0)
+                 :reps 10}
+     :bench {:kg (or (target logs "Bench Press" 10) 20)
+             :reps 10}
+     :overhead {:kg (or (target logs "Overhead Press" 10) 20)
+                :reps 10}
+     :pullups {:kg 0
+               :reps (recent-reps :logs logs :exercise "Pullups")}
+     :deadlift {:kg (or (target logs "Deadlift" 10) 40)
+                :reps 10}}))
 
 
 (defn build-task
@@ -339,29 +393,264 @@
        (if (:tags task) (str " @tags(" (str/join ", " (:tags task)) ")") "")
        "\n"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TASKS/LISTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; (defined task lists for standard workouts & recovery processes) ;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn generate-ladder
-  "Given a target weight, generate a 'ladder' of n increasing weights.
-   These can then be assigned to sets. The target weight can be any integer,
-   but the minimum weight is 20kg, and all intervening weights should be
-   multiples of 5kg, 10kg, or 20kg where possible. Prioritise 'even' movement
-   towards the target weight. There is *always* a warmup set of 20kg if n > 1.
 
-   eg, if the target weight is 54kg, and n is 5, then the ladder would be
-         [20 30 40 50 54]
-       if the target weight is 30, and n is 5, then the ladder would be
-         [20 20 25 25 30]
-   
-   To achieve this, we start at the target weight and work backwards, then
-   reverse the resulting sequence."
-  [target-weight n]
-  (let [target-weight (max 20 target-weight)
-        step-size (max 5 (abs (quot (- 20 target-weight) (max 1 (dec n)))))
-        steps (map (fn [x] (if (< x 20) 20 x))
-                   (rest (map #(int (* 5 (quot (+ 2 %) 5)))
-                              (iterate #(+ % (* -1 step-size))
-                                       (int target-weight)))))]
-    (conj (rest (reverse (conj (take (dec n) steps) target-weight))) 20)))
+(defn generate-pre-running-tasks
+  []
+  [{:text "Get changed into running gear" :estimate 5 :tags ["Low" "Home"]}
+   {:text "Put on running shoes" :estimate 5 :tags ["Low" "Home"]}])
+
+
+(defn generate-running-tasks
+  [& {:keys [distance pace] :or {distance 5 pace 6}}]
+  [{:text (str "Go for a " distance "km run") :tags ["High" "Fitness"]
+    :estimate (+ (* distance pace) 5)}])
+
+
+(defn generate-pre-hiking-tasks
+  []
+  [{:text "Get changed into hiking gear" :estimate 5 :tags ["Low" "Home"]}
+   {:text "Put on hiking boots" :estimate 5 :tags ["Low" "Home"]}
+   {:text "Pack a hiking backpack with water and snacks"
+    :estimate 5 :tags ["Low" "Home"]}])
+
+
+(defn generate-hike-tasks
+  "Generate a list of all hike workout tasks for a given distance (km) and
+   pace (mins per km). If no pace is given, assume 20 mins per km."
+  ([& {:keys [distance pace] :or {distance 5 pace 20}}]
+   [{:text (str "Go for a " distance "km outdoor hike")
+     :tags ["High" "Outside" "Nature" "Fitness"]
+     :estimate (+ (* distance pace) 5)}]))
+
+
+(defn generate-post-cardio-tasks
+  []
+  [{:text "Stretch to touch toes on slant board for 2 minutes"
+    :estimate 3 :tags ["Medium" "Home" "Fitness"]}
+   {:text "Calf stretch on slant board for 2 minutes"
+    :estimate 3 :tags ["Medium" "Home" "Fitness"]}
+   {:text "Incline pigeon pose for 2 minutes (each side)"
+    :estimate 5 :tags ["Medium" "Home" "Fitness"]}
+   {:text "Couch (quad) stretch for 2 minutes (each side)"
+    :estimate 5 :tags ["Medium" "Home" "Fitness"]}
+   {:text "Butterfly pose for 2 minutes"
+    :estimate 3 :tags ["Medium" "Home" "Fitness"]}])
+
+
+(defn generate-pre-lift-stretch-tasks
+  []
+  [{:text "Stretch to touch toes on slant board for 2 minutes"
+    :estimate 3 :tags ["Medium" "Home" "Fitness"]}
+   {:text "Calf stretch on slant board for 2 minutes"
+    :estimate 3 :tags ["Medium" "Home" "Fitness"]}])
+
+
+(defn generate-post-lift-stretch-tasks
+  []
+  [{:text "Incline pigeon pose for 2 minutes (each side)"
+    :estimate 5 :tags ["Medium" "Home" "Fitness"]}
+   {:text "Couch (quad) stretch for 2 minutes (each side)"
+    :estimate 5 :tags ["Medium" "Home" "Fitness"]}
+   {:text "Butterfly pose for 2 minutes"
+    :estimate 3 :tags ["Medium" "Home" "Fitness"]}])
+
+
+(defn generate-lifting-setup-tasks
+  "Generate a list of tasks to setup for a lifting workout. Any keys passed
+   in will be used to generate 'load the bar' task for that exercise's weight."
+  [& {:keys [bench overhead deadlift squat tibialis jefferson]}]
+  (filter some?
+          [(when bench
+             {:text (str "Load barbell for bench press to a total of "
+                         bench "kgs")
+              :tags ["Low" "Home" "Fitness"]
+              :estimate 1})
+           (when overhead
+             {:text (str "Load barbell for overhead press to a total of "
+                         overhead "kgs")
+              :tags ["Low" "Home" "Fitness"]
+              :estimate 1})
+           (when deadlift
+             {:text (str "Load trap bar for deadlift to a total of "
+                         deadlift "kgs")
+              :tags ["Low" "Home" "Fitness"]
+              :estimate 1})
+           (when squat
+             {:text (str "Load barbell for squats to a total of "
+                         squat "kgs")
+              :tags ["Low" "Home" "Fitness"]
+              :estimate 1})
+           (when tibialis
+             {:text (str "Load tib bar to a total of "
+                         tibialis "kgs")
+              :tags ["Low" "Home" "Fitness"]
+              :estimate 1})
+           (when jefferson
+             {:text (str "Load barbell for jefferson curls to a total of "
+                         jefferson "kgs")
+              :tags ["Low" "Home" "Fitness"]
+              :estimate 1})]))
+
+
+(defn generate-upper-lift-tasks
+  "Generate a short list of upper body lifting tasks for a given set of weight
+   and repetition definitions.
+   Assumes you have a bench, overhead press, & pullup bar accessible."
+  [& {:keys [bench overhead pullups]
+      :or {bench {:kg 40 :reps 10}
+           overhead {:kg 20 :reps 10}
+           pullups {:kg 0 :reps 5}}}]
+  (let [bench {:kg (max 20 (:kg bench)) :reps (max 1 (:reps bench))}
+        overhead {:kg (max 20 (:kg overhead)) :reps (max 1 (:reps overhead))}
+        pullups {:kg (max 0 (:kg pullups)) :reps (max 1 (:reps pullups))}]
+    [{:text (str "Bench Press "
+                 (:kg bench) "kg for "
+                 (:reps bench) " reps")
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}
+     {:text (str "Overhead Press "
+                 (:kg overhead) "kg for "
+                 (:reps overhead) " reps")
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}
+     {:text (if (and (integer? (:kg pullups)) (pos? (:kg pullups)))
+              (str "Weighted pullups "
+                   (:kg pullups) "kg for "
+                   (:reps pullups) " reps")
+              (str "Bodyweight pullups for "
+                   (:reps pullups) " reps"))
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}]))
+
+
+(defn generate-lower-lift-tasks
+  "Generate a short list of lower body lifting tasks for a given set of weight
+   and repetition definitions.
+   Assumes you have a deadlift trap bar, squat rack (+ bar), & tibialis bar.
+   Also assumes you have a setup suitable for jefferson curls and calf raises."
+  [& {:keys [squat jefferson deadlift tibialis calf]
+      :or {squat {:kg 20 :reps 10}
+           jefferson {:kg 5 :reps 10}
+           deadlift {:kg 40 :reps 10}
+           tibialis {:kg 5 :reps 10}
+           calf {:kg 5 :reps 10}}}]
+  (let [squat {:kg (max 20 (:kg squat)) :reps (max 1 (:reps squat))}
+        jefferson {:kg (max 0 (:kg jefferson)) :reps (max 1 (:reps jefferson))}
+        deadlift {:kg (max 20 (:kg deadlift)) :reps (max 1 (:reps deadlift))}
+        tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
+        calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]
+    [{:text (str "Back Squat "
+                 (:kg squat) "kg for "
+                 (:reps squat) " reps")
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}
+     {:text (str "Static hang from pullup bar for 30 seconds")
+      :tags ["High" "Home" "Fitness"]
+      :estimate 1}
+     (if (pos? (:kg jefferson))
+       {:text (str "Jefferson Curl "
+                   (:kg jefferson) "kg for "
+                   (:reps jefferson) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3}
+       {:text (str "(Unweighted) Jefferson Curl for "
+                   (:reps jefferson) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3})
+     {:text (str "Deadlift "
+                 (:kg deadlift) "kg for "
+                 (:reps deadlift) " reps")
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}
+     (if (pos? (:kg tibialis))
+       {:text (str "Tibialis Raises "
+                   (:kg tibialis) "kg for "
+                   (:reps tibialis) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3}
+       {:text (str "(Unweighted) Tibialis Raises for "
+                   (:reps tibialis) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3})
+     (if (pos? (:kg calf))
+       {:text (str "Single Leg Calf Raises "
+                   (:kg calf) "kg for "
+                   (:reps calf) " reps"
+                   " (each leg)")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3}
+       {:text (str "(Unweighted) Single Leg Calf Raises for "
+                   (:reps calf) " reps"
+                   " (each leg)")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3})]))
+
+
+(defn generate-recovery-lift-tasks
+  "Generate a list of lifting tasks suitable for a 'recovery' day workout.
+   (This is usually the day after a long run in a distance training plan.)
+   Assumes you have a bench, tibialis bar, pullup bar, & dumbbells accessible."
+  [& {:keys [split jefferson tibialis calf]
+      :or {split {:kg 5 :reps 10}
+           jefferson {:kg 5 :reps 10}
+           tibialis {:kg 5 :reps 10}
+           calf {:kg 5 :reps 10}}}]
+  (let [split {:kg (max 5 (:kg split)) :reps (max 1 (:reps split))}
+        jefferson {:kg (max 0 jefferson) :reps (max 1 (:reps jefferson))}
+        tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
+        calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]
+    [{:text (str "(ATG) Split Squat with "
+                 (:kg split) "kg for "
+                 (:reps split) " reps (each side)")
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}
+     {:text (str "Hanging Leg Raise for 10 reps")
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}
+     (if (pos? (:kg jefferson))
+       {:text (str "Jefferson Curl "
+                   (:kg jefferson) "kg for "
+                   (:reps jefferson) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3}
+       {:text (str "(Unweighted) Jefferson Curl for "
+                   (:reps jefferson) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3})
+     (if (pos? (:kg tibialis))
+       {:text (str "Tibialis Raises "
+                   (:kg tibialis) "kg for "
+                   (:reps tibialis) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3}
+       {:text (str "(Unweighted) Tibialis Raises for "
+                   (:reps tibialis) " reps")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3})
+     (if (pos? (:kg calf))
+       {:text (str "Single Leg Calf Raises "
+                   (:kg calf) "kg for "
+                   (:reps calf) " reps"
+                   " (each leg)")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3}
+       {:text (str "(Unweighted) Single Leg Calf Raises for "
+                   (:reps calf) " reps"
+                   " (each leg)")
+        :tags ["High" "Home" "Fitness"]
+        :estimate 3})]))
+
+
+(defn generate-end-of-workout-tasks
+  []
+  [{:text "Have a cold shower" :tags ["Low" "Home" "Mindfulness"]
+    :estimate 5}])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -369,36 +658,169 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defn generate-quick-workout
-  "Generate a quick workout for when you're short on time.
-   Assumes you have all the equipment at home (and roughly set up already)."
-  [logs bodyweight]
-  (let [bench (latest-weight :logs logs
-                             :exercise "Bench Press"
-                             :target-reps 5)
-        ohead (latest-weight :logs logs
-                             :exercise "Overhead Press"
-                             :target-reps 5)
-        dlift (latest-weight :logs logs
-                             :exercise "Deadlift"
-                             :target-reps 5)
-        squat (latest-weight :logs logs
-                             :exercise "Back Squat"
-                             :target-reps 5)]
-    (str "- Complete a quick workout @parallel(false) @autodone(true) @estimate(55m) @due(5pm) @defer(4am)\n"
-         "\t- Get changed into running gear @estimate(5m) @tags(Low, Home)\n"
-         "\t- Put on running shoes @estimate(1m) @tags(Low, Home)\n"
-         "\t- Go for a 4km run @estimate(25m) @tags(High, Home, Fitness)\n"
-         "\t- Check that bench press bar is loaded to a total of " bench "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
-         "\t- Check that overhead press bar is loaded to a total of " ohead "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
-         "\t- Check that deadlift bar is loaded to a total of " dlift "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
-         "\t- Bench Press " bench "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
-         "\t- Overhead Press " ohead "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
-         "\t- Deadlift " dlift "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
-         "\t- Check that squat bar is loaded to a total of " squat "kgs @estimate(1m) @tags(Low, Home, Fitness)\n"
-         "\t- Back Squat " squat "kg for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
-         "\t- Pullups for 5 reps @estimate(3m) @tags(High, Home, Fitness)\n"
-         "\t- Have a cold shower @estimate(5m) @tags(Low, Home, Mindfulness)\n")))
+(defn generate-workout-tasks
+  "Generate list of workout tasks, given logs, bodyweight, target, etc."
+  [& {:keys [logs bodyweight workout-type distance pace]
+      :or {workout-type :run distance 5 pace 6}}]
+  (let [targets (strength-targets :logs logs :bodyweight bodyweight)]
+    (cond (= workout-type :upper)
+          (concat (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
+                  ;; setup for warmups —
+                  (generate-lifting-setup-tasks
+                   :bench (/ (get-in targets [:bench :kg]) 2)
+                   :overhead (/ (get-in targets [:overhead :kg]) 2))
+                  ;; warmup set —
+                  (generate-upper-lift-tasks
+                   :bench {:kg (/ (get-in targets [:bench :kg]) 2)
+                           :reps (get-in targets [:bench :reps])}
+                   :overhead {:kg (/ (get-in targets [:overhead :kg]) 2)
+                              :reps (get-in targets [:overhead :reps])}
+                   :pullups {:kg (get-in targets [:pullups :kg])
+                             :reps (get-in targets [:pullups :reps])})
+                  ;; setup for working set —
+                  (generate-lifting-setup-tasks
+                   :bench (get-in targets [:bench :kg])
+                   :overhead (get-in targets [:overhead :kg]))
+                  ;; working set 1 —
+                  (generate-upper-lift-tasks
+                   :bench (:bench targets)
+                   :overhead (:overhead targets)
+                   :pullups (:pullups targets))
+                  ;; working set 2 —
+                  (generate-upper-lift-tasks
+                   :bench (:bench targets)
+                   :overhead (:overhead targets)
+                   :pullups (:pullups targets))
+                  ;; post-lift stretching —
+                  (generate-post-lift-stretch-tasks)
+                  (generate-end-of-workout-tasks))
+          (= workout-type :lower)
+          (concat (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
+                  ;; setup for warmups —
+                  (generate-lifting-setup-tasks
+                   :squat (/ (get-in targets [:squat :kg]) 2)
+                   :deadlift (/ (get-in targets [:deadlift :kg]) 2)
+                   :tibialis (/ (get-in targets [:tibialis :kg]) 2)
+                   :calf (/ (get-in targets [:calf :kg]) 2)
+                   :jefferson (/ (get-in targets [:jefferson :kg]) 2))
+                  ;; warmup set —
+                  (generate-lower-lift-tasks
+                   :squat {:kg (/ (get-in targets [:squat :kg]) 2)
+                           :reps (get-in targets [:squat :reps])}
+                   :deadlift {:kg (/ (get-in targets [:deadlift :kg]) 2)
+                              :reps (get-in targets [:deadlift :reps])}
+                   :tibialis {:kg (/ (get-in targets [:tibialis :kg]) 2)
+                              :reps (get-in targets [:tibialis :reps])}
+                   :calf {:kg (/ (get-in targets [:calf :kg]) 2)
+                          :reps (get-in targets [:calf :reps])}
+                   :jefferson {:kg (/ (get-in targets [:jefferson :kg]) 2)
+                               :reps (get-in targets [:jefferson :reps])})
+                  ;; setup for working set —
+                  (generate-lifting-setup-tasks
+                   :squat (get-in targets [:squat :kg])
+                   :deadlift (get-in targets [:deadlift :kg])
+                   :tibialis (get-in targets [:tibialis :kg])
+                   :calf (get-in targets [:calf :kg])
+                   :jefferson (get-in targets [:jefferson :kg]))
+                  ;; working set 1 —
+                  (generate-lower-lift-tasks
+                   :squat (:squat targets)
+                   :deadlift (:deadlift targets)
+                   :tibialis (:tibialis targets)
+                   :calf (:calf targets)
+                   :jefferson (:jefferson targets))
+                  ;; working set 2 —
+                  (generate-lower-lift-tasks
+                   :squat (:squat targets)
+                   :deadlift (:deadlift targets)
+                   :tibialis (:tibialis targets)
+                   :calf (:calf targets)
+                   :jefferson (:jefferson targets))
+                  ;; post-lift stretching —
+                  (generate-post-lift-stretch-tasks)
+                  (generate-end-of-workout-tasks))
+          (= workout-type :recovery)
+          (concat (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
+                  ;; setup for workout —
+                  (generate-lifting-setup-tasks
+                   :split (get-in targets [:split :kg])
+                   :bench (get-in targets [:bench :kg])
+                   :jefferson (get-in targets [:jefferson :kg])
+                   :tibialis (get-in targets [:tibialis :kg])
+                   :calf (get-in targets [:calf :kg]))
+                  ;; workout — 
+                  (generate-recovery-lift-tasks)
+                  (generate-post-lift-stretch-tasks)
+                  (generate-end-of-workout-tasks))
+          (= workout-type :long-run)
+          (concat (generate-pre-running-tasks)
+                  (generate-running-tasks :distance (-> distance
+                                                        (* 1.5)
+                                                        (min 40)
+                                                        (max 3)
+                                                        (int))
+                                          :pace pace)
+                  (generate-post-cardio-tasks))
+          (= workout-type :short-run)
+          (concat (generate-pre-running-tasks)
+                  (generate-running-tasks :distance (-> distance
+                                                        (* 0.7)
+                                                        (min 10)
+                                                        (max 3)
+                                                        (int))
+                                          :pace pace)
+                  (generate-post-cardio-tasks))
+          (= workout-type :run)
+          (concat (generate-pre-running-tasks)
+                  (generate-running-tasks :distance (-> distance
+                                                        (min 15)
+                                                        (max 3)
+                                                        (int))
+                                          :pace pace)
+                  (generate-post-cardio-tasks))
+          :else ;; randomly choose otherwise
+          (generate-workout-tasks
+            :logs logs
+            :bodyweight bodyweight
+            :workout-type (rand-nth [:upper :lower :recovery :long-run :short-run :run])
+            :distance distance
+            :pace pace))))
+
+
+(defn tasks->taskpaper
+  "Given a list of workout tasks (and optional date for due/defer), convert to
+   a taskpaper string."
+  [& {:keys [tasks date title]
+      :or {date (today)
+           title "Workout"}}]
+  (let [total-time (+ 5 (->> tasks (map :estimate) (filter some?) (apply +)))
+        header (str "- " title
+                    " @due(" date " 7pm)"
+                    " @defer(" date " 4am)"
+                    " @estimate(" total-time "m)"
+                    " @autodone(true)"
+                    " @parallel(false)"
+                    "\n")]
+    (str header (str/join "" (map #(str "\t" %) (map build-task tasks))))))
+
+
+(defn generate-workout
+  "Generate a workout as a taskpaper string given logs, bodyweight, target, etc."
+  [& {:keys [logs bodyweight workout-type distance pace date]
+      :or {workout-type :run distance 5 pace 6 date (today)}}]
+  (let [tasks (generate-workout-tasks :logs logs
+                                      :bodyweight bodyweight
+                                      :workout-type workout-type
+                                      :distance distance
+                                      :pace pace)
+        title (cond (= workout-type :upper) "Complete an upper body workout"
+                    (= workout-type :lower) "Complete a lower body workout"
+                    (= workout-type :recovery) "Complete a recovery workout"
+                    (= workout-type :long-run) "Go for a long run"
+                    (= workout-type :short-run) "Go for a short run"
+                    (= workout-type :run) "Go for a run"
+                    :else "Complete a Workout")]
+    (tasks->taskpaper :tasks tasks :date date :title title)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -407,18 +829,18 @@
 
 
 (def cli-spec ;; CLI argument spec.
-  {:input {:default "~/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Logs/Fitness/Lifting/"
-           :help "The input directory to process."
+  {:lifts {:default "~/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Logs/Fitness/Lifting/"
+           :help "The directory containing json logs of lifts to process."
            :parse-fn str}
+   :runs {:default "~/Documents/blog/public/logs/running.csv"
+          :help "The path to a CSV log of runs."
+          :parse-fn str}
    :bodyweight {:default 85
-                :help "Your bodyweight in kg."
+                :help "Your current bodyweight in kg."
                 :parse-fn int}
    :gender {:default nil
             :help "Your gender (opts: male or female)"
             :parse-fn str}
-   :quick {:default false
-           :help "Generate a quick workout instead of a full workout."
-           :parse-fn :boolean}
    :n      {:default 1
             :help "Number of workouts to generate."
             :parse-fn int}
@@ -426,7 +848,7 @@
 
 
 (def cli-aliases ;; CLI argument aliases for convenience.
-  {:i :input})
+  {:l :lifts})
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -442,15 +864,26 @@
                                :aliases cli-aliases})
         args (:args input)
         opts (:opts input)
-        logs (-> opts
-                 :input
+        lifts (-> opts
+                  :lifts
+                  (fs/expand-home)
+                  (fs/unixify)
+                  list-json-files
+                  read-lifting-logs)
+        runs (-> opts
+                 :runs
                  (fs/expand-home)
                  (fs/unixify)
-                 list-json-files
-                 read-logs)
+                 read-run-log)
+        n (:n opts)
         bodyweight (:bodyweight opts)]
-
-    (println (generate-quick-workout logs bodyweight))))
+    (doseq [i (range n)]
+      (let [date (last (days (inc i)))
+            workout (generate-workout :logs lifts
+                                      :bodyweight bodyweight
+                                      :workout-type (which-workout? date)
+                                      :date date)]
+        (println workout)))))
 
 
 (-main)

@@ -602,7 +602,7 @@
            tibialis {:kg 5 :reps 10}
            calf {:kg 5 :reps 10}}}]
   (let [split {:kg (max 5 (:kg split)) :reps (max 1 (:reps split))}
-        jefferson {:kg (max 0 jefferson) :reps (max 1 (:reps jefferson))}
+        jefferson {:kg (max 0 (:kg jefferson)) :reps (max 1 (:reps jefferson))}
         tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
         calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]
     [{:text (str "(ATG) Split Squat with "

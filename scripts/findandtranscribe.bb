@@ -99,6 +99,7 @@
     ;; left-pad the hours, minutes, and seconds with 0s if necessary
     (str hours ":" (format "%02d" hours) ":" (format "%02d" seconds))))
 
+
 (defn json->txt
   "Convert the json output file of a Whisper transcription to a plain text file."
   [json-file outpath]
@@ -135,18 +136,18 @@
     ;; for each transcribable file ...
     (doseq [f transcribable]
       (fs/with-temp-dir [tmp-dir]
-        (println (str "Temp Directory: " tmp-dir))
-        (println (str "Transcribing: " f))
-        (try
-          (let [base-name (fs/strip-ext (fs/file-name f))
-                mono-path (make-mono f tmp-dir)
-                temp-transcription-path (transcribe mono-path tmp-dir)]
-            (fs/move temp-transcription-path (str dir "/" base-name ".json"))
-            (println "Saved json file to " (str dir "/" base-name ".json"))
-            (json->txt (str dir "/" base-name ".json")
-                       (str dir "/" base-name ".txt")))
-          (catch Exception e
-            (println (str "Error transcribing " f ": " (.getMessage e)))))))))
+        (let [basename (fs/strip-ext (fs/file-name f))
+              outpath (str (fs/strip-ext f) ".json")]
+          (println (str "Temp Directory: " tmp-dir))
+          (println (str "Target Output Path for Transcription: " outpath))
+          (println (str "Transcribing: " f))
+          (try
+            (let [mono-path (make-mono f tmp-dir)
+                  temp-transcription-path (transcribe mono-path tmp-dir)]
+              (fs/move temp-transcription-path outpath)
+              (println "Saved json file to " outpath))
+            (catch Exception e
+              (println (str "Error transcribing " f ": " (.getMessage e))))))))))
 
 
 (-main)

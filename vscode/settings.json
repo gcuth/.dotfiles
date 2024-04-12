@@ -134,4 +134,7 @@
     "workbench.layoutControl.enabled": false,
     "window.commandCenter": false,
     "editor.stickyScroll.enabled": false,
+    "workbench.preferredDarkColorTheme": "Default High Contrast",
+    "workbench.colorTheme": "Default High Contrast",
+    "workbench.preferredLightColorTheme": "Default High Contrast Light",
 }

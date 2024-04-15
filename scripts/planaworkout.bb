@@ -468,32 +468,32 @@
   (filter some?
           [(when bench
              {:text (str "Load barbell for bench press to a total of "
-                         bench "kgs")
+                         (int (max 20 bench)) "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when overhead
              {:text (str "Load barbell for overhead press to a total of "
-                         overhead "kgs")
+                         (int (max 20 overhead)) "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when deadlift
              {:text (str "Load trap bar for deadlift to a total of "
-                         deadlift "kgs")
+                         (int (max 20 deadlift)) "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when squat
              {:text (str "Load barbell for squats to a total of "
-                         squat "kgs")
+                         (int (max 20 squat)) "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when tibialis
              {:text (str "Load tib bar to a total of "
-                         tibialis "kgs")
+                         (int tibialis) "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when jefferson
              {:text (str "Load barbell for jefferson curls to a total of "
-                         jefferson "kgs")
+                         (int jefferson) "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})]))
 
@@ -510,21 +510,21 @@
         overhead {:kg (max 20 (:kg overhead)) :reps (max 1 (:reps overhead))}
         pullups {:kg (max 0 (:kg pullups)) :reps (max 1 (:reps pullups))}]
     [{:text (str "Bench Press "
-                 (:kg bench) "kg for "
-                 (:reps bench) " reps")
+                 (int (:kg bench)) "kg for "
+                 (int (:reps bench)) " reps")
       :tags ["High" "Home" "Fitness"]
       :estimate 3}
      {:text (str "Overhead Press "
-                 (:kg overhead) "kg for "
-                 (:reps overhead) " reps")
+                 (int (:kg overhead)) "kg for "
+                 (int (:reps overhead)) " reps")
       :tags ["High" "Home" "Fitness"]
       :estimate 3}
      {:text (if (and (integer? (:kg pullups)) (pos? (:kg pullups)))
               (str "Weighted pullups "
-                   (:kg pullups) "kg for "
-                   (:reps pullups) " reps")
+                   (int (:kg pullups)) "kg for "
+                   (int (:reps pullups)) " reps")
               (str "Bodyweight pullups for "
-                   (:reps pullups) " reps"))
+                   (int (:reps pullups)) " reps"))
       :tags ["High" "Home" "Fitness"]
       :estimate 3}]))
 
@@ -545,9 +545,9 @@
         deadlift {:kg (max 20 (:kg deadlift)) :reps (max 1 (:reps deadlift))}
         tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
         calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]
-    [{:text (str "Back Squat "
-                 (:kg squat) "kg for "
-                 (:reps squat) " reps")
+    [{:text (str "Back Squat " 
+                 (int (:kg squat)) "kg for "
+                 (int (:reps squat)) " reps")
       :tags ["High" "Home" "Fitness"]
       :estimate 3}
      {:text (str "Static hang from pullup bar for 30 seconds")
@@ -555,38 +555,38 @@
       :estimate 1}
      (if (pos? (:kg jefferson))
        {:text (str "Jefferson Curl "
-                   (:kg jefferson) "kg for "
-                   (:reps jefferson) " reps")
+                   (int (:kg jefferson)) "kg for "
+                   (int (:reps jefferson)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3}
        {:text (str "(Unweighted) Jefferson Curl for "
-                   (:reps jefferson) " reps")
+                   (int (:reps jefferson)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3})
      {:text (str "Deadlift "
-                 (:kg deadlift) "kg for "
-                 (:reps deadlift) " reps")
+                 (int (:kg deadlift)) "kg for "
+                 (int (:reps deadlift)) " reps")
       :tags ["High" "Home" "Fitness"]
       :estimate 3}
      (if (pos? (:kg tibialis))
        {:text (str "Tibialis Raises "
-                   (:kg tibialis) "kg for "
-                   (:reps tibialis) " reps")
+                   (int (:kg tibialis)) "kg for "
+                   (int (:reps tibialis)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3}
        {:text (str "(Unweighted) Tibialis Raises for "
-                   (:reps tibialis) " reps")
+                   (int (:reps tibialis)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3})
      (if (pos? (:kg calf))
        {:text (str "Single Leg Calf Raises "
-                   (:kg calf) "kg for "
-                   (:reps calf) " reps"
+                   (int (:kg calf)) "kg for "
+                   (int (:reps calf)) " reps"
                    " (each leg)")
         :tags ["High" "Home" "Fitness"]
         :estimate 3}
        {:text (str "(Unweighted) Single Leg Calf Raises for "
-                   (:reps calf) " reps"
+                   (int (:reps calf)) " reps"
                    " (each leg)")
         :tags ["High" "Home" "Fitness"]
         :estimate 3})]))
@@ -606,8 +606,8 @@
         tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
         calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]
     [{:text (str "(ATG) Split Squat with "
-                 (:kg split) "kg for "
-                 (:reps split) " reps (each side)")
+                 (int (:kg split)) "kg for "
+                 (int (:reps split)) " reps (each side)")
       :tags ["High" "Home" "Fitness"]
       :estimate 3}
      {:text (str "Hanging Leg Raise for 10 reps")
@@ -615,33 +615,33 @@
       :estimate 3}
      (if (pos? (:kg jefferson))
        {:text (str "Jefferson Curl "
-                   (:kg jefferson) "kg for "
-                   (:reps jefferson) " reps")
+                   (int (:kg jefferson)) "kg for "
+                   (int (:reps jefferson)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3}
        {:text (str "(Unweighted) Jefferson Curl for "
-                   (:reps jefferson) " reps")
+                   (int (:reps jefferson)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3})
      (if (pos? (:kg tibialis))
        {:text (str "Tibialis Raises "
-                   (:kg tibialis) "kg for "
-                   (:reps tibialis) " reps")
+                   (int (:kg tibialis)) "kg for "
+                   (int (:reps tibialis)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3}
        {:text (str "(Unweighted) Tibialis Raises for "
-                   (:reps tibialis) " reps")
+                   (int (:reps tibialis)) " reps")
         :tags ["High" "Home" "Fitness"]
         :estimate 3})
      (if (pos? (:kg calf))
        {:text (str "Single Leg Calf Raises "
-                   (:kg calf) "kg for "
-                   (:reps calf) " reps"
+                   (int (:kg calf)) "kg for "
+                   (int (:reps calf)) " reps"
                    " (each leg)")
         :tags ["High" "Home" "Fitness"]
         :estimate 3}
        {:text (str "(Unweighted) Single Leg Calf Raises for "
-                   (:reps calf) " reps"
+                   (int (:reps calf)) " reps"
                    " (each leg)")
         :tags ["High" "Home" "Fitness"]
         :estimate 3})]))
@@ -664,81 +664,88 @@
       :or {workout-type :run distance 5 pace 6}}]
   (let [targets (strength-targets :logs logs :bodyweight bodyweight)]
     (cond (= workout-type :upper)
-          (concat (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
-                  ;; setup for warmups —
-                  (generate-lifting-setup-tasks
-                   :bench (/ (get-in targets [:bench :kg]) 2)
-                   :overhead (/ (get-in targets [:overhead :kg]) 2))
+          (concat
+           (generate-pre-running-tasks) ;; get ready for a run
+           (generate-running-tasks :distance 2 :pace 6) ;; quick warmup run
+           (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
+           (generate-lifting-setup-tasks ;; setup for warmups
+            :bench (/ (get-in targets [:bench :kg]) 2)
+            :overhead (/ (get-in targets [:overhead :kg]) 2))
                   ;; warmup set —
-                  (generate-upper-lift-tasks
-                   :bench {:kg (/ (get-in targets [:bench :kg]) 2)
-                           :reps (get-in targets [:bench :reps])}
-                   :overhead {:kg (/ (get-in targets [:overhead :kg]) 2)
-                              :reps (get-in targets [:overhead :reps])}
-                   :pullups {:kg (get-in targets [:pullups :kg])
-                             :reps (get-in targets [:pullups :reps])})
+           (generate-upper-lift-tasks
+            :bench {:kg (/ (get-in targets [:bench :kg]) 2)
+                    :reps (get-in targets [:bench :reps])}
+            :overhead {:kg (/ (get-in targets [:overhead :kg]) 2)
+                       :reps (get-in targets [:overhead :reps])}
+            :pullups {:kg (get-in targets [:pullups :kg])
+                      :reps (get-in targets [:pullups :reps])})
                   ;; setup for working set —
-                  (generate-lifting-setup-tasks
-                   :bench (get-in targets [:bench :kg])
-                   :overhead (get-in targets [:overhead :kg]))
+           (generate-lifting-setup-tasks
+            :bench (get-in targets [:bench :kg])
+            :overhead (get-in targets [:overhead :kg]))
                   ;; working set 1 —
-                  (generate-upper-lift-tasks
-                   :bench (:bench targets)
-                   :overhead (:overhead targets)
-                   :pullups (:pullups targets))
+           (generate-upper-lift-tasks
+            :bench (:bench targets)
+            :overhead (:overhead targets)
+            :pullups (:pullups targets))
                   ;; working set 2 —
-                  (generate-upper-lift-tasks
-                   :bench (:bench targets)
-                   :overhead (:overhead targets)
-                   :pullups (:pullups targets))
-                  ;; post-lift stretching —
-                  (generate-post-lift-stretch-tasks)
-                  (generate-end-of-workout-tasks))
+           (generate-upper-lift-tasks
+            :bench (:bench targets)
+            :overhead (:overhead targets)
+            :pullups (:pullups targets))
+           ;; post-lift stretching —
+           (generate-post-lift-stretch-tasks)
+           (generate-end-of-workout-tasks))
+
           (= workout-type :lower)
-          (concat (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
+          (concat
+           (generate-pre-running-tasks) ;; get ready for a run
+           (generate-running-tasks :distance 2 :pace 6) ;; quick warmup run
+           (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
                   ;; setup for warmups —
-                  (generate-lifting-setup-tasks
-                   :squat (/ (get-in targets [:squat :kg]) 2)
-                   :deadlift (/ (get-in targets [:deadlift :kg]) 2)
-                   :tibialis (/ (get-in targets [:tibialis :kg]) 2)
-                   :calf (/ (get-in targets [:calf :kg]) 2)
-                   :jefferson (/ (get-in targets [:jefferson :kg]) 2))
+           (generate-lifting-setup-tasks
+            :squat (/ (get-in targets [:squat :kg]) 2)
+            :deadlift (/ (get-in targets [:deadlift :kg]) 2)
+            :tibialis (/ (get-in targets [:tibialis :kg]) 2)
+            :calf (/ (get-in targets [:calf :kg]) 2)
+            :jefferson (/ (get-in targets [:jefferson :kg]) 2))
                   ;; warmup set —
-                  (generate-lower-lift-tasks
-                   :squat {:kg (/ (get-in targets [:squat :kg]) 2)
-                           :reps (get-in targets [:squat :reps])}
-                   :deadlift {:kg (/ (get-in targets [:deadlift :kg]) 2)
-                              :reps (get-in targets [:deadlift :reps])}
-                   :tibialis {:kg (/ (get-in targets [:tibialis :kg]) 2)
-                              :reps (get-in targets [:tibialis :reps])}
-                   :calf {:kg (/ (get-in targets [:calf :kg]) 2)
-                          :reps (get-in targets [:calf :reps])}
-                   :jefferson {:kg (/ (get-in targets [:jefferson :kg]) 2)
-                               :reps (get-in targets [:jefferson :reps])})
+           (generate-lower-lift-tasks
+            :squat {:kg (/ (get-in targets [:squat :kg]) 2)
+                    :reps (get-in targets [:squat :reps])}
+            :deadlift {:kg (/ (get-in targets [:deadlift :kg]) 2)
+                       :reps (get-in targets [:deadlift :reps])}
+            :tibialis {:kg (/ (get-in targets [:tibialis :kg]) 2)
+                       :reps (get-in targets [:tibialis :reps])}
+            :calf {:kg (/ (get-in targets [:calf :kg]) 2)
+                   :reps (get-in targets [:calf :reps])}
+            :jefferson {:kg (/ (get-in targets [:jefferson :kg]) 2)
+                        :reps (get-in targets [:jefferson :reps])})
                   ;; setup for working set —
-                  (generate-lifting-setup-tasks
-                   :squat (get-in targets [:squat :kg])
-                   :deadlift (get-in targets [:deadlift :kg])
-                   :tibialis (get-in targets [:tibialis :kg])
-                   :calf (get-in targets [:calf :kg])
-                   :jefferson (get-in targets [:jefferson :kg]))
+           (generate-lifting-setup-tasks
+            :squat (get-in targets [:squat :kg])
+            :deadlift (get-in targets [:deadlift :kg])
+            :tibialis (get-in targets [:tibialis :kg])
+            :calf (get-in targets [:calf :kg])
+            :jefferson (get-in targets [:jefferson :kg]))
                   ;; working set 1 —
-                  (generate-lower-lift-tasks
-                   :squat (:squat targets)
-                   :deadlift (:deadlift targets)
-                   :tibialis (:tibialis targets)
-                   :calf (:calf targets)
-                   :jefferson (:jefferson targets))
+           (generate-lower-lift-tasks
+            :squat (:squat targets)
+            :deadlift (:deadlift targets)
+            :tibialis (:tibialis targets)
+            :calf (:calf targets)
+            :jefferson (:jefferson targets))
                   ;; working set 2 —
-                  (generate-lower-lift-tasks
-                   :squat (:squat targets)
-                   :deadlift (:deadlift targets)
-                   :tibialis (:tibialis targets)
-                   :calf (:calf targets)
-                   :jefferson (:jefferson targets))
+           (generate-lower-lift-tasks
+            :squat (:squat targets)
+            :deadlift (:deadlift targets)
+            :tibialis (:tibialis targets)
+            :calf (:calf targets)
+            :jefferson (:jefferson targets))
                   ;; post-lift stretching —
-                  (generate-post-lift-stretch-tasks)
-                  (generate-end-of-workout-tasks))
+           (generate-post-lift-stretch-tasks)
+           (generate-end-of-workout-tasks))
+
           (= workout-type :recovery)
           (concat (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
                   ;; setup for workout —
@@ -752,6 +759,7 @@
                   (generate-recovery-lift-tasks)
                   (generate-post-lift-stretch-tasks)
                   (generate-end-of-workout-tasks))
+
           (= workout-type :long-run)
           (concat (generate-pre-running-tasks)
                   (generate-running-tasks :distance (-> distance
@@ -761,6 +769,7 @@
                                                         (int))
                                           :pace pace)
                   (generate-post-cardio-tasks))
+
           (= workout-type :short-run)
           (concat (generate-pre-running-tasks)
                   (generate-running-tasks :distance (-> distance
@@ -778,13 +787,15 @@
                                                         (int))
                                           :pace pace)
                   (generate-post-cardio-tasks))
+
           :else ;; randomly choose otherwise
           (generate-workout-tasks
-            :logs logs
-            :bodyweight bodyweight
-            :workout-type (rand-nth [:upper :lower :recovery :long-run :short-run :run])
-            :distance distance
-            :pace pace))))
+           :logs logs
+           :bodyweight bodyweight
+           :workout-type (rand-nth [:upper :lower :recovery
+                                    :long-run :short-run :run])
+           :distance distance
+           :pace pace))))
 
 
 (defn tasks->taskpaper
@@ -882,7 +893,9 @@
             workout (generate-workout :logs lifts
                                       :bodyweight bodyweight
                                       :workout-type (which-workout? date)
-                                      :date date)]
+                                      :date date
+                                      :distance (recent-kms runs)
+                                      )]
         (println workout)))))
 
 

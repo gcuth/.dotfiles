@@ -134,4 +134,5 @@
     "workbench.layoutControl.enabled": false,
     "window.commandCenter": false,
     "editor.stickyScroll.enabled": false,
+    "workbench.colorTheme": "Default Light Modern",
 }

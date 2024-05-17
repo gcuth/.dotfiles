@@ -345,12 +345,10 @@
 (defn which-workout?
   "Given a date as a YYYY-MM-DD string, return a keyword representing the
    workout type for that day. The year cycles through a sequence of workouts
-   on a fortnightly basis (with long run always on Saturdays!):
-   [:run :upper :run :lower :short-run :long-run :recovery
-   [:run :lower :run :upper :short-run :long-run :recovery]"
+   on a fortnightly basis (with long run always on Saturdays!)."
   [date]
-  (let [sequence [:run :upper :run :lower :short-run :long-run :recovery
-                  :run :lower :run :upper :short-run :long-run :recovery]
+  (let [sequence [:run :upper :hiit :lower :short-run :long-run :upper
+                  :run :lower :hiit :upper :short-run :long-run :lower]
         day-of-week (mod (- (days-between "2023-01-01" date) 1) 14)]
     (nth sequence day-of-week)))
 
@@ -647,6 +645,13 @@
         :estimate 3})]))
 
 
+(defn generate-hiit-workout-tasks
+  []
+  [{:text "Do a 4x4 HIIT workout" :tags ["High" "Home" "Fitness"]
+    :estimate 35}])
+
+
+
 (defn generate-end-of-workout-tasks
   []
   [{:text "Have a cold shower" :tags ["Low" "Home" "Mindfulness"]
@@ -760,6 +765,11 @@
                   (generate-post-lift-stretch-tasks)
                   (generate-end-of-workout-tasks))
 
+          (= workout-type :hiit)
+          (concat (generate-pre-running-tasks)
+                  (generate-hiit-workout-tasks)
+                  (generate-post-cardio-tasks))
+
           (= workout-type :long-run)
           (concat (generate-pre-running-tasks)
                   (generate-running-tasks :distance (-> distance
@@ -792,7 +802,7 @@
           (generate-workout-tasks
            :logs logs
            :bodyweight bodyweight
-           :workout-type (rand-nth [:upper :lower :recovery
+           :workout-type (rand-nth [:upper :lower :recovery :hiit
                                     :long-run :short-run :run])
            :distance distance
            :pace pace))))

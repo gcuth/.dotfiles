@@ -135,4 +135,5 @@
     "window.commandCenter": false,
     "editor.stickyScroll.enabled": false,
     "workbench.colorTheme": "Default Light Modern",
+    "github.copilot.editor.enableAutoCompletions": true,
 }

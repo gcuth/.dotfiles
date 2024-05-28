@@ -85,6 +85,7 @@
   - visual-studio-code
   - postgresql
   - coreutils # the missing GNU coreutils, macOS style
+  - ollama
 - tap:
   - homebrew/cask-fonts
 - brew:

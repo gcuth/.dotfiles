@@ -110,14 +110,17 @@
         ;; and questions without a community prediction
         questions (->> questions
                        (filter #(nil? (:group %)))
-                       (remove #(nil? (get-current-community-prediction %))))
-        question (rand-nth questions)
-        id (:id question)
-        title (:title question)
-        current-community (get-current-community-prediction question)]
-    (println (str "[" id "] " title " [" current-community "]: "))
-    {:id id
-     :value (Float/parseFloat (read-line))}))
+                       (remove #(nil? (get-current-community-prediction %))))]
+    (println "Found" (count questions) "questions.")
+    (doseq [question questions]
+      (let [id (:id question)
+            title (:title question)
+            current-community (get-current-community-prediction question)]
+        (println (str "[" id "] " title " [" current-community "]: "))
+        (post-prediction
+         {:id id
+          :value (Float/parseFloat (read-line))
+          :token token})))))
 
 
 (def cli-spec
@@ -156,10 +159,7 @@
                 (println (str (:id q) ": " (:title q))))))
 
           (= command "prompt")
-          (-> (prompt-for-prediction opts)
-              (assoc :token (:token opts))
-              (post-prediction)
-              (println))
+          (-> (prompt-for-prediction opts))
           
           :else (println "Unknown command."))))
 

@@ -135,12 +135,15 @@
   # every minute, log the currently playing song (if any) to a csv file
   - cron: "* * * * *"
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv
+  # every minute, run a shortcut to monitor writing progress
+  - cron: "* * * * *"
+    command: shortcuts run "Monitor Writing Progress"
   # Run the 'every five minutes' shortcut
   - cron: "*/5 * * * *"
     command: shortcuts run "Every Five Minutes"
-  # run 'every hour' shortcut every hour at 59 minutes past
+  # run the 'every hour' shortcut every hour at 59 minutes past
   - cron: "59 * * * *"
     command: shortcuts run "Every Hour"
-  # Run a misc 'every day' shortcut every day at 4am
+  # Run the misc 'every day' shortcut every day at 4am
   - cron: "0 4 * * *"
     command: shortcuts run "Every Day"

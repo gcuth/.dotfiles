@@ -86,6 +86,7 @@
   - postgresql
   - coreutils # the missing GNU coreutils, macOS style
   - ollama
+  - 1password-cli
 - tap:
   - homebrew/cask-fonts
 - brew:

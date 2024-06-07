@@ -71,7 +71,7 @@
                 (json/parse-string (:body response) true))))
 
 
-(defn get-question-type 
+(defn get-question-type
   "Given a question object, return the type from [:possibilities :type]."
   [question]
   (get-in question [:possibilities :type]))
@@ -92,11 +92,8 @@
   (= "OPEN" (:active_state question)))
 
 
-(defn post-prediction
-  "Post a prediction to Metaculus for a specific question.
-   
-   (Only supports binary questions for now.)
-   "
+(defn post-binary-prediction
+  "Post a binary prediction to Metaculus for a specific question."
   [{:keys [id token value]}]
   (let [url (str "https://www.metaculus.com/api2/questions/" id "/predict/")
         response (curl/post url
@@ -104,16 +101,52 @@
                                    :body (json/generate-string {:prediction value})))]
     (json/parse-string (:body response) true)))
 
+(defn post-continuous-prediction
+  "Post a continuous prediction to Metaculus for a specific question."
+  [{:keys [id token value]}]
+  ;; 
+  ;; The JSON schema continuous predictions is:
+  ;; schema = { "type": "object", "properties": { "kind": { "enum": (["logistic", "gaussian"]) }, "avg": { "type": "number", "minimum": -2, "maximum": 3, }, "stdev": { "type": "number", "minimum": 0.005, "maximum": 10, }, "a": { "type": "number", "minimum": -0.96, "maximum": +0.96, }, "low": { "type": "number", "minimum": 0.0099, "maximum": 1 - 0.0099, }, "high": { "type": "number", "minimum": 0.0099, "maximum": 1 - 0.0099, }, }, "additionalProperties": boolean, "required": ["avg", "stdev"] }
+  ;;
+  ;; THIS IS NOT IMPLEMENTED YET
+  nil)
+
+
+(defn post-prediction
+  "Post a prediction to Metaculus for a specific question."
+  [{:keys [id token value type]}]
+  (cond (nil? id) (throw (ex-info "No Question ID provided." {}))
+        (nil? token) (throw (ex-info "No token provided." {}))
+        (nil? value) (throw (ex-info "No prediction value provided." {}))
+        (nil? type) (throw (ex-info "No prediction type provided." {}))
+        (= type "binary") (post-binary-prediction {:id id :token token :value value})
+        :else (throw (ex-info "Unknown prediction type." {}))))
+
 
 (defn get-current-community-prediction
   "Get the current community prediction from a question."
   [question]
+  (cond (is-binary? question)
+        (-> question
+            :community_prediction
+            :history
+            last
+            :x2
+            :weighted_avg)
+        :else (-> question
+                  :community_prediction
+                  :history
+                  last)))
+
+
+(defn get-current-user-prediction
+  "Get the current user prediction from a question."
+  [question]
   (-> question
-      :community_prediction
-      :history
+      :my_predictions
+      :predictions
       last
-      :x2
-      :weighted_avg))
+      :x))
 
 
 (defn prompt-for-prediction
@@ -126,13 +159,15 @@
                     (list-questions {:token token
                                      :params params})
                     (apply concat (map #(list-questions {:token token
-                                                   :params %})
-                                 params)))
+                                                         :params %})
+                                       params)))
         ;; remove questions with a 'group' value
         ;; and questions without a community prediction
         questions (->> questions
                        (filter #(nil? (:group %)))
-                       (remove #(nil? (get-current-community-prediction %))))]
+                       (remove #(nil? (get-current-community-prediction %)))
+                       (filter #(is-open? %))
+                       (filter #(is-binary? %)))]
     (println "Found" (count questions) "questions.")
     (doseq [question questions]
       (let [id (:id question)
@@ -142,7 +177,8 @@
         (post-prediction
          {:id id
           :value (Float/parseFloat (read-line))
-          :token token})))))
+          :token token
+          :type "binary"})))))
 
 
 (def cli-spec
@@ -170,7 +206,7 @@
               (println question)))
 
           (= command "predict")
-          (let [prediction (post-prediction opts)]
+          (let [prediction (post-prediction opts)] ;; TODO: Check for question type and post accordingly
             (println prediction))
 
           (= command "list")
@@ -182,7 +218,17 @@
 
           (= command "prompt")
           (-> (prompt-for-prediction opts))
-          
+
+          (= command "adopt")
+          (let [question (get-question opts)
+                community (get-current-community-prediction question)
+                user (get-current-user-prediction question)]
+            (cond (nil? community) (println "No community prediction available.")
+                  (= community user) (println "Community and user predictions already match.")
+                  (not (is-open? question)) (println "Question is not open for predictions.")
+                  (not (is-binary? question)) (println "Question type is not yet supported.")
+                  :else (println (post-prediction (assoc opts :value community :type "binary")))))
+
           :else (println "Unknown command."))))
 
 (-main)

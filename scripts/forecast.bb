@@ -71,6 +71,27 @@
                 (json/parse-string (:body response) true))))
 
 
+(defn get-question-type 
+  "Given a question object, return the type from [:possibilities :type]."
+  [question]
+  (get-in question [:possibilities :type]))
+
+(defn is-binary?
+  "Given a question object, return whether it is a binary question."
+  [question]
+  (= "binary" (get-question-type question)))
+
+(defn is-continuous?
+  "Given a question object, return whether it is a continuous question."
+  [question]
+  (= "continuous" (get-question-type question)))
+
+(defn is-open?
+  "Given a question object, return whether it is open for predictions."
+  [question]
+  (= "OPEN" (:active_state question)))
+
+
 (defn post-prediction
   "Post a prediction to Metaculus for a specific question.
    
@@ -93,6 +114,7 @@
       last
       :x2
       :weighted_avg))
+
 
 (defn prompt-for-prediction
   "Find an appropriate question for the user to predict on, and then prompt for

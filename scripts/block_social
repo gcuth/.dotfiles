@@ -10,6 +10,8 @@ echo "0.0.0.0 netflix.com" >> /etc/hosts
 echo "0.0.0.0 www.netflix.com" >> /etc/hosts
 echo "0.0.0.0 primevideo.com" >> /etc/hosts
 echo "0.0.0.0 www.primevideo.com" >> /etc/hosts
+echo "0.0.0.0 vimeo.com" >> /etc/hosts
+echo "0.0.0.0 www.vimeo.com" >> /etc/hosts
 echo "0.0.0.0 sbs.com.au" >> /etc/hosts
 echo "0.0.0.0 www.sbs.com.au" >> /etc/hosts
 echo "0.0.0.0 abc.net.au" >> /etc/hosts

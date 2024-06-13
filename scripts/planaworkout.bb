@@ -466,22 +466,26 @@
   (filter some?
           [(when bench
              {:text (str "Load barbell for bench press to a total of "
-                         (int (max 20 bench)) "kgs")
+                         (-> bench (max 20) (int) (quot 5) (inc) (* 5))
+                         "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when overhead
              {:text (str "Load barbell for overhead press to a total of "
-                         (int (max 20 overhead)) "kgs")
+                         (-> overhead (max 20) (int) (quot 5) (inc) (* 5))
+                         "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when deadlift
              {:text (str "Load trap bar for deadlift to a total of "
-                         (int (max 20 deadlift)) "kgs")
+                         (-> deadlift (max 20) (int) (quot 5) (inc) (* 5))
+                         "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when squat
              {:text (str "Load barbell for squats to a total of "
-                         (int (max 20 squat)) "kgs")
+                         (-> squat (max 20) (int) (quot 5) (inc) (* 5))
+                         "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})
            (when tibialis
@@ -491,7 +495,8 @@
               :estimate 1})
            (when jefferson
              {:text (str "Load barbell for jefferson curls to a total of "
-                         (int jefferson) "kgs")
+                         (-> jefferson (max 0) (int) (quot 5) (inc) (* 5))
+                         "kgs")
               :tags ["Low" "Home" "Fitness"]
               :estimate 1})]))
 
@@ -504,9 +509,12 @@
       :or {bench {:kg 40 :reps 10}
            overhead {:kg 20 :reps 10}
            pullups {:kg 0 :reps 5}}}]
-  (let [bench {:kg (max 20 (:kg bench)) :reps (max 1 (:reps bench))}
-        overhead {:kg (max 20 (:kg overhead)) :reps (max 1 (:reps overhead))}
-        pullups {:kg (max 0 (:kg pullups)) :reps (max 1 (:reps pullups))}]
+  (let [bench {:kg (-> bench :kg (max 20) (int) (quot 5) (inc) (* 5))
+               :reps (max 1 (:reps bench))}
+        overhead {:kg (-> overhead :kg (max 20) (int) (quot 5) (inc) (* 5))
+                  :reps (max 1 (:reps overhead))}
+        pullups {:kg (max 0 (:kg pullups))
+                 :reps (max 1 (:reps pullups))}]
     [{:text (str "Bench Press "
                  (int (:kg bench)) "kg for "
                  (int (:reps bench)) " reps")
@@ -538,9 +546,12 @@
            deadlift {:kg 40 :reps 10}
            tibialis {:kg 5 :reps 10}
            calf {:kg 5 :reps 10}}}]
-  (let [squat {:kg (max 20 (:kg squat)) :reps (max 1 (:reps squat))}
-        jefferson {:kg (max 0 (:kg jefferson)) :reps (max 1 (:reps jefferson))}
-        deadlift {:kg (max 20 (:kg deadlift)) :reps (max 1 (:reps deadlift))}
+  (let [squat {:kg (-> squat (max 20) (int) (quot 5) (inc) (* 5))
+               :reps (max 1 (:reps squat))}
+        jefferson {:kg (max 0 (:kg jefferson))
+                   :reps (max 1 (:reps jefferson))}
+        deadlift {:kg (-> deadlift (max 20) (int) (quot 5) (inc) (* 5))
+                  :reps (max 1 (:reps deadlift))}
         tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
         calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]
     [{:text (str "Back Squat " 

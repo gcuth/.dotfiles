@@ -515,7 +515,10 @@
                   :reps (max 1 (:reps overhead))}
         pullups {:kg (max 0 (:kg pullups))
                  :reps (max 1 (:reps pullups))}]
-    [{:text (str "Bench Press "
+    [{:text "Shrug 16kg for 10 reps"
+      :tags ["High" "Home" "Fitness"]
+      :estimate 3}
+     {:text (str "Bench Press "
                  (int (:kg bench)) "kg for "
                  (int (:reps bench)) " reps")
       :tags ["High" "Home" "Fitness"]
@@ -786,7 +789,7 @@
                   (generate-running-tasks :distance (-> distance
                                                         (* 1.5)
                                                         (min 40)
-                                                        (max 3)
+                                                        (max 4)
                                                         (int))
                                           :pace pace)
                   (generate-post-cardio-tasks))

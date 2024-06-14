@@ -103,13 +103,45 @@
 
 (defn post-continuous-prediction
   "Post a continuous prediction to Metaculus for a specific question."
-  [{:keys [id token value]}]
+  [{:keys [id token values]}]
   ;; 
   ;; The JSON schema continuous predictions is:
-  ;; schema = { "type": "object", "properties": { "kind": { "enum": (["logistic", "gaussian"]) }, "avg": { "type": "number", "minimum": -2, "maximum": 3, }, "stdev": { "type": "number", "minimum": 0.005, "maximum": 10, }, "a": { "type": "number", "minimum": -0.96, "maximum": +0.96, }, "low": { "type": "number", "minimum": 0.0099, "maximum": 1 - 0.0099, }, "high": { "type": "number", "minimum": 0.0099, "maximum": 1 - 0.0099, }, }, "additionalProperties": boolean, "required": ["avg", "stdev"] }
+  ;; schema = { "type": "object",
+  ;; "properties": {
+  ;;   "kind": { "enum": (["logistic", "gaussian"]) },
+  ;;   "avg": { "type": "number", "minimum": -2, "maximum": 3, },
+  ;;   "stdev": { "type": "number", "minimum": 0.005, "maximum": 10, },
+  ;;   "a": { "type": "number", "minimum": -0.96, "maximum": +0.96, },
+  ;;   "low": { "type": "number", "minimum": 0.0099, "maximum": 1 - 0.0099, },
+  ;;   "high": { "type": "number", "minimum": 0.0099, "maximum": 1 - 0.0099, },
+  ;; },
+  ;; "additionalProperties": boolean,
+  ;; "required": ["avg", "stdev"] }
   ;;
-  ;; THIS IS NOT IMPLEMENTED YET
-  nil)
+  {:pre [(int? id) (string? token) (map? values)
+         ;; Check that the values map contains the required keys ---
+         (contains? values :kind)
+         (contains? #{:logistic :gaussian} (:kind values))
+         (or
+          (and (= (:kind values) :logistic)
+               (contains? values :avg)
+               (<= -2 (:avg values) 3)
+               (contains? values :stdev)
+               (<= 0.005 (:stdev values) 10))
+          (and (= (:kind values) :gaussian)
+               (contains? values :x0)
+               (contains? values :s)))
+         (contains? values :a)
+         (<= -0.96 (:a values) 0.96)
+         (contains? values :low)
+         (<= 0.0099 (:low values) (- 1 0.0099))
+         (contains? values :high)
+         (<= 0.0099 (:high values) (- 1 0.0099))]}
+  (let [url (str "https://www.metaculus.com/api2/questions/" id "/predict/")
+        response (curl/post url
+                            (assoc (build-header token)
+                                   :body (json/generate-string values)))]
+    (json/parse-string (:body response) true)))
 
 
 (defn post-prediction
@@ -120,6 +152,7 @@
         (nil? value) (throw (ex-info "No prediction value provided." {}))
         (nil? type) (throw (ex-info "No prediction type provided." {}))
         (= type "binary") (post-binary-prediction {:id id :token token :value value})
+        (= type "continuous") (post-continuous-prediction {:id id :token token :values value})
         :else (throw (ex-info "Unknown prediction type." {}))))
 
 
@@ -133,10 +166,12 @@
             last
             :x2
             :weighted_avg)
-        :else (-> question
-                  :community_prediction
-                  :history
-                  last)))
+        (is-continuous? question)
+        (-> question
+            :community_prediction
+            :history
+            last)
+        :else nil))
 
 
 (defn get-current-user-prediction
@@ -220,14 +255,38 @@
           (-> (prompt-for-prediction opts))
 
           (= command "adopt")
-          (let [question (get-question opts)
-                community (get-current-community-prediction question)
-                user (get-current-user-prediction question)]
-            (cond (nil? community) (println "No community prediction available.")
-                  (= community user) (println "Community and user predictions already match.")
-                  (not (is-open? question)) (println "Question is not open for predictions.")
-                  (not (is-binary? question)) (println "Question type is not yet supported.")
-                  :else (println (post-prediction (assoc opts :value community :type "binary")))))
+          (if (:id opts)
+            (let [question (get-question opts)
+                  community (get-current-community-prediction question)
+                  user (get-current-user-prediction question)]
+              (cond (nil? community) (println "No community prediction available.")
+                    (= community user) (println "Community and user predictions already match.")
+                    (not (is-open? question)) (println "Question is not open for predictions.")
+                    (not (is-binary? question)) (println "Question type is not yet supported.")
+                    :else (println (post-prediction (assoc opts :value community :type "binary")))))
+            (let [questions (->> (apply concat (map #(list-questions {:token (:token opts)
+                                                                      :params %})
+                                                    DEFAULT-SEARCH-PARAMS))
+                                ;;  (filter #(nil? (:group %)))
+                                 (remove #(nil? (get-current-community-prediction %)))
+                                 (filter #(is-open? %))
+                                 (filter #(is-binary? %)))]
+              (doseq [question questions]
+                (let [community (get-current-community-prediction question)
+                      user (get-current-user-prediction question)]
+                  (if (not= community user)
+                    (do
+                      (println (str (:title question) " (" user "->" community ")"))
+                      (println (post-prediction (assoc opts
+                                                       :id (:id question)
+                                                       :value community
+                                                       :type "binary")))
+                      (println ""))
+                    (println (str "Community and user predictions already match for \"" (:title question) "\"")))))))
+          
+          (= command "check")
+          (let [question (get-question opts)]
+            (println (json/generate-string (get-current-community-prediction question))))
 
           :else (println "Unknown command."))))
 

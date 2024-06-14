@@ -549,11 +549,11 @@
            deadlift {:kg 40 :reps 10}
            tibialis {:kg 5 :reps 10}
            calf {:kg 5 :reps 10}}}]
-  (let [squat {:kg (-> squat (max 20) (int) (quot 5) (inc) (* 5))
+  (let [squat {:kg (-> squat :kg (max 20) (int) (quot 5) (inc) (* 5))
                :reps (max 1 (:reps squat))}
         jefferson {:kg (max 0 (:kg jefferson))
                    :reps (max 1 (:reps jefferson))}
-        deadlift {:kg (-> deadlift (max 20) (int) (quot 5) (inc) (* 5))
+        deadlift {:kg (-> deadlift :kg (max 20) (int) (quot 5) (inc) (* 5))
                   :reps (max 1 (:reps deadlift))}
         tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
         calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]

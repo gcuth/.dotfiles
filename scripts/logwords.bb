@@ -50,7 +50,7 @@
          log-line (str (fs/unixify (fs/expand-home dir)) ", "
                        now ", "
                        total-words "\n")]
-          (spit log-fp log-line :append true))))
+     (spit log-fp log-line :append true))))
 
 
 (defn- read-log
@@ -66,6 +66,21 @@
          (filter #(re-matches #"\d+" %))
          (map #(Integer/parseInt %)))
     []))
+
+
+(defn- trim-log
+  "Trim log file (given by the path 'log-file') to the most recent n entries."
+  ([log-file]
+   (trim-log log-file 100))
+  ([log-file n]
+   (let [lines (->> (slurp log-file)
+                    (str/split-lines)
+                    (take-last n))]
+     (->> lines
+          (str/join "\n")
+          (str/trim)
+          (#(str % "\n"))
+          (spit log-file)))))
 
 
 (defn- calculate-deltas
@@ -101,6 +116,7 @@
        :description "The number of entries to keep in the log."
        :parse-fn #(Integer/parseInt %)}})
 
+
 (defn -main
   ""
   []
@@ -109,8 +125,12 @@
           (not (fs/exists? dir)) (println "Given directory does not exist.")
           (nil? log) (println "Provide a file to write the word count log to.")
           (not (fs/exists? log)) (spit log "")
-          :else
-          (do (log-total-word-count dir log)
-              (println (int (ewma (calculate-deltas (read-log log)))))))))
+          :else (do (log-total-word-count dir log)
+                    (trim-log log (or n (get-in cli-opts [:n :default])))
+                    (->> (read-log log)
+                         (calculate-deltas)
+                         (ewma)
+                         (int)
+                         (println))))))
 
 (-main)

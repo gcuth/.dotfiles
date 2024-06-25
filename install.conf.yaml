@@ -122,9 +122,6 @@
 - link:
     ~/Documents/thesis/.git/hooks/pre-commit:
       path: hooks/thesis-pre-commit
-- link:
-    ~/Documents/thesis/.git/hooks/post-commit:
-      path: hooks/thesis-post-commit
 
 
 # IF VSCODE EXISTS, INSTALL BASIC EXTENSIONS FROM FILE

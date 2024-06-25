@@ -1,17 +1,4 @@
 #!/bin/sh
-#
-# A git hook script that backs up (& processes) data from elsewhere into
-# (limited) backup in the blog repository. These data are then used for
-# some jekyll-built static pages.
 
-
-###############################################################################
-############################# OBSIDIAN -> ARCHIVE #############################
-###############################################################################
-
-# Override & Backup all of Obsidian 'Notes' dir in '_archive' dir of blog repo
-rm -rf ~/Documents/blog/_archive/obsidian/notes/
-cp -a ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_archive/obsidian/notes
-
-# Add the updated log & data & post files to the commit
+# Make sure to add the updated log & data & post files to the commit
 git add ~/Documents/blog/_data ~/Documents/blog/public ~/Documents/blog/_posts ~/Documents/blog/_archive

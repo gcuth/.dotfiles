@@ -6,78 +6,12 @@
 
 
 ###############################################################################
-############################## OBSIDIAN -> POSTS ##############################
-###############################################################################
-
-# Extract posts from Obsidian Notes folder to _posts folder
-# /opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_obsidian_posts.py ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_posts
-
-
-
-###############################################################################
 ############################# OBSIDIAN -> ARCHIVE #############################
 ###############################################################################
 
 # Override & Backup all of Obsidian 'Notes' dir in '_archive' dir of blog repo
 rm -rf ~/Documents/blog/_archive/obsidian/notes/
 cp -a ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes ~/Documents/blog/_archive/obsidian/notes
-
-
-
-###############################################################################
-################################# DATA EXPORT #################################
-###############################################################################
-
-# Export data from Apple Health (exported as shortcut logs in iCloud) to public CSV and _data YAML files
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/Weight ~/Documents/blog/_data/health/weight.yml ~/Documents/blog/public/logs/weight.csv
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/VO2\ Max ~/Documents/blog/_data/health/vo2_max.yml ~/Documents/blog/public/logs/vo2_max.csv
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_shortcut_health_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Apple\ Health\ Exports/Resting\ Heart\ Rate ~/Documents/blog/_data/health/resting_heart_rate.yml ~/Documents/blog/public/logs/resting_heart_rate.csv
-
-# Export Timery Sauna logs (previously exported by shortcut) to public CSV
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/json_dir_to_csv.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Health/Sauna ~/Documents/blog/public/logs/sauna.csv
-
-# Extract lifting logs from iCloud to a CSV file in public data folder
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_lifting_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Fitness/Lifting  ~/Documents/blog/public/logs/lifts.csv
-
-# Export Aranet4 C02 data logs from iCloud to a CSV file in _data
-python3 ~/Documents/blog/bin/extract_aranet_logs.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Aranet4/ ~/Documents/blog/_data/co2/aranet4_logs.csv
-
-# Try to get an updated copy of strava data from 'strava-offline' (see https://github.com/liskin/strava-offline)
-/opt/homebrew/bin/strava-offline sqlite --config ~/.config/strava_offline/config.yaml
-/opt/homebrew/bin/strava-offline gpx --config ~/.config/strava_offline/config.yaml
-
-# copy the current strava-offline sqlite db to public/strava folder
-cp ~/Library/Application\ Support/strava_offline/strava.sqlite ~/Documents/blog/public/strava
-# copy gpx files to public/strava/activities folder
-cp ~/Library/Application\ Support/strava_offline/activities/* ~/Documents/blog/public/strava/activities
-# build run log (in public/logs/running.csv) from strava data stored in sqlite database
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_strava_logs.py ~/Library/Application\ Support/strava_offline/strava.sqlite ~/Documents/blog/public/logs/running.csv
-# build updated YAML file from running.csv
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/build_yaml_running_log.py ~/Documents/blog/public/logs/running.csv ~/Documents/blog/_data/health/running/log.yml
-
-# Build updated breadcrumb log
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/breadcrumbs.py ~/Documents/blog/public/strava/activities/ ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/ ~/Documents/blog/_data/location/breadcrumbs.csv
-
-# Extract media log data
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/extract_music_log.py ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv ~/Documents/blog/_data/media/music.yml
-
-# Finances
-
-
-
-###############################################################################
-################################ TREND REPORT #################################
-###############################################################################
-
-# summary of trends in key personal metrics —
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/trends.py ~/Documents/blog/public/logs/ ~/Documents/blog/_data/trends.json
-
-# summary of day-by-day activity/streaks —
-/opt/homebrew/bin/python3 ~/Documents/blog/bin/streaks.py ~/Documents/blog/public/logs/ ~/Documents/blog/_data/streaks.json
-
-###############################################################################
-################################ ADD TO COMMIT ################################
-###############################################################################
 
 # Add the updated log & data & post files to the commit
 git add ~/Documents/blog/_data ~/Documents/blog/public ~/Documents/blog/_posts ~/Documents/blog/_archive

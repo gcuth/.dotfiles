@@ -3,12 +3,28 @@
 ###############################################################################
 
 - defaults:
-  - link:
-      - create: true
-      - relink: true
-  - brew:
-      - stdout: true
-      - stderr: true
+    link:
+      create: true
+      relink: true
+	
+    brew:
+        stdin: true
+        stderr: true
+        stdout: true
+
+    cask:
+        stdin: true
+        stderr: true
+        stdout: true
+
+    brewfile:
+        stdin: true
+        stderr: true
+        stdout: true
+
+
+- shell:
+  - [git submodule update --init --recursive, Installing submodules]
 
 
 ###############################################################################
@@ -52,8 +68,6 @@
       path: git/config
     ~/.config/starship.toml:
       path: starship.toml
-    ~/.tmux.conf:
-      path: tmux.conf
     ~/.local/bin/:
       path: scripts/**
       glob: true
@@ -76,7 +90,6 @@
 ###############################################################################
 
 # BREW INSTALLS
-- install-brew: true
 - shell:
   - [ test -e `which brew` || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ]
 - shell:

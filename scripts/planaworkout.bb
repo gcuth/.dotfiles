@@ -690,7 +690,7 @@
            (generate-lifting-setup-tasks ;; setup for warmups
             :bench (/ (get-in targets [:bench :kg]) 2)
             :overhead (/ (get-in targets [:overhead :kg]) 2))
-                  ;; warmup set —
+           ;; warmup set —
            (generate-upper-lift-tasks
             :bench {:kg (/ (get-in targets [:bench :kg]) 2)
                     :reps (get-in targets [:bench :reps])}
@@ -698,16 +698,21 @@
                        :reps (get-in targets [:overhead :reps])}
             :pullups {:kg (get-in targets [:pullups :kg])
                       :reps (get-in targets [:pullups :reps])})
-                  ;; setup for working set —
+           ;; setup for working set —
            (generate-lifting-setup-tasks
             :bench (get-in targets [:bench :kg])
             :overhead (get-in targets [:overhead :kg]))
-                  ;; working set 1 —
+           ;; working set 1 —
            (generate-upper-lift-tasks
             :bench (:bench targets)
             :overhead (:overhead targets)
             :pullups (:pullups targets))
-                  ;; working set 2 —
+           ;; working set 2 —
+           (generate-upper-lift-tasks
+            :bench (:bench targets)
+            :overhead (:overhead targets)
+            :pullups (:pullups targets))
+           ;; working set 3 —
            (generate-upper-lift-tasks
             :bench (:bench targets)
             :overhead (:overhead targets)
@@ -721,14 +726,14 @@
            (generate-pre-running-tasks) ;; get ready for a run
            (generate-running-tasks :distance 2 :pace 6) ;; quick warmup run
            (generate-pre-lift-stretch-tasks) ;; pre-lift stretching
-                  ;; setup for warmups —
+           ;; setup for warmups —
            (generate-lifting-setup-tasks
             :squat (/ (get-in targets [:squat :kg]) 2)
             :deadlift (/ (get-in targets [:deadlift :kg]) 2)
             :tibialis (/ (get-in targets [:tibialis :kg]) 2)
             :calf (/ (get-in targets [:calf :kg]) 2)
             :jefferson (/ (get-in targets [:jefferson :kg]) 2))
-                  ;; warmup set —
+           ;; warmup set —
            (generate-lower-lift-tasks
             :squat {:kg (/ (get-in targets [:squat :kg]) 2)
                     :reps (get-in targets [:squat :reps])}
@@ -740,28 +745,28 @@
                    :reps (get-in targets [:calf :reps])}
             :jefferson {:kg (/ (get-in targets [:jefferson :kg]) 2)
                         :reps (get-in targets [:jefferson :reps])})
-                  ;; setup for working set —
+           ;; setup for working set —
            (generate-lifting-setup-tasks
             :squat (get-in targets [:squat :kg])
             :deadlift (get-in targets [:deadlift :kg])
             :tibialis (get-in targets [:tibialis :kg])
             :calf (get-in targets [:calf :kg])
             :jefferson (get-in targets [:jefferson :kg]))
-                  ;; working set 1 —
+           ;; working set 1 —
            (generate-lower-lift-tasks
             :squat (:squat targets)
             :deadlift (:deadlift targets)
             :tibialis (:tibialis targets)
             :calf (:calf targets)
             :jefferson (:jefferson targets))
-                  ;; working set 2 —
+           ;; working set 2 —
            (generate-lower-lift-tasks
             :squat (:squat targets)
             :deadlift (:deadlift targets)
             :tibialis (:tibialis targets)
             :calf (:calf targets)
             :jefferson (:jefferson targets))
-                  ;; post-lift stretching —
+           ;; post-lift stretching —
            (generate-post-lift-stretch-tasks)
            (generate-end-of-workout-tasks))
 

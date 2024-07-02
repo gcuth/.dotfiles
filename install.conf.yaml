@@ -6,7 +6,7 @@
     link:
       create: true
       relink: true
-	
+
     brew:
         stdin: true
         stderr: true

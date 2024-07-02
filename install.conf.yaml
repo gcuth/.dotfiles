@@ -1,5 +1,5 @@
 ###############################################################################
-######################## DEFAULT BEHAVIOUR FOR LINKING ########################
+###################### DEFAULT BEHAVIOUR FOR LINKING ETC ######################
 ###############################################################################
 
 - defaults:
@@ -129,14 +129,6 @@
   - 1password-cli
   - iterm2
   - mas
-- tap:
-  - heroku/brew
-- brew:
-  - heroku
-- tap:
-  - basictex
-- brew:
-  - basictex
 - cask:
   - signal
   - anki

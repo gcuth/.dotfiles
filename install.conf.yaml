@@ -135,11 +135,15 @@
   - protonmail-bridge
   - zotero
   - zoom
+  - bartender
 
 ###############################################################################
 ################ USE MAS & APP STORE TO INSTALL APP STORE APPS ################
 ###############################################################################
-
+- shell:
+  - open -a "App Store"
+- shell: # wait while we sign in to the app store
+  - sleep 60
 - shell:
   - mas install 497799835  # Xcode
   - mas install 1586435171 # Actions (extras for Siri Shortcuts)

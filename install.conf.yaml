@@ -1,17 +1,35 @@
-# DEFAULT BEHAVIOURS
-- defaults:
-    link:
-      create: true
-      relink: true
+###############################################################################
+######################## DEFAULT BEHAVIOUR FOR LINKING ########################
+###############################################################################
 
-# CLEAN ON START
+- defaults:
+  - link:
+      - create: true
+      - relink: true
+  - brew:
+      - stdout: true
+      - stderr: true
+
+
+###############################################################################
+################################# CLEAN START #################################
+###############################################################################
+
 - clean: ['~', '~/.local/bin/', '~/Library/Application Support/Code/User/snippets/']
 
-# CREATE THE BASIC (NEEDED) DIRS
+
+###############################################################################
+############### CREATE THE BASIC DIRECTORY FOR ALL DEV PROJECTS ###############
+###############################################################################
+
 - create:
     - ~/Developer/
 
-# LINK VERY BASIC GLOBAL SETTINGS FILES, SNIPPETS, & SCRIPTS:
+
+###############################################################################
+############### LINK GLOBAL SETTINGS FILES, SNIPPETS, & SCRIPTS ###############
+###############################################################################
+
 - link:
     ~/.zshrc:
       path: zshrc
@@ -52,11 +70,19 @@
       glob: true
       create: true
 
-# BREW:
+
+###############################################################################
+######################## INSTALL & SETUP DEFAULT STACK ########################
+###############################################################################
+
+# BREW INSTALLS
+- install-brew: true
 - shell:
   - [ test -e `which brew` || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ]
 - shell:
   - brew update && brew upgrade
+- cask: # install 1password first so that we can use it to authenticate others
+  - 1password
 - brew: 
   - python
   - nvm
@@ -65,6 +91,7 @@
   - java
   - leiningen
   - git
+  - git-lfs
   - gpg
   - fzf
   - jq
@@ -87,48 +114,67 @@
   - coreutils # the missing GNU coreutils, macOS style
   - ollama
   - 1password-cli
-- tap:
-  - homebrew/cask-fonts
-- brew:
-  - font-fira-code
-  - font-hack-nerd-font
-- tap:
-  - homebrew/cask-versions
-- brew:
-  - iterm2-beta
+  - iterm2
+  - mas
 - tap:
   - heroku/brew
 - brew:
   - heroku
 - tap:
-  - openhue/cli
-- brew:
-  - openhue-cli
-- tap:
   - basictex
 - brew:
   - basictex
+- cask:
+  - signal
+  - anki
+  - font-fira-code
+  - font-hack-nerd-font
+  - textexpander
+  - rescuetime
+  - protonvpn
+  - protonmail-bridge
+  - zotero
+  - zoom
+
+###############################################################################
+################ USE MAS & APP STORE TO INSTALL APP STORE APPS ################
+###############################################################################
+
 - shell:
-  - [ test -e /Applications/Anki.app || open "https://apps.ankiweb.net" ]
+  - mas install 497799835  # Xcode
+  - mas install 1586435171 # Actions (extras for Siri Shortcuts)
+  - mas install 1453273600 # Data Jar (extras for Siri Shortcuts)
+  - mas install 1425368544 # Timery for Toggl
+  - mas install 1542143627 # Omnifocus
+  - mas install 1604176982 # One Thing (menu bar item/display)
+  - mas install 1529448980 # Reeder
+  - mas install 1033342465 # Just Press Record
+  - mas install 1402042596 # AdBlock for Safari
+  - mas install 1569813296 # 1Password for Safari
+  - mas install 937984704  # Amphetamine (keep mac awake)
+  - mas install 946812450  # Binaural sound generator
 
 
-# CLONE THESIS & BLOG IF NOT ALREADY PRESENT (AND LINK HOOKS)
+###############################################################################
+################# INSTALL REMAINING APPS (IF NOT YET PRESENT) #################
+###############################################################################
+
 - shell:
-  - if [ ! -d "/Users/g/Documents/thesis" ]; then git clone git@github.com:gcuth/phd_thesis.git ~/Documents/thesis; fi
-  - if [ ! -d "/Users/g/Documents/blog" ]; then git clone git@github.com:gcuth/gcuth.github.io.git ~/Documents/blog; fi
-- link:
-    ~/Documents/blog/.git/hooks/pre-commit:
-      path: hooks/blog-pre-commit
-- link:
-    ~/Documents/thesis/.git/hooks/pre-commit:
-      path: hooks/thesis-pre-commit
+  - [ test -e /Applications/Audio\ Hijack.app || open "https://rogueamoeba.com/audiohijack/download.php" ]
 
+###############################################################################
+############################## VSCODE EXTENSIONS ##############################
+###############################################################################
 
 # IF VSCODE EXISTS, INSTALL BASIC EXTENSIONS FROM FILE
 - shell:
   - [ test -e `which code` && cat /Users/g/.dotfiles/vscode/extensions.txt | xargs -n 1 code --install-extension ]
 
-# SETUP CRON JOBS:
+
+###############################################################################
+################################## CRON JOBS ##################################
+###############################################################################
+
 - crontab:
   # every minute, log the currently playing song (if any) to a csv file
   - cron: "* * * * *"

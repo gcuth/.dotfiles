@@ -8,3 +8,6 @@
 [submodule "crontab-dotbot"]
 	path = crontab-dotbot
 	url = https://github.com/fundor333/crontab-dotbot.git
+[submodule "dotbot-brew"]
+	path = dotbot-brew
+	url = https://github.com/wren/dotbot-brew.git

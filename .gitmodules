@@ -7,7 +7,7 @@
 	url = https://github.com/ssbanerje/dotbot-ifplatform.git
 [submodule "dotbot-brew"]
 	path = dotbot-brew
-	url = https://github.com/d12frosted/dotbot-brew.git
+	url = https://github.com/wren/dotbot-brew.git
 [submodule "crontab-dotbot"]
 	path = crontab-dotbot
 	url = https://github.com/fundor333/crontab-dotbot.git

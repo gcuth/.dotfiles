@@ -29,9 +29,9 @@
     ~/.aliases:
       path: aliases
     ~/.gitignore:
-      path: gitignore
+      path: git/ignore
     ~/.gitconfig:
-      path: gitconfig
+      path: git/config
     ~/.config/starship.toml:
       path: starship.toml
     ~/.tmux.conf:

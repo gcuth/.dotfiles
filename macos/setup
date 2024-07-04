@@ -188,6 +188,8 @@ defaults write com.apple.Doc appswitcher-all-displays -bool true
 # Reference: https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
 defaults write NSGlobalDomain AppleFontSmoothing -int 1
 
+# set all wallpapers to solid black
+osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"/System/Library/Desktop Pictures/Solid Colors/Black.png\" as POSIX file"
 
 
 ###############################################################################

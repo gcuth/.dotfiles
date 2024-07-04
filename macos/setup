@@ -76,7 +76,7 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 10
 # DOCK SETTINGS ---------------------------------------------------------------
 
 # Set the icon size of Dock items to 36 pixels
-defaults write com.apple.dock tilesize -int 36
+defaults write com.apple.dock tilesize -int 64
 
 # hide all 'persistent' apps from the dock (display active only)
 defaults write com.apple.dock static-only -bool true
@@ -127,8 +127,8 @@ defaults write com.apple.finder DisableAllAnimations -bool true
 # Finder: show hidden files by default
 defaults write com.apple.finder AppleShowAllFiles -bool true
 
-# Finder: show all filename extensions
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+# Finder: don't show file extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool false
 
 # Finder: show status bar
 defaults write com.apple.finder ShowStatusBar -bool true
@@ -160,16 +160,21 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 # Disable the warning before emptying the Trash
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
 
-# MENUBAR CLOCK ---------------------------------------------------------------
+# Empty Trash securely by default
+defaults write com.apple.finder EmptyTrashSecurely -bool true
 
-# Use a 24-hour digital clock
-defaults write com.apple.menuextra.clock.plist IsAnalog -bool false
-defaults write com.apple.menuextra.clock.plist DateFormat -string "HH:mm:ss"
-defaults delete -g AppleICUForce12HourTime > /dev/null 2>&1
-defaults write com.apple.menuextra.clock.plist Show24Hour -bool true
-defaults write com.apple.menuextra.clock.plist ShowDayOfWeek -bool false
-defaults write com.apple.menuextra.clock.plist ShowSeconds -bool true
+# Empty trash every 30 days automatically
+defaults write com.apple.finder FXRemoveOldTrashItems -bool true
 
+# MENU BAR TIME FORMAT --------------------------------------------------------
+# (24 hour time with seconds; no other details)
+defaults write com.apple.menuextra.clock "DateFormat" -string "HH:mm:ss"
+defaults write com.apple.menuextra.clock "IsAnalog" -bool false
+defaults write com.apple.menuextra.clock "FlashDateSeparators" -bool false
+defaults write com.apple.menuextra.clock "ShowDayOfWeek" -bool false
+defaults write com.apple.menuextra.clock "ShowAMPM" -bool false
+defaults write com.apple.menuextra.clock "Show24Hour" -bool true
+defaults write com.apple.menuextra.clock "ShowSeconds" -bool true
 
 
 ###############################################################################
@@ -205,25 +210,25 @@ defaults write com.apple.screencapture location -string "${HOME}/Desktop"
 ###############################################################################
 
 # Disable send and reply animations in Mail.app
-defaults write com.apple.mail DisableReplyAnimations -bool true
-defaults write com.apple.mail DisableSendAnimations -bool true
+# defaults write com.apple.mail DisableReplyAnimations -bool true
+# defaults write com.apple.mail DisableSendAnimations -bool true
 
 # Copy email addresses as `foo@example.com` instead of `Foo Bar <foo@example.com>` in Mail.app
 defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
 
 # Add the keyboard shortcut ⌘ + Enter to send an email in Mail.app
-defaults write com.apple.mail NSUserKeyEquivalents -dict-add "Send" "@\U21a9"
+# defaults write com.apple.mail NSUserKeyEquivalents -dict-add "Send" "@\U21a9"
 
 # Display emails in threaded mode, sorted by date (oldest at the top)
-defaults write com.apple.mail DraftsViewerAttributes -dict-add "DisplayInThreadedMode" -string "yes"
-defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortedDescending" -string "yes"
-defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortOrder" -string "received-date"
+# defaults write com.apple.mail DraftsViewerAttributes -dict-add "DisplayInThreadedMode" -string "yes"
+# defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortedDescending" -string "yes"
+# defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortOrder" -string "received-date"
 
 # Disable inline attachments (just show the icons)
-defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
+# defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
 
 # Disable automatic spell checking
-defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled"
+# defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled"
 
 
 
@@ -294,9 +299,15 @@ defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnab
 
 
 
+###############################################################################
+############################## TERMINAL & ITERM2 ##############################
+###############################################################################
 
+# Disable the annoying line marks in Terminal
+defaults write com.apple.Terminal ShowLineMarks -int 0
 
-
+# Don’t display the annoying prompt when quitting iTerm
+defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 
 
 
@@ -325,6 +336,8 @@ defaults write org.m0k.transmission WarningDonate -bool false
 # Hide the legal disclaimer
 defaults write org.m0k.transmission WarningLegal -bool false
 
+
+
 ###############################################################################
 ################################# TIDY/FINISH #################################
 ###############################################################################
@@ -337,11 +350,7 @@ for app in "Activity Monitor" \
 	"Contacts" \
 	"Dock" \
 	"Finder" \
-	"Google Chrome Canary" \
-	"Google Chrome" \
 	"Mail" \
-	"Messages" \
-	"Opera" \
 	"Photos" \
 	"Safari" \
 	"SizeUp" \
@@ -356,4 +365,5 @@ for app in "Activity Monitor" \
 	killall "${app}" &> /dev/null
 done
 
-echo "Done. Note: some changes require a logout/restart to take effect."
+echo "Done."
+echo "Note: some changes require a logout/restart to take effect."

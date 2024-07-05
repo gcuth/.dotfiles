@@ -46,7 +46,7 @@ if check_recent_changes; then
         # Commit and push changes
         if git -C "$TEMP_DIR" add . && \
            git -C "$TEMP_DIR" commit -m "Auto-update chapters $(date '+%Y-%m-%d %H:%M:%S')" && \
-           git -C "$TEMP_DIR" push origin main; then
+           git -C "$TEMP_DIR" push origin master; then
             log_message "Changes committed and pushed successfully"
         else
             log_message "Error: Failed to commit and push changes"

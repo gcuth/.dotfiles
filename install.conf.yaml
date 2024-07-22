@@ -99,6 +99,7 @@
   - 1password
 - brew: 
   - python
+  - pipx
   - nvm
   - neovim
   - pandoc

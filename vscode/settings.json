@@ -137,4 +137,5 @@
     "workbench.colorTheme": "Default Light Modern",
     "github.copilot.editor.enableAutoCompletions": true,
     "git.openRepositoryInParentFolders": "always",
+    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
 }

@@ -115,7 +115,7 @@
   "Clean a chapter title by removing any leading (ie, left-padding) zeroes.
    Keep all other zeroes & numbers."
   [s]
-  (str/replace s #"^0+" "0"))
+  (str "Chapter " (str/replace s #"^0+" "0")))
 
 
 (defn create-metadata-txt

@@ -317,11 +317,13 @@ defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 # TRANSMISSION #
 ###############################################################################
 
+# Use `~/Torrents/Incomplete` to store incomplete downloads
 defaults write org.m0k.transmission UseIncompleteDownloadFolder -bool true
-defaults write org.m0k.transmission IncompleteDownloadFolder -string "${HOME}/Torrents"
+defaults write org.m0k.transmission IncompleteDownloadFolder -string "${HOME}/Torrents/Incomplete"
 
-# Use `~/Downloads` to store completed downloads
+# Use `~/Torrents/Complete` to store complete downloads
 defaults write org.m0k.transmission DownloadLocationConstant -bool true
+defaults write org.m0k.transmission DownloadFolder -string "${HOME}/Torrents/Complete"
 
 # Don’t prompt for confirmation before downloading
 defaults write org.m0k.transmission DownloadAsk -bool false

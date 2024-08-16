@@ -127,10 +127,10 @@
           (not (fs/exists? log)) (spit log "")
           :else (do (log-total-word-count dir log)
                     (trim-log log (or n (get-in cli-opts [:n :default])))
-                    (->> (read-log log)
-                         (calculate-deltas)
-                         (ewma)
-                         (int)
-                         (println))))))
+                    (let [deltas-now (->> (read-log log)
+                                          (calculate-deltas))
+                          ewma-now (int (ewma deltas-now))
+                          max-now (int (apply max deltas-now))]
+                      (println (int (avg [ewma-now max-now]))))))))
 
 (-main)

@@ -20,7 +20,6 @@
 ;; By default, the script will look for files in the target dir, using the
 ;; history to determine a suitable next set/rep/exercise group. It will then
 ;; generate a complete workout.
-;;
 
 
  (require '[babashka.fs :as fs]
@@ -98,12 +97,15 @@
 
 
 (defn read-run-log
-  "Read a CSV file (representing a log of runs) into a list of maps."
+  "Read a CSV file (representing a log of runs) into a list of maps; return nil
+   if the file does not exist."
   [path]
-  (->> (slurp path)
-       (str/split-lines)
-       (rest)
-       (map #(zipmap [:date :time :distance :pace] (str/split % #",")))))
+  (if (fs/exists? path)
+    (->> (slurp path)
+         (str/split-lines)
+         (rest)
+         (map #(zipmap [:date :time :distance :pace] (str/split % #","))))
+    nil))
 
 
 (defn days
@@ -125,21 +127,212 @@
   [start end]
   (let [start-date (java.time.LocalDate/parse start)
         end-date (java.time.LocalDate/parse end)]
-    (Math/abs (.between java.time.temporal.ChronoUnit/DAYS start-date end-date))))
+    (Math/abs (.between java.time.temporal.ChronoUnit/DAYS
+                        start-date end-date))))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;; STANDARD EXERCISES & THEIR REQUIREMENTS ;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def EXERCISES
+  [;; BARBELL LIFTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   {:name "Overhead Press"
+    :equipment ["Barbell"
+                "Squat Rack"
+                "Bumper Plates"
+                "Fractional Plates"
+                "Barbell Collars"]
+    :minimum-kg 20
+    :plates [0.5 1 1.5 5 10 15 20]
+    :defaults {:reps 10
+               :sets 3}
+    :tags ["Upper Body" "Triceps"]}
+
+   {:name "Bench Press"
+    :equipment ["Barbell"
+                "Bench"
+                "Bumper Plates"
+                "Fractional Plates"
+                "Barbell Collars"]
+    :minimum-kg 20
+    :plates [0.5 1 1.5 5 10 15 20]
+    :defaults {:reps 10
+               :sets 5}
+    :tags ["Upper Body" "Chest" "Pectorals"]}
+
+   {:name "Back Squat"
+    :equipment []
+    :minimum-kg 20
+    :plates [0.5 1 1.5 5 10 15 20]
+    :defaults {:reps 10
+               :sets 3}
+    :tags []}
+
+   {:name "Deadlift"
+    :equipment []
+    :minimum-kg 20
+    :plates [0.5 1 1.5 5 10 15 20]
+    :defaults {:reps 10
+               :sets 3}
+    :tags []}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   {:name "Barbell Row"
+    :equipment []
+    :minimum-kg 20
+    :plates [0.5 1 1.5 5 10 15 20]
+    :defaults {:reps 10
+               :sets 3}
+    :tags []}
+
+   {:name "Barbell Bicep Curl"
+    :equipment []
+    :minimum-kg 20
+    :plates [0.5 1 1.5 5 10 15 20]
+    :defaults {:reps 10
+               :sets 3}
+    :tags []}
+
+
+
+
+
+
+
+
+
+
+
+   {:name "Pullups"
+    :equipment []
+    :minimum-kg nil
+    :plates []
+    :tags ["Bodyweight"]}
+
+   {:name "Pushups"
+    :equipment []
+    :minimum-kg nil
+    :plates []
+    :tags ["Bodyweight"]}
+
+   {:name "Dips"
+    :equipment []
+    :minimum-kg nil
+    :plates []
+    :tags ["Bodyweight"]}
+
+   {:name "Bodyweight Row"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :tags []}
+
+
+
+
+
+
+
+
+   {:name "Tibialis Raise"
+    :equipment ["Bench"
+                "Tib Bar"]
+    :minimum-kg 10
+    :plates [0.5 1 1.5 5 10 15 20]
+    :defaults {:reps 10
+               :sets 3}
+    :tags []}
+
+   {:name "Jefferson Curl"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :defaults {:reps 10
+               :sets 3}
+    :tags []}
+
+   {:name "Single Leg Calf Raise"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :tags []}
+
+
+
+
+
+
+
+
+
+
+   {:name "Kettlebell Shrug"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :tags []}
+
+   {:name "Kettlebell Lateral Raise"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :tags []}
+
+   {:name "Kettlebell Overhead Press"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :tags []}
+
+   {:name "Kettlebell Bicep Curl"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :tags []}
+
+
+
+
+
+
+
+
+   {:name "Nordic Curl"
+    :equipment []
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates []
+    :tags []}
+
+   {:name "Front Neck Curl"}
+
+   {:name "Back Neck Curl"}])
+
+
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;; STRENGTH EXERCISE STANDARDS ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-(def EXERCISES
-  ["Overhead Press"
-   "Bench Press"
-   "Barbell Row"
-   "Back Squat"
-   "Deadlift"
-   "Barbell Bicep Curl"])
 
 
 (defn measure-orm-level
@@ -884,6 +1077,9 @@
    :n      {:default 1
             :help "Number of workouts to generate."
             :parse-fn int}
+   :equipment {:default nil
+               :help "The equipment you have available (opts: home, gym, none)"
+               :parse-fn str}
    :help {:coerce :boolean}})
 
 
@@ -923,8 +1119,8 @@
                                       :bodyweight bodyweight
                                       :workout-type (which-workout? date)
                                       :date date
-                                      :distance (recent-kms runs)
-                                      )]
+                                      :distance (if (empty? runs) 5
+                                                    (recent-kms runs)))]
         (println workout)))))
 
 

@@ -134,11 +134,11 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;; STANDARD EXERCISES & THEIR REQUIREMENTS ;;;;;;;;;;;;;;;;;;;
+;;;;;; (if provided, standards include ORM based on bodyweight & gender) ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def EXERCISES
-  [;; BARBELL LIFTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   {:name "Overhead Press"
+  [{:name "Overhead Press"
     :equipment ["Barbell"
                 "Squat Rack"
                 "Bumper Plates"
@@ -148,8 +148,11 @@
     :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 3}
-    :tags ["Upper Body" "Triceps"]}
-
+    :muscles {:primary ["Front Deltoids"]
+              :secondary ["Triceps" "Lateral Deltoids"]}
+    :standards {:male [0.35 0.55 0.8 1.1 1.4]
+                :female [0.2 0.35 0.5 0.75 1]}
+    :tags nil}
    {:name "Bench Press"
     :equipment ["Barbell"
                 "Bench"
@@ -160,96 +163,142 @@
     :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 5}
-    :tags ["Upper Body" "Chest" "Pectorals"]}
-
+    :muscles {:primary ["Chest" "Front Deltoids"]
+              :secondary ["Triceps"]}
+    :standards {:male [0.5 0.75 1.25 1.75 2]
+                :female [0.25 0.5 0.75 1 1.5]}
+    :tags ["Powerlifting"]}
    {:name "Back Squat"
-    :equipment []
+    :equipment ["Barbell"
+                "Squat Rack"
+                "Bumper Plates"
+                "Fractional Plates"
+                "Barbell Collars"]
     :minimum-kg 20
     :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 3}
-    :tags []}
-
+    :muscles {:primary ["Quads" "Adductors" "Glutes" "Lower Back"]
+              :secondary ["Calves"]}
+    :standards {:male [0.75 1.25 1.5 2.25 2.75]
+                :female [0.5 0.75 1.25 1.5 2]}
+    :tags ["Powerlifting"]}
    {:name "Deadlift"
-    :equipment []
+    :equipment ["Barbell"
+                "Trap Bar"
+                "Bumper Plates"
+                "Fractional Plates"
+                "Barbell Collars"]
     :minimum-kg 20
     :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 3}
-    :tags []}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    :muscles {:primary ["Glutes" "Lower Back" "Quads"]
+              :secondary ["Adductors" "Trapezius"
+                          "Forearm Flexors" "Hamstrings"]}
+    :standards {:male [1 1.5 2 2.5 3]
+                :female [0.5 1 1.25 1.75 2.5]}
+    :tags ["Powerlifting"]}
    {:name "Barbell Row"
-    :equipment []
+    :equipment ["Barbell"
+                "Bumper Plates"
+                "Fractional Plates"
+                "Barbell Collars"]
     :minimum-kg 20
     :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 3}
-    :tags []}
-
+    :muscles {:primary ["Lats" "Trapezius" "Rear Deltoids"]
+              :secondary ["Biceps" "Lower Back"
+                          "Forearm Flexors" "Rotator Cuffs"]}
+    :standards {:male [0.5 0.75 1 1.5 1.75]
+                :female [0.25 0.4 0.65 0.9 1.2]}
+    :tags nil}
    {:name "Barbell Bicep Curl"
-    :equipment []
+    :equipment ["Barbell"
+                "Bumper Plates"
+                "Fractional Plates"
+                "Barbell Collars"]
     :minimum-kg 20
     :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 3}
-    :tags []}
-
-
-
-
-
-
-
-
-
-
-
+    :muscles {:primary ["Biceps"]
+              :secondary ["Forearm Flexors"]}
+    :standards {:male [0.2 0.4 0.6 0.85 1.15]
+                :female [0.1 0.2 0.4 0.6 0.85]}
+    :tags nil}
    {:name "Pullups"
-    :equipment []
+    :equipment ["Pullup Bar"]
     :minimum-kg nil
     :plates []
+    :defaults {:reps 5
+               :sets 3}
+    :muscles {:primary ["Lats"]
+              :secondary ["Biceps" "Rear Deltoids"
+                          "Forearm Flexors" "Rotator Cuffs"]}
     :tags ["Bodyweight"]}
-
    {:name "Pushups"
-    :equipment []
+    :equipment nil
     :minimum-kg nil
     :plates []
+    :defaults {:reps 10
+               :sets 3}
+    :muscles {:primary ["Chest" "Front Deltoids"]
+              :secondary ["Triceps" "Abs"]}
     :tags ["Bodyweight"]}
-
+   {:name "Situps"
+    :equipment nil
+    :minimum-kg nil
+    :defaults {:reps 20
+               :sets 3}
+    :muscles {:primary ["Abs"]
+              :secondary ["Obliques"]}
+    :tags ["Bodyweight"]}
+   {:name "Flutter Kicks"
+    :equipment nil
+    :minimum-kg nil
+    :defaults {:reps 20
+               :sets 3}
+    :muscles {:primary ["Abs"]
+              :secondary ["Obliques" "Hip Flexors"]}
+    :tags ["Bodyweight" "Cardio"]}
+   {:name "Mountain Climbers"
+    :equipment nil
+    :minimum-kg nil
+    :defaults {:reps 20
+               :sets 3}
+    :muscles {:primary ["Abs"]
+              :secondary ["Obliques"]}
+    :tags ["Bodyweight" "Cardio"]}
    {:name "Dips"
-    :equipment []
+    :equipment ["Dip Bars"]
     :minimum-kg nil
     :plates []
+    :defaults {:reps 10
+               :sets 3}
+    :muscles {:primary ["Chest" "Front Deltoids"]
+              :secondary ["Triceps"]}
     :tags ["Bodyweight"]}
-
-   {:name "Bodyweight Row"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
+   {:name "Ring Rows"
+    :equipment ["Pullup Bar"
+                "Rings"]
+    :minimum-kg nil
     :plates []
-    :tags []}
-
-
-
-
-
-
-
-
+    :defaults {:reps 10
+               :sets 3}
+    :muscles {:primary ["Lats" "Trapezius" "Rear Deltoids"]
+              :secondary ["Biceps" "Forearm Flexors" "Rotator Cuffs"]}
+    :tags ["Bodyweight"]}
+   {:name "Hanging Leg Raise"
+    :equipment ["Pullup Bar"]
+    :minimum-kg nil
+    :plates []
+    :defaults {:reps 10
+               :sets 3}
+    :muscles {:primary ["Abs"]
+              :secondary ["Obliques"]}
+    :tags ["Bodyweight"]}
    {:name "Tibialis Raise"
     :equipment ["Bench"
                 "Tib Bar"]
@@ -257,118 +306,96 @@
     :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 3}
+    :muscles {:primary []
+              :secondary []}
     :tags []}
-
    {:name "Jefferson Curl"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
-    :plates []
+    :equipment ["Barbell"
+                "Bumper Plates"
+                "Fractional Plates"
+                "Barbell Collars"]
+    :minimum-kg 20
+    :plates [0.5 1 1.5 5 10 15 20]
     :defaults {:reps 10
                :sets 3}
+    :muscles {:primary ["Lower Back"]
+              :secondary ["Adductors" "Glutes" "Hamstrings" "Trapezius"]}
     :tags []}
-
    {:name "Single Leg Calf Raise"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
-    :plates []
+    :equipment ["Bench"
+                "Kettlebells"]
+    :minimum-kg 8
+    :allowed-kg [2 4 8 12 16 20]
+    :defaults {:reps 10
+               :sets 3}
+    :muscles {:primary ["Calves"]
+              :secondary []}
     :tags []}
-
-
-
-
-
-
-
-
-
-
-   {:name "Kettlebell Shrug"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
-    :plates []
-    :tags []}
-
-   {:name "Kettlebell Lateral Raise"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
-    :plates []
-    :tags []}
-
-   {:name "Kettlebell Overhead Press"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
-    :plates []
-    :tags []}
-
-   {:name "Kettlebell Bicep Curl"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
-    :plates []
-    :tags []}
-
-
-
-
-
-
-
-
    {:name "Nordic Curl"
-    :equipment []
-    :minimum-kg nil ;; TODO: add a minimum weight
+    :equipment ["Bench"]
+    :minimum-kg nil
     :plates []
+    :muscles {:primary ["Hamstrings"]
+              :secondary ["Glutes" "Lower Back"]}
+    :tags ["Bodyweight"]}
+   {:name "Kettlebell Shrug"
+    :equipment ["Kettlebells"]
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates nil
+    :defaults {:reps 20
+               :sets 3}
+    :allowed-kg [2 4 8 12 16 20]
+    :muscles {:primary ["Trapezius"]
+              :secondary ["Forearm Flexors"]}
     :tags []}
-
+   {:name "Kettlebell Lateral Raise"
+    :equipment ["Kettlebells"]
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates nil
+    :defaults {:reps 10
+               :sets 3}
+    :allowed-kg [2 4 8 12 16 20]
+    :muscles {:primary ["Lateral Deltoids"]
+              :secondary ["Front Deltoids"]}
+    :tags []}
+   {:name "Kettlebell Front Raise"
+    :equipment ["Kettlebells"]
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates nil
+    :defaults {:reps 10
+               :sets 3}
+    :allowed-kg [2 4 8 12 16 20]
+    :muscles {:primary ["Front Deltoids"]
+              :secondary ["Lateral Deltoids"]}
+    :tags []}
+   {:name "Kettlebell Overhead Press"
+    :equipment ["Kettlebells"]
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates nil
+    :defaults {:reps 10
+               :sets 3}
+    :allowed-kg [2 4 8 12 16 20]
+    :muscles {:primary ["Front Deltoids"]
+              :secondary ["Triceps" "Lateral Deltoids"]}
+    :tags []}
+   {:name "Kettlebell Bicep Curl"
+    :equipment ["Kettlebells"]
+    :minimum-kg nil ;; TODO: add a minimum weight
+    :plates nil
+    :defaults {:reps 20
+               :sets 3}
+    :allowed-kg [2 4 8 12 16 20]
+    :muscles {:primary ["Biceps"]
+              :secondary ["Forearm Flexors"]}
+    :tags []}
+   ;; NECK STRENGTH/SAFETY EXERCISES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    {:name "Front Neck Curl"}
-
    {:name "Back Neck Curl"}])
 
-
-
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;; STRENGTH EXERCISE STANDARDS ;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-(defn measure-orm-level
-  "Take an exercise name & 1RM, along with optionally 'gender', & 'bodyweight'.
-   Use rough 'strength levels' to return a continuous score between 0 and 5,
-   interpolating between defined thresholds."
-  [& {:keys [exercise orm gender bodyweight]}]
-  (let [bodyweight (or bodyweight
-                       (cond (= gender "male") 85
-                             (= gender "female") 60
-                             :else 70))
-        fractional-orm (/ orm bodyweight)
-        all-thresholds (cond
-                         (= gender "male")
-                         {"Overhead Press" [0.35 0.55 0.8 1.1 1.4]
-                          "Bench Press" [0.5 0.75 1.25 1.75 2]
-                          "Barbell Row" [0.5 0.75 1 1.5 1.75]
-                          "Back Squat" [0.75 1.25 1.5 2.25 2.75]
-                          "Deadlift" [1 1.5 2 2.5 3]
-                          "Barbell Bicep Curl" [0.2 0.4 0.6 0.85 1.15]}
-                         (= gender "female")
-                         {"Overhead Press" [0.2 0.35 0.5 0.75 1]
-                          "Bench Press" [0.25 0.5 0.75 1 1.5]
-                          "Barbell Row" [0.25 0.4 0.65 0.9 1.2]
-                          "Back Squat" [0.5 0.75 1.25 1.5 2]
-                          "Deadlift" [0.5 1 1.25 1.75 2.5]
-                          "Barbell Bicep Curl" [0.1 0.2 0.4 0.6 0.85]}
-                         :else ;; halfway between the above
-                         {"Overhead Press" [0.275 0.45 0.65 0.925 1.2]
-                          "Bench Press" [0.375 0.625 1 1.375 1.75]
-                          "Barbell Row" [0.375 0.575 0.825 1.2 1.475]
-                          "Back Squat" [0.625 1 1.375 1.875 2.375]
-                          "Deadlift" [0.75 1.25 1.625 2.125 2.75]
-                          "Barbell Bicep Curl" [0.15 0.3 0.5 0.725 1]})
-        thresholds (all-thresholds exercise)]
-    thresholds))
+(def WORKOUTS ;; list of 'standard' workouts (used with EXERCISES to generate)
+  [{:name ""}
+   
+   {:name "Couch to 5K"}])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -750,7 +777,7 @@
                   :reps (max 1 (:reps deadlift))}
         tibialis {:kg (max 0 (:kg tibialis)) :reps (max 1 (:reps tibialis))}
         calf {:kg (max 0 (:kg calf)) :reps (max 1 (:reps calf))}]
-    [{:text (str "Back Squat " 
+    [{:text (str "Back Squat "
                  (int (:kg squat)) "kg for "
                  (int (:reps squat)) " reps")
       :tags ["High" "Home" "Fitness"]
@@ -1038,7 +1065,7 @@
 
 
 (defn generate-workout
-  "Generate a workout as a taskpaper string given logs, bodyweight, target, etc."
+  "Generate a workout as a taskpaper string given logs, bodyweight, target etc"
   [& {:keys [logs bodyweight workout-type distance pace date]
       :or {workout-type :run distance 5 pace 6 date (today)}}]
   (let [tasks (generate-workout-tasks :logs logs
@@ -1062,7 +1089,17 @@
 
 
 (def cli-spec ;; CLI argument spec.
-  {:lifts {:default "~/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Logs/Fitness/Lifting/"
+  {:lifts {:default (->> ["~"
+                          "Library"
+                          "Mobile Documents"
+                          "iCloud~is~workflow~my~workflows"
+                          "Documents"
+                          "Logs"
+                          "Fitness"
+                          "Lifting"]
+                         (str/join "/")
+                         (fs/expand-home)
+                         (fs/unixify))
            :help "The directory containing json logs of lifts to process."
            :parse-fn str}
    :runs {:default "~/Documents/blog/public/logs/running.csv"

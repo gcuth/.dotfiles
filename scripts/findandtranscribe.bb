@@ -32,14 +32,17 @@
   [fp]
   (fs/exists? (str (s/replace fp #"\.\w+$" ".txt"))))
 
+
 (defn has-json?
   "Check for a json file (or files) for the given audio file."
-  [fp]
-  (or
-   (fs/exists? (str (s/replace fp #"\.\w+$" ".json")))
-   (and
-    (fs/exists? (str (s/replace fp #"\.\w+$" "-LEFT.json")))
-    (fs/exists? (str (s/replace fp #"\.\w+$" "-RIGHT.json"))))))
+  ([fp]
+   (has-json? fp true))
+  ([fp mono?]
+   (if mono?
+     (fs/exists? (str (s/replace fp #"\.\w+$" ".json")))
+     (and
+      (fs/exists? (str (s/replace fp #"\.\w+$" "-LEFT.json")))
+      (fs/exists? (str (s/replace fp #"\.\w+$" "-RIGHT.json")))))))
 
 
 (defn is-new?
@@ -52,7 +55,7 @@
 
 
 (defn sort-by-creation-date
-  "Sort a list of files by their creation date."
+  "Sort a list of files by their creation date. (Returns oldest first.)"
   [files]
   (sort-by #(.lastModified (fs/file %)) files))
 
@@ -176,12 +179,13 @@
         mono? (get-in input [:opts :mono])
         n (get-in input [:opts :n])
         audio-files (list-audio-files dir)
-        transcribable (take n (sort-by-creation-date
-                               (filter #(and (not (has-transcription? %))
-                                             (not (has-json? %))
+        transcribable
+        (shuffle
+         (take n (reverse (sort-by-creation-date
+                           (filter #(and (not (has-transcription? %))
                                             ;;  (not (is-new? % 1))
-                                             )
-                                       audio-files)))]
+                                         (not (has-json? % mono?)))
+                                   audio-files)))))]
     (enforce-availability "ffmpeg" "whisper-mps")
     (println "Starting transcription process ...")
     (println (str "Finding audio files in input directory: " dir))

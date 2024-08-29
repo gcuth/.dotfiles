@@ -8,7 +8,8 @@
 (require '[babashka.fs :as fs]
          '[clojure.string :as s]
          '[babashka.process :as sh]
-         '[cheshire.core :as json])
+         '[cheshire.core :as json]
+         '[babashka.cli :as cli])
 
 ;; Check for required executables ---------------------------------------------
 (def ffmpeg-installed? (boolean (fs/which "ffmpeg")))
@@ -64,8 +65,29 @@
   [audio-file output-directory]
   (let [filename (fs/strip-ext (fs/file-name audio-file))
         mono-path (str output-directory "/" filename " MONO.wav")]
+    (println (str "Converting " audio-file " to mono at " mono-path))
     (sh/sh "ffmpeg" "-i" audio-file "-ac" "1" mono-path)
+    (println (str "Saved mono file to " mono-path))
     mono-path))
+
+
+(defn split-channels
+  "Take a path to an audio file and convert it to multiple mono files using
+   ffmpeg, saving the result to the output directory and returning a list of
+   the paths to the new files."
+  [audio-file output-directory]
+  (let [filename (fs/strip-ext (fs/file-name audio-file))
+        left-path (str output-directory "/" filename " LEFT.wav")
+        right-path (str output-directory "/" filename " RIGHT.wav")]
+    (println (str "Splitting " audio-file " into left and right channels at "
+                  left-path " and " right-path))
+    (sh/sh "ffmpeg" "-i" audio-file
+           "-filter_complex" "[0:a]channelsplit=channel_layout=stereo[left][right]"
+                              "-map" "[left]" left-path
+                              "-map" "[right]" right-path)
+    (println (str "Saved left channel to " left-path))
+    (println (str "Saved right channel to " right-path))
+    [left-path right-path]))
 
 
 (defn enforce-availability
@@ -84,10 +106,21 @@
   [audio-file output-directory]
   (let [input-directory (fs/unixify (fs/parent audio-file))
         filename (fs/file-name audio-file)]
+    (println (str "Files currently in directory " input-directory " --- " (into [] (map fs/unixify (fs/glob (fs/expand-home input-directory) "**" {:recursive true})))))
+    (println (str "Transcribing " audio-file " using whisper-mps ..."))
+    (println (str "Input Directory: " input-directory))
+    (println (str "Filename: " filename))
+    (println (str "Files currently in directory " input-directory " --- " (into [] (map fs/unixify (fs/glob (fs/expand-home input-directory) "**" {:recursive true})))))
+    (println ("Beginning transcription of " audio-file))
     (sh/shell {:dir input-directory}
               "whisper-mps" "--file-name" audio-file "--model-name" "large")
+    (println (str "Transcription complete for " audio-file))
+    (println (str "Files currently in directory " input-directory " --- " (into [] (map fs/unixify (fs/glob (fs/expand-home input-directory) "**" {:recursive true})))))
+    (println (str "Moving output.json to " output-directory))
     (fs/move (str input-directory "/output.json")
              (str output-directory "/" (fs/strip-ext filename) ".json"))
+    (println (str "Saved json file to " (str output-directory "/" (fs/strip-ext filename) ".json")))
+    (println (str "Files currently in directory " input-directory " --- " (into [] (map fs/unixify (fs/glob (fs/expand-home input-directory) "**" {:recursive true})))))
     (str output-directory "/" (fs/strip-ext filename) ".json")))
 
 
@@ -116,6 +149,17 @@
                        (:segments json-data))))))
 
 
+(def cli-spec
+  {:input {:help "Directory path containing audio files to transcribe."
+           :parse-fn str}
+   :mono {:help "Transcribe files as mono (default is stereo)."
+          :default false
+          :parse-fn boolean}
+   :n {:help "The number of files to transcribe (default is 10)."
+       :default 10
+       :parse-fn #(Integer/parseInt %)}})
+
+
 (defn -main
   "Process any audio files found in the directory given as a command line arg.
    
@@ -123,16 +167,22 @@
    the end. This directory is used to store the mono audio files & transcripts.
    The original audio files are not modified."
   []
-  (enforce-availability "ffmpeg" "whisper" "whisper-mps")
-  (let [dir (first *command-line-args*)
+  (let [input (cli/parse-args *command-line-args* {:spec cli-spec})
+        dir (get-in input [:opts :input])
+        mono? (get-in input [:opts :mono])
+        n (get-in input [:opts :n])
         audio-files (list-audio-files dir)
-        transcribable (shuffle
-                       (filter #(and (not (has-transcription? %))
-                                     (not (has-json? %))
-                                     (not (is-new? % 1))) audio-files))]
-    (println (str "Input Directory: " dir))
+        transcribable (take n (sort-by-creation-date
+                               (filter #(and (not (has-transcription? %))
+                                             (not (has-json? %))
+                                            ;;  (not (is-new? % 1))
+                                             )
+                                       audio-files)))]
+    (enforce-availability "ffmpeg" "whisper-mps")
+    (println "Starting transcription process ...")
+    (println (str "Finding audio files in input directory: " dir))
     (println (str "Total audio files found: " (count audio-files)))
-    (println (str "Total transcribable files: " (count transcribable)))
+    (println (str "Total files to transcribe: " (count transcribable)))
     ;; for each transcribable file ...
     (doseq [f transcribable]
       (fs/with-temp-dir [tmp-dir]
@@ -140,14 +190,32 @@
               outpath (str (fs/strip-ext f) ".json")]
           (println (str "Temp Directory: " tmp-dir))
           (println (str "Target Output Path for Transcription: " outpath))
-          (println (str "Transcribing: " f))
-          (try
-            (let [mono-path (make-mono f tmp-dir)
-                  temp-transcription-path (transcribe mono-path tmp-dir)]
-              (fs/move temp-transcription-path outpath)
-              (println "Saved json file to " outpath))
-            (catch Exception e
-              (println (str "Error transcribing " f ": " (.getMessage e))))))))))
+          (if mono?
+            (str "Transcribing file as a mono file: " f)
+            (str "Transcribing file as stereo: " f))
+          (if mono?
+            (try
+              (let [mono-path (make-mono f tmp-dir)
+                    temp-transcription-path (transcribe mono-path tmp-dir)]
+                (fs/move temp-transcription-path outpath)
+                (println "Saved json file to " outpath))
+              (catch Exception e
+                (println (str "Error transcribing " f ": " (.getMessage e)))))
+            (try
+              (let [[left-path right-path] (split-channels f tmp-dir)
+                    temp-transcription-path-left (transcribe left-path tmp-dir)
+                    temp-transcription-path-right (transcribe right-path tmp-dir)]
+                ;; move transcriptions to the output directory
+                (fs/move temp-transcription-path-left
+                         (str (fs/strip-ext outpath) "-LEFT.json"))
+                (fs/move temp-transcription-path-right
+                         (str (fs/strip-ext outpath) "-RIGHT.json"))
+                (println "Saved json files to "
+                         (str (fs/strip-ext outpath) "-LEFT.json")
+                         " and "
+                         (str (fs/strip-ext outpath) "-RIGHT.json")))
+              (catch Exception e
+                (println (str "Error transcribing " f ": " (.getMessage e)))))))))))
 
 
-(-main)
+  (-main)

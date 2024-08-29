@@ -115,7 +115,7 @@
     (println (str "Input Directory: " input-directory))
     (println (str "Filename: " filename))
     (println (str "Files currently in directory " input-directory " --- " (into [] (map fs/unixify (fs/glob (fs/expand-home input-directory) "**" {:recursive true})))))
-    (println ("Beginning transcription of " audio-file))
+    (println (str "Beginning transcription of " audio-file))
     (sh/shell {:dir input-directory}
               "whisper-mps" "--file-name" audio-file "--model-name" "large")
     (println (str "Transcription complete for " audio-file))
@@ -193,7 +193,6 @@
         (let [basename (fs/strip-ext (fs/file-name f))
               outpath (str (fs/strip-ext f) ".json")]
           (println (str "Temp Directory: " tmp-dir))
-          (println (str "Target Output Path for Transcription: " outpath))
           (if mono?
             (str "Transcribing file as a mono file: " f)
             (str "Transcribing file as stereo: " f))
@@ -219,7 +218,8 @@
                          " and "
                          (str (fs/strip-ext outpath) "-RIGHT.json")))
               (catch Exception e
-                (println (str "Error transcribing " f ": " (.getMessage e)))))))))))
+                (println (str "Error transcribing " f ": " (.getMessage e)))
+                (println (str "Files in directory " tmp-dir " at time of error --- " (into [] (map fs/unixify (fs/glob (fs/expand-home tmp-dir) "**" {:recursive true})))))))))))))
 
 
   (-main)

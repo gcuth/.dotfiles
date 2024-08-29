@@ -33,9 +33,13 @@
   (fs/exists? (str (s/replace fp #"\.\w+$" ".txt"))))
 
 (defn has-json?
-  "Check if a json file already exists for the given audio file."
+  "Check for a json file (or files) for the given audio file."
   [fp]
-  (fs/exists? (str (s/replace fp #"\.\w+$" ".json"))))
+  (or
+   (fs/exists? (str (s/replace fp #"\.\w+$" ".json")))
+   (and
+    (fs/exists? (str (s/replace fp #"\.\w+$" "-LEFT.json")))
+    (fs/exists? (str (s/replace fp #"\.\w+$" "-RIGHT.json"))))))
 
 
 (defn is-new?

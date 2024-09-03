@@ -22,6 +22,11 @@
 
 (def USERID "111805") ;; my user ID on Metaculus
 
+(defn log
+  "Print a message with a timestamp prepended; println but with a timestamp."
+  [& msgs]
+  (println (str "[" (java.time.Instant/now) "] " (apply str msgs))))
+
 (def DEFAULT-SEARCH-PARAMS
   [{"order_by" "last_prediction_time"
     "type" "forecast"
@@ -203,12 +208,12 @@
                        (remove #(nil? (get-current-community-prediction %)))
                        (filter #(is-open? %))
                        (filter #(is-binary? %)))]
-    (println "Found" (count questions) "questions.")
+    (log "Found" (count questions) "questions.")
     (doseq [question questions]
       (let [id (:id question)
             title (:title question)
             current-community (get-current-community-prediction question)]
-        (println (str "[" id "] " title " [" current-community "]: "))
+        (log (str "[" id "] " title " [" current-community "]: "))
         (post-prediction
          {:id id
           :value (Float/parseFloat (read-line))
@@ -234,22 +239,24 @@
   (let [input (cli/parse-args *command-line-args* cli-spec)
         command (first (:args input))
         opts (:opts input)]
+    (log "Command: \"" command "\"")
+    (log "Starting with options: " opts)
     (cond (= command "report")
           (let [question (get-question opts)]
             (if (:json opts)
-              (println (json/generate-string question))
-              (println question)))
+              (log (json/generate-string question))
+              (log question)))
 
           (= command "predict")
           (let [prediction (post-prediction opts)] ;; TODO: Check for question type and post accordingly
-            (println prediction))
+            (log prediction))
 
           (= command "list")
           (let [questions (list-questions (assoc opts :params (rand-nth DEFAULT-SEARCH-PARAMS)))]
             (if (:json opts)
-              (println (json/generate-string questions))
+              (log (json/generate-string questions))
               (doseq [q questions]
-                (println (str (:id q) ": " (:title q))))))
+                (log (str (:id q) ": " (:title q))))))
 
           (= command "prompt")
           (-> (prompt-for-prediction opts))
@@ -259,11 +266,11 @@
             (let [question (get-question opts)
                   community (get-current-community-prediction question)
                   user (get-current-user-prediction question)]
-              (cond (nil? community) (println "No community prediction available.")
-                    (= community user) (println "Community and user predictions already match.")
-                    (not (is-open? question)) (println "Question is not open for predictions.")
-                    (not (is-binary? question)) (println "Question type is not yet supported.")
-                    :else (println (post-prediction (assoc opts :value community :type "binary")))))
+              (cond (nil? community) (log "No community prediction available.")
+                    (= community user) (log "Community and user predictions already match.")
+                    (not (is-open? question)) (log "Question is not open for predictions.")
+                    (not (is-binary? question)) (log "Question type is not yet supported.")
+                    :else (log (post-prediction (assoc opts :value community :type "binary")))))
             (let [questions (->> (apply concat (map #(list-questions {:token (:token opts)
                                                                       :params %})
                                                     DEFAULT-SEARCH-PARAMS))
@@ -276,18 +283,18 @@
                       user (get-current-user-prediction question)]
                   (if (not= community user)
                     (do
-                      (println (str (:title question) " (" user "->" community ")"))
-                      (println (post-prediction (assoc opts
-                                                       :id (:id question)
-                                                       :value community
-                                                       :type "binary")))
-                      (println ""))
-                    (println (str "Community and user predictions already match for \"" (:title question) "\"")))))))
+                      (log (str (:title question) " (" user "->" community ")"))
+                      (log (post-prediction (assoc opts
+                                                   :id (:id question)
+                                                   :value community
+                                                   :type "binary")))
+                      (log ""))
+                    (log (str "Community and user predictions already match for \"" (:title question) "\"")))))))
           
           (= command "check")
           (let [question (get-question opts)]
-            (println (json/generate-string (get-current-community-prediction question))))
+            (log (json/generate-string (get-current-community-prediction question))))
 
-          :else (println "Unknown command."))))
+          :else (log "Unknown command."))))
 
 (-main)

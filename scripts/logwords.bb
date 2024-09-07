@@ -1,8 +1,10 @@
 #!/usr/bin/env bb
 ;;
 ;; A babashka script for logging the total number of words written in all files
-;; in a given directory and outputting a score (based on that log) for the 
-;; rolling average 'delta' in word count.
+;; in a given directory and then outputting a brief report on the change in
+;; word count: the total number of words written in the last 24 hours, and the
+;; recent change in word count (calculated as the minimum of the exponentially
+;; weighted moving average and the average of the logged deltas).
 ;;
 ;; Usage: ./logwords.bb --dir /path/to/directory --log /path/to/logfile --n 100
 
@@ -53,19 +55,42 @@
      (spit log-fp log-line :append true))))
 
 
+(defn- seconds-since
+  "Get the number of seconds between now and a given date.
+
+   date will be a string in the format 'yyyy-MM-ddTHH:mm:ssZ'
+      eg: '2024-09-07T03:39:01.124108Z'"
+  [date]
+  (let [now (java.time.Instant/now)
+        date (java.time.Instant/parse (str/trim date))
+        seconds (-> date
+                    (.until now java.time.temporal.ChronoUnit/SECONDS)
+                    int)]
+    (-> date
+        (.until now java.time.temporal.ChronoUnit/SECONDS)
+        int)))
+
+
 (defn- read-log
   "Read the log of the total number of words as a list of integers. We expect a
-   csv with a path, date, & word count on each line; only return word counts."
-  [log-file]
-  (if (fs/exists? log-file)
-    (->> (slurp log-file)
-         (str/split-lines)
-         (map #(str/split % #","))
-         (map last)
-         (map str/trim)
-         (filter #(re-matches #"\d+" %))
-         (map #(Integer/parseInt %)))
-    []))
+   csv with a path, date, & word count on each line; only return word counts.
+   
+   Optionally filter for only lines in the last s seconds; default is s=nil.
+   "
+  ([log-file] (read-log log-file nil))
+  ([log-file s]
+   (let [is-recent #(if s (<= (seconds-since %) s) true)]
+     (if (fs/exists? log-file)
+       (->> (slurp log-file) ;; Read the log file
+            (str/split-lines) ;; Split on newlines
+            (map #(str/split % #",")) ;; Split on commas
+            (filter #(= (count %) 3)) ;; Require 3 elements (path, date, wc)
+            (filter #(is-recent (second %))) ;; Require newer than s seconds
+            (map last) ;; Get the word count
+            (map str/trim) ;; Trim whitespace
+            (filter #(re-matches #"\d+" %)) ;; Filter out non-numeric entries
+            (map #(Integer/parseInt %))) ;; Convert word counts to integers
+       []))))
 
 
 (defn- trim-log
@@ -136,10 +161,10 @@
                           change (if (pos? change)
                                    (str "+" change)
                                    (str change))
-                          first-wc (first (read-log log))
-                          last-wc (last (read-log log))
-                          first->last (- last-wc first-wc)]
-                      (println (str first->last
+                          wc-yesterday (first (read-log log (* 24 60 60)))
+                          wc-now (last (read-log log))
+                          in-24h (- wc-now wc-yesterday)]
+                      (println (str in-24h
                                     " (" change ")")))))))
 
 (-main)

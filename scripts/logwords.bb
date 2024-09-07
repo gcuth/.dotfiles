@@ -132,7 +132,7 @@
                           ewma-now (int (ewma deltas))
                           avg-now (int (avg deltas))
                           max-now (int (apply max deltas))
-                          change (int (max ewma-now (avg [avg-now max-now])))
+                          change (int (min ewma-now (avg [avg-now max-now])))
                           change (if (pos? change)
                                    (str "+" change)
                                    (str change))

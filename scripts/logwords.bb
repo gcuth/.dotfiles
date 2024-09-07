@@ -130,6 +130,53 @@
              nums))))
 
 
+(defn- date->local
+  "Convert a date string to a local date string."
+  [date]
+  (let [date (java.time.Instant/parse (str/trim date))
+        zone (java.time.ZoneId/systemDefault)
+        local-date (.atZone date zone)]
+    (.format local-date java.time.format.DateTimeFormatter/ISO_LOCAL_DATE)))
+
+
+(defn- generate-report
+  "Read the log file and return a report on per-day changes."
+  [log-file]
+  (if (fs/exists? log-file)
+    (let [local-log (->> (slurp log-file)
+                         (str/split-lines)
+                         (map #(str/split % #","))
+                         (filter #(= (count %) 3))
+                         (map #(map str/trim %))
+                         (map #(vector (second %) (date->local (second %)) (last %))))
+          days (distinct (map second local-log))]
+      (->> days
+           (map (fn [date]
+                  (let [entries (filter #(= date (second %)) local-log)
+                        wcs (->> entries
+                                 (map last)
+                                 (map str/trim)
+                                 (filter #(re-matches #"\d+" %))
+                                 (map #(Integer/parseInt %)))
+                        deltas (calculate-deltas wcs)
+                        first-wc (first wcs)
+                        last-wc (last wcs)
+                        net-change (- last-wc first-wc)]
+                    (str date
+                         " --- "
+                         first-wc " -> " last-wc
+                         " --- "
+                         "↑" (count (filter pos? deltas))
+                         " "
+                         "↓" (count (filter neg? deltas))
+                         " --- "
+                         (if (pos? net-change)
+                           (str "+" net-change)
+                           (str net-change))))))
+           (str/join "\n")))
+    "No log file found."))
+
+
 (def cli-opts
   {:dir {:default nil
          :description "The directory to count words in."
@@ -137,19 +184,23 @@
    :log {:default nil
          :description "The log file to write the total word count to."
          :parse-fn #(fs/unixify (fs/expand-home %))}
-   :n {:default 100
+   :n {:default (* 14 24 60 60) ;; 14 days by default, assuming 1 log per min
        :description "The number of entries to keep in the log."
-       :parse-fn #(Integer/parseInt %)}})
+       :parse-fn #(Integer/parseInt %)}
+   :report {:default false
+            :description "Print a report on the log file."
+            :parse-fn #(= % "true")}})
 
 
 (defn -main
   ""
   []
-  (let [{:keys [dir log n]} (cli/parse-opts *command-line-args* cli-opts)]
+  (let [{:keys [dir log n report]} (cli/parse-opts *command-line-args* cli-opts)]
     (cond (nil? dir) (println "Please provide a directory to count words in.")
           (not (fs/exists? dir)) (println "Given directory does not exist.")
           (nil? log) (println "Provide a file to write the word count log to.")
           (not (fs/exists? log)) (spit log "")
+          (= true report) (println (generate-report log))
           :else (do (log-total-word-count dir log)
                     (trim-log log (or n (get-in cli-opts [:n :default])))
                     (let [deltas (->> (read-log log)

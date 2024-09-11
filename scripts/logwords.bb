@@ -205,7 +205,7 @@
                     (trim-log log (or n (get-in cli-opts [:n :default])))
                     (let [deltas (->> (read-log log)
                                       (calculate-deltas))
-                          change (int (ewma deltas))
+                          change (int (avg [(ewma deltas) (last deltas)]))
                           change (if (pos? change)
                                    (str "+" change)
                                    (str change))

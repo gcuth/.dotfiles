@@ -1,8 +1,10 @@
 betterthantomorrow.calva
 betterthantomorrow.calva-spritz
+charliermarsh.ruff
 fabiospampinato.vscode-highlight
-GitHub.copilot
-GitHub.copilot-chat
+github.copilot
+github.copilot-chat
+ms-python.debugpy
 ms-python.python
 ms-python.vscode-pylance
 ms-vscode-remote.remote-ssh

@@ -85,7 +85,18 @@
             ]
         },
         "(.{79})(.*)": { // skip the first 79 characters
-            "filterLanguageRegex": "clojure|python",
+            "filterLanguageRegex": "clojure", // only apply to clojure files
+            "decorations": [
+                {}, // do nothing with the first capture group
+                {
+                    "borderWidth": "0 0 2px 0",
+                    "borderColor": "red",
+                    "borderStyle": "solid"
+                },
+            ]
+        },
+        "(.{87})(.*)": { // skip the first 87 characters
+            "filterLanguageRegex": "python", // only apply to python files
             "decorations": [
                 {}, // do nothing with the first capture group
                 {

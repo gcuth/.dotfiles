@@ -99,6 +99,17 @@
                 },
             ]
         },
+        "(.{79})(.{1,8})": { // skip the first 79 characters, and any after 80
+            "filterLanguageRegex": "python", // only apply to python files
+            "decorations": [
+                {}, // do nothing with the first capture group
+                {
+                    "borderWidth": "0 0 2px 0",
+                    "borderColor": "orange",
+                    "borderStyle": "solid"
+                },
+            ]
+        },
         "(.{87})(.*)": { // skip the first 87 characters
             "filterLanguageRegex": "python", // only apply to python files
             "decorations": [

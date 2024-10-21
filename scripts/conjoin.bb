@@ -8,19 +8,16 @@
          '[clojure.java.shell :refer [sh]]
          '[clojure.string :as str])
 
-
 (defn list-mp3s
   "List all mp3s in a given directory."
   [path]
   (let [files (fs/list-dir (fs/path path))]
     (filter #(= "mp3" (fs/extension %)) files)))
 
-
 (defn has-mp3s?
   "Return true if a given directory contains mp3 files."
   [directory]
   (> (count (list-mp3s directory)) 1))
-
 
 (defn list-audiobook-folders
   "List all folders in a given directory that look like they contain audiobooks"
@@ -28,12 +25,10 @@
   (let [subdirs (filter fs/directory? (fs/list-dir (fs/path path)))]
     (filter has-mp3s? subdirs)))
 
-
 (defn numeric-filenames?
   "Return true if a list of files has numbers in all the filenames (not counting the extension)."
   [l]
   (every? #(re-find #"\d+" %) (map #(fs/file-name %) l)))
-
 
 (defn zero-padded?
   "Returns true if a list of files seems to contain zeropadded numbers in the filenames"
@@ -42,14 +37,12 @@
                (map #(re-find #"\d+" %)
                     (map #(fs/file-name %) l)))))
 
-
 (defn sort-by-numeric
   "Sort a list of filenames by the numeric value contained within filenames."
   [l]
   (let [digits (map #(re-find #"\d+" %) (map #(fs/file-name %) l))
         numbers (map #(Integer/parseInt %) digits)]
     (map first (sort-by second (zipmap l numbers)))))
-
 
 (defn sort-mp3-list
   "Sort a list of mp3 filepaths by likely order."
@@ -58,14 +51,13 @@
     (sort-by-numeric l)
     (sort l)))
 
-
 (defn pad "Zero pad an integer."
   [i]
   (format "%06d" i))
 
-
 (defn sort-and-copy
-  "Copy all mp3s in a given directory to a new directory with sorted names, listing the new filenames."
+  "Copy all mp3s in a given directory to a new directory with sorted names,
+   returning a map of new to original filenames."
   [in out]
   (let [files (sort-mp3-list (list-mp3s in))
         outpaths (map-indexed (fn [i v] (str (fs/path out)
@@ -74,8 +66,8 @@
                                              "."
                                              (fs/extension v)))
                               files)]
-    (doall (map-indexed (fn [i v] (fs/copy v (nth outpaths i))) files))))
-
+    (doall (map-indexed (fn [i v] (fs/copy v (nth outpaths i))) files))
+    (zipmap outpaths files)))
 
 (defn create-list-txt
   "Create 'list.txt' file in the outpath suitable for ffmpeg concatenate."
@@ -84,7 +76,6 @@
         text (str/join "\n" (map #(str "file '" (fs/expand-home %) "'") l))]
     (spit listpath text)))
 
-
 (defn ffmpeg-join
   "Conjoin a list of mp3 files (declared in a list.txt file) by calling ffmpeg."
   [list-text-path outdir]
@@ -92,12 +83,10 @@
         result (sh "ffmpeg" "-f" "concat" "-safe" "0" "-i" list-text-path outfile)]
     (str (:out result))))
 
-
 (defn ffmpeg-downsample
   "Take a given mp3 file and downsample it to 32kbps."
   [inpath outpath]
   (str (:out (sh "ffmpeg" "-i" inpath "-b:a" "32k" outpath))))
-
 
 (defn get-duration
   "Get the duration of a given file."
@@ -110,20 +99,25 @@
   [path]
   (map #(get-duration %) (sort-mp3-list (list-mp3s path))))
 
-
 (defn clean-chapter-title
-  "Clean a chapter title by removing any leading (ie, left-padding) zeroes.
-   Keep all other zeroes & numbers."
+  "Remove any *leading* digits/hyphens/whitespace from a chapter title, leaving
+    only the chapter title itself.
+   If the cleaned title is empty, just return the original title."
   [s]
-  (str "Chapter " (str/replace s #"^0+" "0")))
-
+  (let [leading-digits #"^[\d\-\s]*"
+        ;; remove leading digits/hyphens/whitespace
+        cleaned (str/replace-first s leading-digits "")]
+    (if (empty? cleaned)
+      s
+      cleaned)))
 
 (defn create-metadata-txt
   "Generate a txt file (in the same dir as the mp3s) with chaptered metadata."
-  [path]
+  [path file-mapping]
   (let [mp3s (sort-mp3-list (list-mp3s path))
         durations (get-durations path)
-        titles (map #(clean-chapter-title (fs/strip-ext (fs/file-name %))) mp3s)
+        titles (map #(clean-chapter-title (str (fs/strip-ext (fs/file-name (get file-mapping (str (fs/unixify %)))))))
+                    mp3s)
         cumulative-durations (map int (reductions + (map #(Float/parseFloat %) durations)))
         starting-times (cons 0 (butlast cumulative-durations))
         ending-times (map-indexed (fn [i v]
@@ -147,21 +141,21 @@
                                              "\n"))
                                       mp3s))))))
 
-
 (defn ffmpeg-chapterise
   "Chapterise a given mp3 file using metadata.txt."
   [metadata-path inpath outpath]
   (str (:out (sh "ffmpeg" "-i" inpath "-i" metadata-path "-map_metadata" "1" "-codec" "copy" outpath))))
 
-
-
 (defn conjoin
   "Run the conjoining process."
   [inpath outpath]
-  (let [tempdir (fs/create-temp-dir)]
+  (let [tempdir (fs/create-temp-dir)
+        file-mapping (sort-and-copy inpath tempdir)
+        temp-files (sort-by-numeric (keys file-mapping))]
     ;; (1) SORT AND COPY
     (println (str "Sorting and copying mp3s found in " inpath "..."))
-    (sort-and-copy inpath tempdir)
+    (doseq [temp-f temp-files]
+      (println (str "\"" (fs/file-name (get file-mapping temp-f)) "\" -> " temp-f)))
 
     ;; (2) CREATE LIST.TXT FOR CONCATENATION
     (println (str "Creating list.txt file in " tempdir "..."))
@@ -171,7 +165,7 @@
 
     ;; (3) CREATE CHAPTERED METADATA
     (println (str "Creating metadata.txt file in " tempdir "..."))
-    (create-metadata-txt tempdir)
+    (create-metadata-txt tempdir file-mapping)
     (println (str "Metadata file:\n"
                   (slurp (str tempdir fs/file-separator "metadata.txt"))))
 
@@ -206,8 +200,8 @@
     (println (str "Renaming " outpath fs/file-separator
                   "out_chaptered_small.mp3 to " (fs/file-name inpath) ".mp3"))
     (fs/move (str outpath fs/file-separator "out_chaptered_small.mp3")
-             (str outpath fs/file-separator (fs/file-name inpath) ".mp3"))))
-
+             (str outpath fs/file-separator (fs/file-name inpath) ".mp3"))
+    ))
 
 (def cli-spec {:input  {:ref          "<directory>"
                         :desc         "The input directory (which contains mp3s)."
@@ -217,7 +211,6 @@
                         :desc         "The output directory (to save a joined mp3)."
                         :alias        :o
                         :default      nil}})
-
 
 (defn -main
   "Run the conjoining process."

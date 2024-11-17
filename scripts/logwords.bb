@@ -7,6 +7,9 @@
 ;; weighted moving average and the average of the logged deltas).
 ;;
 ;; Usage: ./logwords.bb --dir /path/to/directory --log /path/to/logfile --n 100
+;;
+;; Note that an optional --flat flag is used to prevent the script from finding
+;; and counting words in subdirectories.
 
 (require '[babashka.fs :as fs]
          '[clojure.string :as str]
@@ -32,8 +35,9 @@
   "Get the total number of words in all files in a directory, filtered to only
    include files with the given extensions."
   ([dir] (count-words-in-dir dir ["txt" "md"]))
-  ([dir extensions]
-   (->> (fs/list-dir dir)
+  ([dir extensions] (count-words-in-dir dir extensions false))
+  ([dir extensions flat?]
+   (->> (if flat? (fs/list-dir dir) (fs/glob dir "**"))
         (filter #(has-extension? % extensions))
         (map #(fs/expand-home %))
         (map #(fs/unixify %))
@@ -46,7 +50,9 @@
   ([dir log-fp]
    (log-total-word-count dir log-fp ["txt" "md"]))
   ([dir log-fp extensions]
-   (let [total-words (count-words-in-dir dir extensions)
+   (log-total-word-count dir log-fp extensions false))
+  ([dir log-fp extensions flat?]
+   (let [total-words (count-words-in-dir dir extensions flat?)
          log-fp (fs/unixify (fs/expand-home log-fp))
          now (java.time.Instant/now)
          log-line (str (fs/unixify (fs/expand-home dir)) ", "
@@ -187,6 +193,9 @@
    :n {:default (* 14 24 60 60) ;; 14 days by default, assuming 1 log per min
        :description "The number of entries to keep in the log."
        :parse-fn #(Integer/parseInt %)}
+   :flat {:default false
+          :description "Do not count words in subdirectories."
+          :parse-fn #(= % "true")}
    :report {:default false
             :description "Print a report on the log file."
             :parse-fn #(= % "true")}})
@@ -195,13 +204,13 @@
 (defn -main
   ""
   []
-  (let [{:keys [dir log n report]} (cli/parse-opts *command-line-args* cli-opts)]
+  (let [{:keys [dir log n report flat]} (cli/parse-opts *command-line-args* cli-opts)]
     (cond (nil? dir) (println "Please provide a directory to count words in.")
           (not (fs/exists? dir)) (println "Given directory does not exist.")
           (nil? log) (println "Provide a file to write the word count log to.")
           (not (fs/exists? log)) (spit log "")
           (= true report) (println (generate-report log))
-          :else (do (log-total-word-count dir log)
+          :else (do (log-total-word-count dir log ["txt" "md"] flat)
                     (trim-log log (or n (get-in cli-opts [:n :default])))
                     (let [deltas (->> (read-log log)
                                       (calculate-deltas))

@@ -194,7 +194,7 @@
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv
   # every minute, set the One Thing menu bar item to match writing progress
   - cron: "* * * * *"
-    command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/Thesis/ --log ~/.thesis_word_delta.log | tr -d "\n")"
+    command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/ --log ~/.word_delta.log | tr -d "\n")"
   # Run the 'every five minutes' shortcut
   - cron: "*/5 * * * *"
     command: shortcuts run "Every Five Minutes"

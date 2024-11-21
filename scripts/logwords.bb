@@ -89,6 +89,7 @@
      (if (fs/exists? log-file)
        (->> (slurp log-file) ;; Read the log file
             (str/split-lines) ;; Split on newlines
+            (rest) ;; Skip the header line
             (map #(str/split % #",")) ;; Split on commas
             (filter #(= (count %) 3)) ;; Require 3 elements (path, date, wc)
             (filter #(is-recent (second %))) ;; Require newer than s seconds
@@ -100,13 +101,20 @@
 
 
 (defn- trim-log
-  "Trim log file (given by the path 'log-file') to the most recent n entries."
+  "Trim log file (given by the path 'log-file') to the most recent n entries.
+  Keep the header line!"
   ([log-file]
    (trim-log log-file 100))
   ([log-file n]
-   (let [lines (->> (slurp log-file)
+   (let [header (->> (slurp log-file)
+                     (str/split-lines)
+                     (first)
+                     (str/trim))
+         lines (->> (slurp log-file)
                     (str/split-lines)
-                    (take-last n))]
+                    (rest) ;; Skip the header line
+                    (take-last n))
+         lines (if (empty? lines) [header] (cons header lines))]
      (->> lines
           (str/join "\n")
           (str/trim)
@@ -151,6 +159,7 @@
   (if (fs/exists? log-file)
     (let [local-log (->> (slurp log-file)
                          (str/split-lines)
+                         (rest)
                          (map #(str/split % #","))
                          (filter #(= (count %) 3))
                          (map #(map str/trim %))

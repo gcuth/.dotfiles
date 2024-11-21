@@ -97,7 +97,7 @@
   - brew update && brew upgrade
 - cask: # install 1password first so that we can use it to authenticate others
   - 1password
-- brew: 
+- brew:
   - python
   - pipx
   - nvm
@@ -141,6 +141,7 @@
   - rescuetime
   - protonvpn
   - protonmail-bridge
+  - proton-drive
   - zotero
   - zoom
   - bartender
@@ -165,7 +166,6 @@
   - mas install 1402042596 # AdBlock for Safari
   - mas install 1569813296 # 1Password for Safari
   - mas install 937984704  # Amphetamine (keep mac awake)
-  - mas install 946812450  # Binaural sound generator
 
 
 ###############################################################################

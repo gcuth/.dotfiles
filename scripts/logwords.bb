@@ -217,7 +217,7 @@
     (cond (nil? dir) (println "Please provide a directory to count words in.")
           (not (fs/exists? dir)) (println "Given directory does not exist.")
           (nil? log) (println "Provide a file to write the word count log to.")
-          (not (fs/exists? log)) (spit log "")
+          (not (fs/exists? log)) (spit log "\"path\",\"date\",\"wordcount\"\n")
           (= true report) (println (generate-report log))
           :else (do (log-total-word-count dir log ["txt" "md"] flat)
                     (trim-log log (or n (get-in cli-opts [:n :default])))

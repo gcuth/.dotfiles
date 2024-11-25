@@ -6,13 +6,14 @@
 # Set variables
 OBSIDIAN_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes/"
 REPO_URL="git@github.com:gcuth/notes.git"
-TEMP_DIR="/tmp/notes"
+TEMP_DIR="/tmp/notes_temp"
 TARGET_DIR="obsidian"
 TARGET_BRANCH="main"
+LOG_PATH="$HOME/Logs/track_notes.log"
 
 # Function to log messages with timestamps
 log_message() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_PATH"
 }
 
 # Function to check if any files have been modified in the last 5 minutes

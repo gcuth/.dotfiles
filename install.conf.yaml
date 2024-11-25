@@ -175,9 +175,15 @@
   # every minute, set the One Thing menu bar item to match writing progress
   - cron: "* * * * *"
     command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/ --log ~/Logs/word_delta.log | tr -d "\n")"
-  # Run the 'every five minutes' shortcut
+  # every five minutes, run the 'every five minutes' shortcut
   - cron: "*/5 * * * *"
     command: shortcuts run "Every Five Minutes"
+  # every five minutes, track notes
+  - cron: "*/5 * * * *"
+    command: /bin/bash ~/.dotfiles/scripts/track_notes.sh
+  # every five minutes, track thesis
+  - cron: "*/5 * * * *"
+    command: /bin/bash ~/.dotfiles/scripts/track_thesis.sh
   # run the 'every hour' shortcut every hour at 59 minutes past
   - cron: "59 * * * *"
     command: shortcuts run "Every Hour"

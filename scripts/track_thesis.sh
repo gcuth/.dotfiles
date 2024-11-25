@@ -7,10 +7,12 @@ REPO_URL="git@github.com:gcuth/phd_thesis.git"
 TEMP_DIR="/tmp/phd_thesis_temp"
 CHAPTERS_DIR="chapters"
 CITATIONS_DIR="citations"
+TARGET_BRANCH="master"
+LOG_PATH="$HOME/Logs/track_thesis.log"
 
 # Function to log messages with timestamps
 log_message() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_PATH"
 }
 
 # Function to check if any chapter files have been modified in the last 5 minutes
@@ -60,7 +62,7 @@ if check_recent_changes; then
         # Commit and push changes
         if git -C "$TEMP_DIR" add . && \
            git -C "$TEMP_DIR" commit -m "Auto-update chapters $(date '+%Y-%m-%d %H:%M:%S')" && \
-           git -C "$TEMP_DIR" push origin master; then
+           git -C "$TEMP_DIR" push origin "$TARGET_BRANCH"; then
             log_message "Changes committed and pushed successfully"
         else
             log_message "Error: Failed to commit and push changes"

@@ -132,7 +132,6 @@
   - ollama
   - 1password-cli
   - iterm2
-  - mas
 - cask:
   - signal
   - anki
@@ -147,26 +146,6 @@
   - zoom
   - bartender
   - transmission
-
-###############################################################################
-################ USE MAS & APP STORE TO INSTALL APP STORE APPS ################
-###############################################################################
-- shell:
-  - open -a "App Store"
-- shell: # wait while we sign in to the app store
-  - sleep 60
-- shell:
-  - mas install 497799835  # Xcode
-  - mas install 1586435171 # Actions (extras for Siri Shortcuts)
-  - mas install 1453273600 # Data Jar (extras for Siri Shortcuts)
-  - mas install 1425368544 # Timery for Toggl
-  - mas install 1542143627 # Omnifocus
-  - mas install 1604176982 # One Thing (menu bar item/display)
-  - mas install 1529448980 # Reeder
-  - mas install 1033342465 # Just Press Record
-  - mas install 1402042596 # AdBlock for Safari
-  - mas install 1569813296 # 1Password for Safari
-  - mas install 937984704  # Amphetamine (keep mac awake)
 
 
 ###############################################################################

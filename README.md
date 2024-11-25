@@ -9,4 +9,13 @@ cd .dotfiles
 ./install
 ```
 
+On a completely fresh `macOS` install, you would *probably* try the following:
+
+0. [ ] `git clone https://github.com/gcuth/.dotfiles.git`
+1. [ ] `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+2. [ ] `sudo xcodebuild -license accept`
+3. [ ] `./install`
+4. [ ] `./macos/setup`
+
+
 Now get back to work.

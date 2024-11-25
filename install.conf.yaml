@@ -122,7 +122,6 @@
   - discord
   - docker
   - starship
-  - keybase
   - obsidian
   - sqlite
   - sqlcipher
@@ -154,6 +153,7 @@
 
 - shell:
   - [ test -e /Applications/Audio\ Hijack.app || open "https://rogueamoeba.com/audiohijack/download.php" ]
+
 
 ###############################################################################
 ############################## VSCODE EXTENSIONS ##############################

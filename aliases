@@ -1,7 +1,7 @@
 # BASICS
 alias c="clear; ls"
 alias vi="nvim" # should be installed
-alias e="$VISUAL" # quick-open editor
+alias e="$VISUAL" # quick-open visual editor
 alias l="ls -Glah" # override to add colour
 alias ls="ls -G" # override ls usual to add colour by default
 alias grep="grep --color=auto" # who *doesn't* want grep colour?

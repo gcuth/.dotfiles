@@ -131,6 +131,7 @@
   - ollama
   - 1password-cli
   - iterm2
+  - exiftool
 - cask:
   - signal
   - anki

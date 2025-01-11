@@ -39,9 +39,11 @@
 ###############################################################################
 
 - create:
-    - ~/Developer/ # main directory for all dev projects
-    - ~/Torrents/  # directory for torrent downloads etc
-    - ~/Logs/      # convenience for lil script logs etc
+    - ~/Developer/           # main directory for all dev projects
+    - ~/Torrents/            # directory for torrent downloads etc
+    - ~/Torrents/Incomplete/ # directory for incomplete torrent downloads
+    - ~/Torrents/Complete/   # directory for complete torrent downloads
+    - ~/Logs/                # convenience for lil script logs etc
 
 
 ###############################################################################
@@ -92,47 +94,55 @@
 ###############################################################################
 
 # BREW INSTALLS
-- shell:
+- shell: # make sure brew is installed
   - [ test -e `which brew` || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ]
-- shell:
+- shell: # update brew and upgrade all packages
   - brew update && brew upgrade
 - cask: # install 1password first so that we can use it to authenticate others
   - 1password
-- brew:
-  - python
-  - pipx
-  - nvm
-  - neovim
-  - pandoc
-  - java
-  - leiningen
+- brew: # install git & git-lfs (& the github cli)
   - git
   - git-lfs
-  - gpg
-  - fzf
-  - jq
   - gh
+- brew: # install tmux, fzf, etc for general easy terminal use
+  - tmux
+  - ripgrep
+  - starship
+  - iterm2
+  - fzf
+- brew: # install the python stack
+  - python
+  - pipx
+- brew: # install the node stack
+  - nvm
+- brew: # install the "I use clojure all the time" stack
+  - java
+  - leiningen
+  - borkdude/brew/babashka
+- brew: # install some general db tools
+  - sqlite
+  - postgresql
+  - sqlcipher
+- brew: # install some general security-related tools
+  - gpg
+  - 1password-cli
+- brew: # install writing & dev tools
+  - pandoc
+  - neovim
+  - visual-studio-code
+  - obsidian
+  - discord
+- brew: # install some other general tools
+  - jq
   - ffmpeg
   - rclone
-  - tmux
   - rust
-  - borkdude/brew/babashka
-  - ripgrep
   - gdu
-  - discord
   - docker
-  - starship
-  - obsidian
-  - sqlite
-  - sqlcipher
-  - visual-studio-code
-  - postgresql
   - coreutils # the missing GNU coreutils, macOS style
   - ollama
-  - 1password-cli
-  - iterm2
   - exiftool
-- cask:
+- cask: # install tasks & fonts that require a cask
   - signal
   - anki
   - font-fira-code

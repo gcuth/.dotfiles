@@ -52,13 +52,14 @@
   ([dir log-fp extensions]
    (log-total-word-count dir log-fp extensions false))
   ([dir log-fp extensions flat?]
-   (let [total-words (count-words-in-dir dir extensions flat?)
-         log-fp (fs/unixify (fs/expand-home log-fp))
-         now (java.time.Instant/now)
-         log-line (str (fs/unixify (fs/expand-home dir)) ", "
-                       now ", "
-                       total-words "\n")]
-     (spit log-fp log-line :append true))))
+   (let [total-words (count-words-in-dir dir extensions flat?)]
+     (when (pos? total-words)  ; Only log if word count is positive
+       (let [log-fp (fs/unixify (fs/expand-home log-fp))
+             now (java.time.Instant/now)
+             log-line (str (fs/unixify (fs/expand-home dir)) ", "
+                           now ", "
+                           total-words "\n")]
+         (spit log-fp log-line :append true))))))
 
 
 (defn- seconds-since

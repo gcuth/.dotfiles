@@ -91,7 +91,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
-
+##################
+# RUBY VIA RBENV #
+##################
+eval "$(rbenv init -)"
 
 #################
 # CUSTOM PROMPT #

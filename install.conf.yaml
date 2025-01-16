@@ -115,6 +115,8 @@
   - pipx
 - brew: # install the node stack
   - nvm
+- brew: # install a ruby environment manager
+  - rbenv
 - brew: # install the "I use clojure all the time" stack
   - java
   - leiningen

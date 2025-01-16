@@ -5,7 +5,7 @@ ie, close a lot of distracting tabs & windows.
 *)
 
 -- Define lists of sites and apps to close
-set tabsToClose to {"youtube.com", "netflix.com", "vimeo.com", "iview.abc.net.au", "stan.com.au", "reddit.com", "instagram.com", "primevideo.com", "hulu.com", "twitch.tv"}
+set tabsToClose to {"youtube.com", "netflix.com", "vimeo.com", "iview.abc.net.au", "stan.com.au", "reddit.com", "instagram.com", "primevideo.com", "hulu.com", "twitch.tv", "x.com"}
 set appsToClose to {"TV", "VLC Media Player", "QuickTime Player", "News"}
 
 -- First handle Safari tabs if Safari is running

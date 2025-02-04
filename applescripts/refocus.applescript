@@ -1,11 +1,12 @@
 (*
 A script to refocus on the important things.
 
-This involves four main steps:
+This involves five main steps:
 1. forcefully closing a lot of distracting tabs & applications;
 2. logging the currently active app;
 3. gently closing a list of inactive-but-running applications on a schedule;
-4. gently reopening some 'good' default applications on a schedule.
+4. gently reopening some 'good' default applications on a schedule;
+5. cleaning up the plist file after all other operations are complete.
 *)
 
 -- STEP 0: SETUP AND DEFINITIONS FOR HELPER FUNCTIONS -------------------------
@@ -64,13 +65,48 @@ on savePlist(plistContents)
 </plist>"
     
     -- Write the complete XML to file
-    set plistFile to open for access (plistPath as string) with write permission
-    write (xmlHeader & xmlContent & xmlFooter) to plistFile starting at 0
-    close access plistFile
+    try
+        -- First, delete the existing file if it exists
+        do shell script "rm -f " & quoted form of POSIX path of plistPath
+        
+        -- Then create a new file and write to it
+        set plistFile to open for access (plistPath as string) with write permission
+        write (xmlHeader & xmlContent & xmlFooter) to plistFile
+        close access plistFile
+    on error
+        -- Make sure we close the file even if there's an error
+        try
+            close access plistFile
+        end try
+    end try
 end savePlist
 
-
-
+-- Helper function to clean plist, keeping only most recent record per app
+on cleanPlist()
+    set plistContents to my getPlist()
+    set cleanedContents to {}
+    set processedApps to {}
+    
+    -- Go through list in reverse (most recent first)
+    repeat with i from (count plistContents) to 1 by -1
+        set plistItem to item i of plistContents
+        
+        -- Split into app name and timestamp
+        set AppleScript's text item delimiters to {"|"}
+        set itemParts to text items of plistItem
+        set appName to text item 1 of itemParts
+        set AppleScript's text item delimiters to {""}
+        
+        -- If we haven't seen this app yet, keep its record
+        if processedApps does not contain appName then
+            set end of cleanedContents to plistItem
+            set end of processedApps to appName
+        end if
+    end repeat
+    
+    -- Save the cleaned list
+    my savePlist(cleanedContents)
+end cleanPlist
 
 -- STEP 1: FORCEFUL! (ALWAYS CLOSE THESE STRAIGHT AWAY!) ----------------------
 -- Define lists of websites to close
@@ -178,3 +214,6 @@ repeat with appName in goodApps
         tell application appName to run
     end if
 end repeat
+
+-- Clean up the plist file after all operations are complete
+my cleanPlist()

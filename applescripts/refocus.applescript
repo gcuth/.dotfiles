@@ -173,7 +173,7 @@ my savePlist(plistContents)
 -- For each app & defined inactivity time (in minutes), check if it's been inactive for that
 -- long. If so, quit it.
 -- Define the inactivity times for each app
-set distractingApps to {{name:"Safari", threshold:10}, {name:"Mail", threshold:10}, {name:"Messages", threshold:10}, {name:"Signal", threshold:10}, {name:"Discord", threshold:10}}
+set distractingApps to {{name:"Safari", threshold:60}, {name:"Mail", threshold:10}, {name:"Messages", threshold:5}, {name:"Signal", threshold:5}, {name:"Discord", threshold:5}, {name:"Claude", threshold:15}}
 
 -- Run through the distracting apps and check if they've been inactive for a while
 repeat with appRecord in distractingApps

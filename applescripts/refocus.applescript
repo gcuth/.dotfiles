@@ -173,7 +173,15 @@ my savePlist(plistContents)
 -- For each app & defined inactivity time (in minutes), check if it's been inactive for that
 -- long. If so, quit it.
 -- Define the inactivity times for each app
-set distractingApps to {{name:"Safari", threshold:60}, {name:"Mail", threshold:10}, {name:"Messages", threshold:5}, {name:"Signal", threshold:5}, {name:"Discord", threshold:5}, {name:"Claude", threshold:15}}
+set distractingApps to {Â
+    {name:"Safari", threshold:60}, Â
+    {name:"Mail", threshold:10}, Â
+    {name:"Messages", threshold:5}, Â
+    {name:"Signal", threshold:5}, Â
+    {name:"Discord", threshold:5}, Â
+    {name:"Claude", threshold:15}, Â
+    {name:"Calendar", threshold:10}, Â
+    {name:"Cursor", threshold:120}}
 
 -- Run through the distracting apps and check if they've been inactive for a while
 repeat with appRecord in distractingApps
@@ -206,7 +214,7 @@ end repeat
 
 -- STEP 4: GENTLE! (OPEN THESE IF THEY'RE NOT RUNNING) ----------------------
 -- Define the good apps to open
-set goodApps to {"Obsidian", "OmniFocus", "Timery"}
+set goodApps to {"Obsidian", "OmniFocus", "Timery", "Zotero"}
 
 -- Loop through the good apps and open them (in the background) if they're *not* already running
 repeat with appName in goodApps

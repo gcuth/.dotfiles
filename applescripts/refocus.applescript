@@ -181,7 +181,8 @@ set distractingApps to {Â
     {name:"Discord", threshold:5}, Â
     {name:"Claude", threshold:15}, Â
     {name:"Calendar", threshold:10}, Â
-    {name:"Cursor", threshold:120}}
+    {name:"Cursor", threshold:120}, Â
+    {name:"Photos", threshold:120}}
 
 -- Run through the distracting apps and check if they've been inactive for a while
 repeat with appRecord in distractingApps

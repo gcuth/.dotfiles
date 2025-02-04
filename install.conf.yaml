@@ -192,7 +192,7 @@
     command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/Thesis/ --log ~/Logs/thesis_word_delta.log | tr -d "\n")"
   # every minute, run the 'refocus' applescript
   - cron: "* * * * *"
-    command: osascript ~/.dotfiles/applescripts/refocus.scpt
+    command: osascript ~/.dotfiles/applescripts/refocus.applescript
   # every five minutes, run the 'every five minutes' shortcut
   - cron: "*/5 * * * *"
     command: shortcuts run "Every Five Minutes"

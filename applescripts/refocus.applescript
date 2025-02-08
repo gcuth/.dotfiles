@@ -109,6 +109,8 @@ on cleanPlist()
 end cleanPlist
 
 -- STEP 1: FORCEFUL! (ALWAYS CLOSE THESE STRAIGHT AWAY!) ----------------------
+log "Starting Step 1: Forcefully closing distracting tabs and applications..."
+
 -- Define lists of websites to close
 set tabsToClose to {"youtube.com", "netflix.com", "vimeo.com", "iview.abc.net.au", "stan.com.au", "reddit.com", "instagram.com", "primevideo.com", "hulu.com", "twitch.tv", "x.com", "tiktok.com", "twitter.com", "facebook.com", "snapchat.com", "discord.com", "discord.gg", "discord.io", "discord.net", "discord.org"}
 -- Define a list of applications to close
@@ -117,6 +119,7 @@ set appsToClose to {"TV", "VLC Media Player", "QuickTime Player", "News", "Spoti
 -- First handle Safari tabs (if Safari is running)
 tell application "System Events"
     if exists (process "Safari") then
+        log "Found Safari running - checking tabs..."
         tell application "Safari"
             -- Get all windows
             repeat with thisWindow in windows
@@ -131,6 +134,7 @@ tell application "System Events"
                             repeat with domainName in tabsToClose
                                 if tabURL contains contents of domainName then
                                     -- Close the tab
+                                    log "Closing distracting tab: " & tabURL
                                     close thisTab
                                     exit repeat
                                 end if
@@ -148,19 +152,25 @@ tell application "System Events"
 end tell
 
 -- Handle closing specific applications
+log "Checking for distracting applications to close..."
 tell application "System Events"
     repeat with appName in appsToClose
         if exists (process appName) then
+            log "Closing application: " & appName
             tell application appName to quit
         end if
     end repeat
 end tell
 
 -- STEP 2: LOG THE CURRENTLY ACTIVE APP ----------------------------
+log "Starting Step 2: Logging currently active application..."
+
 -- Get the name of the currently active application
 tell application "System Events"
     set activeAppName to name of the first process whose frontmost is true
 end tell
+
+log "Currently active application: " & activeAppName
 
 -- Update timestamp for currently active app
 set currentTime to current date
@@ -170,6 +180,8 @@ my savePlist(plistContents)
 
 
 -- STEP 3: GENTLE! (CLOSE THESE IF THEY'VE BEEN INACTIVE FOR A WHILE) ----------------------
+log "Starting Step 3: Checking for inactive applications..."
+
 -- For each app & defined inactivity time (in minutes), check if it's been inactive for that
 -- long. If so, quit it.
 -- Define the inactivity times for each app
@@ -190,6 +202,7 @@ repeat with appRecord in distractingApps
     set appThreshold to threshold of (contents of appRecord)
     
     if currentApp is not activeAppName and application currentApp is running then
+        log "Checking inactivity for: " & currentApp
         -- Get the inactivity threshold for this app (in minutes) & convert to seconds
         set appThreshold to appThreshold * 60
         -- Get the last active time for this app
@@ -206,6 +219,7 @@ repeat with appRecord in distractingApps
         if lastActiveTime is not missing value then
             set inactiveDuration to (currentTime - lastActiveTime)
             if inactiveDuration > appThreshold then
+                log "Closing " & currentApp & " due to inactivity (" & (inactiveDuration div 60) & " minutes)"
                 tell application currentApp to quit
             end if
         end if
@@ -214,15 +228,21 @@ end repeat
 
 
 -- STEP 4: GENTLE! (OPEN THESE IF THEY'RE NOT RUNNING) ----------------------
+log "Starting Step 4: Opening productive applications..."
+
 -- Define the good apps to open
 set goodApps to {"Obsidian", "OmniFocus", "Timery", "Zotero"}
 
 -- Loop through the good apps and open them (in the background) if they're *not* already running
 repeat with appName in goodApps
     if application appName is not running then
+        log "Opening application: " & appName
         tell application appName to run
     end if
 end repeat
 
+log "Cleaning up plist file..."
 -- Clean up the plist file after all operations are complete
 my cleanPlist()
+
+log "Refocus script completed successfully!"

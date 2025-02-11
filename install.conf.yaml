@@ -140,10 +140,11 @@
   - rclone
   - rust
   - gdu
-  - docker
   - coreutils # the missing GNU coreutils, macOS style
   - ollama
   - exiftool
+- cask: # install docker desktop
+  - docker
 - cask: # install tasks & fonts that require a cask
   - signal
   - anki

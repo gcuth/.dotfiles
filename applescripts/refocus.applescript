@@ -2,7 +2,7 @@
 A script to refocus on the important things.
 
 This involves five main steps:
-1. forcefully closing a lot of distracting tabs & applications;
+1. forcefully closing a lot of always-distracting tabs & applications;
 2. logging the currently active app;
 3. gently closing a list of inactive-but-running applications on a schedule;
 4. gently reopening some 'good' default applications on a schedule;

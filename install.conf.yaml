@@ -44,6 +44,7 @@
     - ~/Torrents/Incomplete/ # directory for incomplete torrent downloads
     - ~/Torrents/Complete/   # directory for complete torrent downloads
     - ~/Logs/                # convenience for lil script logs etc
+    - ~/Snapshots/           # directory for incremental snapshots of things
 
 
 ###############################################################################

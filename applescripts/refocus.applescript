@@ -191,7 +191,7 @@ set distractingApps to {Â
     {name:"Messages", threshold:5}, Â
     {name:"Signal", threshold:5}, Â
     {name:"Discord", threshold:5}, Â
-    {name:"Claude", threshold:15}, Â
+    {name:"Claude", threshold:60}, Â
     {name:"Calendar", threshold:10}, Â
     {name:"Cursor", threshold:120}, Â
     {name:"Google Chrome", threshold:60}, Â

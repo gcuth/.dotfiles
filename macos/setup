@@ -341,6 +341,14 @@ defaults write org.m0k.transmission WarningDonate -bool false
 defaults write org.m0k.transmission WarningLegal -bool false
 
 
+###############################################################################
+############################ ANKI (& ANKI-CONNECT) ############################
+###############################################################################
+
+# Disable app nap for Anki so that anki connect always works when anki is open:
+defaults write net.ankiweb.dtop NSAppSleepDisabled -bool true
+defaults write net.ichi2.anki NSAppSleepDisabled -bool true
+defaults write org.qt-project.Qt.QtWebEngineCore NSAppSleepDisabled -bool true
 
 ###############################################################################
 ################################# TIDY/FINISH #################################

@@ -232,7 +232,7 @@ end repeat
 log "Starting Step 4: Opening productive applications..."
 
 -- Define the good apps to open
-set goodApps to {"Obsidian", "OmniFocus", "Timery", "Zotero"}
+set goodApps to {"Obsidian", "OmniFocus", "Timery", "Zotero", "Anki"}
 
 -- Loop through the good apps and open them (in the background) if they're *not* already running
 repeat with appName in goodApps

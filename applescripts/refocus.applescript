@@ -180,10 +180,11 @@ my savePlist(plistContents)
 
 
 -- STEP 3: GENTLE! (CLOSE THESE IF THEY'VE BEEN INACTIVE FOR A WHILE) ----------------------
+-- Note: This skips in the event that any one of the 'skipClosingWhenOpenApps' is open. ----
 log "Starting Step 3: Checking for inactive applications..."
-
 -- For each app & defined inactivity time (in minutes), check if it's been inactive for that
 -- long. If so, quit it.
+
 -- Define the inactivity times for each app
 set distractingApps to {Â
     {name:"Safari", threshold:60}, Â
@@ -197,36 +198,52 @@ set distractingApps to {Â
     {name:"Google Chrome", threshold:60}, Â
     {name:"Photos", threshold:120}}
 
+-- Define the apps that, if open, should cause us to skip closing any of the distracting apps.
+set skipClosingWhenOpenApps to {"Audio Hijack"}
+set skipClosing to false -- will be set to true if any of the skipClosingWhenOpenApps are open
+
+-- Check if any of the skipClosingWhenOpenApps are open
+tell application "System Events"
+    repeat with appName in skipClosingWhenOpenApps
+        if exists (process appName) then
+            log "Skipping closing of distracting apps because " & appName & " is open."
+            set skipClosing to true
+            exit repeat
+        end if
+    end repeat
+end tell
+
 -- Run through the distracting apps and check if they've been inactive for a while
-repeat with appRecord in distractingApps
-    set currentApp to name of (contents of appRecord)
-    set appThreshold to threshold of (contents of appRecord)
-    
-    if currentApp is not activeAppName and application currentApp is running then
-        log "Checking inactivity for: " & currentApp
-        -- Get the inactivity threshold for this app (in minutes) & convert to seconds
-        set appThreshold to appThreshold * 60
-        -- Get the last active time for this app
-        set lastActiveTime to missing value
-        set plistContents to my getPlist()
-        repeat with plistItem in plistContents
-            if plistItem contains currentApp then
-                set AppleScript's text item delimiters to {"|"}
-                set lastActiveTime to date (text item 2 of plistItem)
-                set AppleScript's text item delimiters to {""}
-            end if
-        end repeat
-        -- Check if app has been inactive longer than threshold
-        if lastActiveTime is not missing value then
-            set inactiveDuration to (currentTime - lastActiveTime)
-            if inactiveDuration > appThreshold then
-                log "Closing " & currentApp & " due to inactivity (" & (inactiveDuration div 60) & " minutes)"
-                tell application currentApp to quit
+-- unless we're skipping closing due to an open skipClosingWhenOpenApp.
+if skipClosing is false then
+    repeat with appRecord in distractingApps
+        set currentApp to name of (contents of appRecord)
+        set appThreshold to threshold of (contents of appRecord)
+        if currentApp is not activeAppName and application currentApp is running then
+            log "Checking inactivity for: " & currentApp
+            -- Get the inactivity threshold for this app (in minutes) & convert to seconds
+            set appThreshold to appThreshold * 60
+            -- Get the last active time for this app
+            set lastActiveTime to missing value
+            set plistContents to my getPlist()
+            repeat with plistItem in plistContents
+                if plistItem contains currentApp then
+                    set AppleScript's text item delimiters to {"|"}
+                    set lastActiveTime to date (text item 2 of plistItem)
+                    set AppleScript's text item delimiters to {""}
+                end if
+            end repeat
+            -- Check if app has been inactive longer than threshold
+            if lastActiveTime is not missing value then
+                set inactiveDuration to (currentTime - lastActiveTime)
+                if inactiveDuration > appThreshold then
+                    log "Closing " & currentApp & " due to inactivity (" & (inactiveDuration div 60) & " minutes)"
+                    tell application currentApp to quit
+                end if
             end if
         end if
-    end if
-end repeat
-
+    end repeat
+end if
 
 -- STEP 4: GENTLE! (OPEN THESE IF THEY'RE NOT RUNNING) ----------------------
 log "Starting Step 4: Opening productive applications..."

@@ -135,7 +135,7 @@
   - visual-studio-code
   - obsidian
   - discord
-- brew: # install some other general tools
+- brew: # install some other general tools & qol improvements
   - jq
   - ffmpeg
   - rclone
@@ -144,6 +144,7 @@
   - coreutils # the missing GNU coreutils, macOS style
   - ollama
   - exiftool
+  - hovrly
 - cask: # install docker desktop
   - docker
 - cask: # install tasks & fonts that require a cask

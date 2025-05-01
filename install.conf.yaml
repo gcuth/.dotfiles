@@ -145,6 +145,7 @@
   - ollama
   - exiftool
   - hovrly
+  - yt-dlp
 - cask: # install docker desktop
   - docker
 - cask: # install tasks & fonts that require a cask

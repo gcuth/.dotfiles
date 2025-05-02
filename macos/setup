@@ -167,14 +167,14 @@ defaults write com.apple.finder EmptyTrashSecurely -bool true
 defaults write com.apple.finder FXRemoveOldTrashItems -bool true
 
 # MENU BAR TIME FORMAT --------------------------------------------------------
-# (24 hour time with seconds; no other details)
-defaults write com.apple.menuextra.clock "DateFormat" -string "HH:mm:ss"
+# (24 hour time, no seconds; no other details)
+defaults write com.apple.menuextra.clock "DateFormat" -string "HH:mm"
 defaults write com.apple.menuextra.clock "IsAnalog" -bool false
 defaults write com.apple.menuextra.clock "FlashDateSeparators" -bool false
 defaults write com.apple.menuextra.clock "ShowDayOfWeek" -bool false
 defaults write com.apple.menuextra.clock "ShowAMPM" -bool false
 defaults write com.apple.menuextra.clock "Show24Hour" -bool true
-defaults write com.apple.menuextra.clock "ShowSeconds" -bool true
+defaults write com.apple.menuextra.clock "ShowSeconds" -bool false
 
 
 ###############################################################################

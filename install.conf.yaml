@@ -135,6 +135,7 @@
   - visual-studio-code
   - obsidian
   - discord
+  - espanso # text expansion
 - brew: # install some other general tools & qol improvements
   - jq
   - ffmpeg

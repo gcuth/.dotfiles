@@ -31,7 +31,7 @@
 ################################# CLEAN START #################################
 ###############################################################################
 
-- clean: ['~', '~/.local/bin/', '~/Library/Application Support/Code/User/snippets/']
+- clean: ['~', '~/.local/bin/', '~/Library/Application Support/Code/User/snippets/', '~/Library/Application Support/espanso/match/', '~/Library/Application Support/espanso/config/']
 
 
 ###############################################################################
@@ -85,8 +85,14 @@
       relink: true
       force: true
     ~/Library/Application Support/Code/User/snippets/:
-      path: snippets/**
+      path: snippets/code/**
       glob: true
+      create: true
+    ~/Library/Application Support/espanso/config/default.yml:
+      path: snippets/espanso/config.yml
+      create: true
+    ~/Library/Application Support/espanso/match/base.yml:
+      path: snippets/espanso/match.yml
       create: true
 
 

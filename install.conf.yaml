@@ -201,8 +201,8 @@
   # every minute, set the One Thing menu bar item to match writing progress
   - cron: "* * * * *"
     command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/Thesis/ --log ~/Logs/thesis_word_delta.log | tr -d "\n")"
-  # every minute, run the 'refocus' applescript
-  - cron: "* * * * *"
+  # every minute, run the 'refocus' applescript (5am - 5pm)
+  - cron: "* 5-17 * * *"
     command: osascript ~/.dotfiles/applescripts/refocus.applescript
   # every five minutes, run the 'every five minutes' shortcut
   - cron: "*/5 * * * *"

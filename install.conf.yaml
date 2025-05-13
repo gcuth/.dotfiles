@@ -92,7 +92,7 @@
       path: snippets/espanso/config.yml
       create: true
     ~/Library/Application Support/espanso/match/base.yml:
-      path: snippets/espanso/match.yml
+      path: snippets/espanso/matches/base.yml
       create: true
 
 

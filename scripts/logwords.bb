@@ -77,6 +77,18 @@
         (.until now java.time.temporal.ChronoUnit/SECONDS)
         int)))
 
+(defn- seconds-since-local-midnight
+  "Get the number of seconds between now and the start of the current *local*
+   system day."
+  []
+  (let [utc-now (java.time.Instant/now)
+        local-now (.atZone utc-now (java.time.ZoneId/systemDefault))
+        start-of-day (.withSecond (.withMinute (.withHour local-now 0) 0) 0)]
+    ;; get the number of seconds between the local now and the local start of day
+    (-> start-of-day
+        (.until local-now java.time.temporal.ChronoUnit/SECONDS)
+        int)))
+
 
 (defn- read-log
   "Read the log of the total number of words as a list of integers. We expect a
@@ -212,7 +224,10 @@
 
 
 (defn -main
-  ""
+  "Count the number of words in a target directory, log the total word count to
+   a target log file, then print a report on the change in word count since
+   midnight of the current day. If 'n' is provided, log file will be trimmed
+   to the most recent n entries."
   []
   (let [{:keys [dir log n report flat]} (cli/parse-opts *command-line-args* cli-opts)]
     (cond (nil? dir) (println "Please provide a directory to count words in.")
@@ -222,16 +237,17 @@
           (= true report) (println (generate-report log))
           :else (do (log-total-word-count dir log ["txt" "md"] flat)
                     (trim-log log (or n (get-in cli-opts [:n :default])))
-                    (let [deltas (->> (read-log log)
-                                      (calculate-deltas))
+                    (let [deltas (->> (read-log log) (calculate-deltas))
                           change (int (avg [(ewma deltas) (last deltas)]))
                           change (if (pos? change)
                                    (str "+" change)
                                    (str change))
-                          wc-yesterday (first (read-log log (* 24 60 60)))
                           wc-now (last (read-log log))
-                          in-24h (- wc-now wc-yesterday)]
-                      (println (str in-24h
+                          ;; wc-24-hours-ago (first (read-log log (* 24 60 60)))
+                          ;; in-last-24h (- wc-now wc-24-hours-ago) 
+                          wc-at-midnight (first (read-log log (+ (seconds-since-local-midnight) 60)))
+                          wc-since-midnight (- wc-now wc-at-midnight)]
+                      (println (str wc-since-midnight
                                     " (" change ")")))))))
 
 (-main)

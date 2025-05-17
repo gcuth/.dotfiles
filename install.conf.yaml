@@ -200,10 +200,10 @@
     command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv
   # every minute, set the One Thing menu bar item to match writing progress
   - cron: "* * * * *"
-    command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/Thesis/ --log ~/Logs/thesis_word_delta.log | tr -d "\n")"
-  # every minute, run the 'refocus' applescript ... unless you've logged over 100 words already
+    command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/ --log ~/Logs/word_delta.log | tr -d "\n")"
+  # every minute, run the 'refocus' applescript ... unless you've logged over 1000 words already
   - cron: "* * * * *"
-    command: number=$(/usr/bin/defaults read com.sindresorhus.One-Thing text 2>/dev/null | /usr/bin/tr -d "\n" | /usr/bin/sed 's/ .*//g') && [[ "$number" =~ ^-?[0-9]+$ ]] && (( number < 100 )) && /usr/bin/osascript ~/.dotfiles/applescripts/refocus.applescript
+    command: number=$(/usr/bin/defaults read com.sindresorhus.One-Thing text 2>/dev/null | /usr/bin/tr -d "\n" | /usr/bin/sed 's/ .*//g') && [[ "$number" =~ ^-?[0-9]+$ ]] && (( number < 1000 )) && /usr/bin/osascript ~/.dotfiles/applescripts/refocus.applescript
   # every five minutes, run the 'every five minutes' shortcut
   - cron: "*/5 * * * *"
     command: shortcuts run "Every Five Minutes"

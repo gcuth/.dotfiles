@@ -186,16 +186,15 @@ log "Starting Step 3: Checking for inactive applications..."
 -- long. If so, quit it.
 
 -- Define the inactivity times for each app
-set distractingApps to {Â
-    {name:"Safari", threshold:60}, Â
-    {name:"Mail", threshold:10}, Â
-    {name:"Messages", threshold:5}, Â
-    {name:"Signal", threshold:5}, Â
-    {name:"Discord", threshold:5}, Â
-    {name:"Claude", threshold:60}, Â
-    {name:"Calendar", threshold:10}, Â
-    {name:"Cursor", threshold:120}, Â
-    {name:"Google Chrome", threshold:60}, Â
+set distractingApps to {Â¬
+    {name:"Safari", threshold:60}, Â¬
+    {name:"Mail", threshold:10}, Â¬
+    {name:"Messages", threshold:5}, Â¬
+    {name:"Signal", threshold:5}, Â¬
+    {name:"Discord", threshold:5}, Â¬
+    {name:"Calendar", threshold:10}, Â¬
+    {name:"Cursor", threshold:120}, Â¬
+    {name:"Google Chrome", threshold:60}, Â¬
     {name:"Photos", threshold:120}}
 
 -- Define the apps that, if open, should cause us to skip closing any of the distracting apps.
@@ -249,7 +248,7 @@ end if
 log "Starting Step 4: Opening productive applications..."
 
 -- Define the good apps to open
-set goodApps to {"Obsidian", "OmniFocus", "Timery", "Zotero", "Anki"}
+set goodApps to {"Obsidian", "OmniFocus", "Timery", "Zotero", "Anki", "Claude"}
 
 -- Loop through the good apps and open them (in the background) if they're *not* already running
 repeat with appName in goodApps

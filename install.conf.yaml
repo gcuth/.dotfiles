@@ -155,12 +155,14 @@
   - yt-dlp
 - cask: # install docker desktop
   - docker
+- cask: # fonts of my choosing
+  - font-fira-code # monospace with ligatures for code
+  - font-hack-nerd-font # nerd icons for use in the terminal
+  - font-b612 # the most legible humanist sans serif so far (thanks airbus!)
+  - font-b612-mono # the most legible sans serif font's mutant monospace sister
 - cask: # install tasks & fonts that require a cask
   - signal
   - anki
-  - font-fira-code
-  - font-hack-nerd-font
-  - textexpander
   - rescuetime
   - protonvpn
   - protonmail-bridge

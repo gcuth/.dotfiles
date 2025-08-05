@@ -10,8 +10,8 @@ scan_timeout = 10
 
 # Set a simple prompt character
 [character]
-success_symbol = "[==](bold green)"
-error_symbol = "[!=](bold red)"
+success_symbol = "[>](bold green)"
+error_symbol = "[!](bold red)"
 
 # disable aws region (etc) info
 [aws]

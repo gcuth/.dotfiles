@@ -181,14 +181,15 @@ my savePlist(plistContents)
 
 -- STEP 3: GENTLE! (CLOSE THESE IF THEY'VE BEEN INACTIVE FOR A WHILE) ----------------------
 -- Note: This skips in the event that any one of the 'skipClosingWhenOpenApps' is open. ----
-log "Starting Step 3: Checking for inactive applications..."
 -- For each app & defined inactivity time (in minutes), check if it's been inactive for that
 -- long. If so, quit it.
 
+log "Starting Step 3: Checking for inactive applications..."
+
 -- Define the inactivity times for each app
+
 set distractingApps to {¬
     {name:"Safari", threshold:60}, ¬
-    {name:"Mail", threshold:10}, ¬
     {name:"Messages", threshold:5}, ¬
     {name:"Signal", threshold:5}, ¬
     {name:"Discord", threshold:5}, ¬
@@ -198,8 +199,10 @@ set distractingApps to {¬
     {name:"Photos", threshold:120}}
 
 -- Define the apps that, if open, should cause us to skip closing any of the distracting apps.
+
 set skipClosingWhenOpenApps to {"Audio Hijack"}
-set skipClosing to false -- will be set to true if any of the skipClosingWhenOpenApps are open
+-- set skipClosing to false -- will be set to true if any of the skipClosingWhenOpenApps are open
+set skipClosing to true -- TRUE FOR NOW, so we're not closing any apps.
 
 -- Check if any of the skipClosingWhenOpenApps are open
 tell application "System Events"
@@ -250,13 +253,17 @@ log "Starting Step 4: Opening productive applications..."
 -- Define the good apps to open
 set goodApps to {"Obsidian", "OmniFocus", "Timery", "Zotero", "Anki", "Claude"}
 
+set skipOpening to true -- TRUE FOR NOW, so we're not opening any apps.
+
 -- Loop through the good apps and open them (in the background) if they're *not* already running
-repeat with appName in goodApps
-    if application appName is not running then
-        log "Opening application: " & appName
-        tell application appName to run
-    end if
-end repeat
+if skipOpening is false then
+    repeat with appName in goodApps
+        if application appName is not running then
+            log "Opening application: " & appName
+            tell application appName to run
+        end if
+    end repeat
+end if
 
 log "Cleaning up plist file..."
 -- Clean up the plist file after all operations are complete

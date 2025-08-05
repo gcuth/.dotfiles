@@ -94,6 +94,9 @@
     ~/Library/Application Support/espanso/match/base.yml:
       path: snippets/espanso/matches/base.yml
       create: true
+    ~/Library/Application Support/espanso/match/pretty.yml:
+      path: snippets/espanso/matches/pretty.yml
+      create: true
 
 
 ###############################################################################

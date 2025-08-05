@@ -1,0 +1,13 @@
+# espanso match file
+#
+# This file is used to define 'pretty' snippets: words where I want to replace
+# the trigger word with one containing special non-ascii characters for
+# 'correctness' and/or persnicketyness (eg 'naive'-> 'naïve').
+#
+# (It's an ad-hoc list, and it needs expansion (pun intended).)
+
+matches:
+  - trigger: "naive"
+    replace: "naïve"
+  - trigger: "facade"
+    replace: "façade"

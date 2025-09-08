@@ -31,7 +31,7 @@
 ################################# CLEAN START #################################
 ###############################################################################
 
-- clean: ['~', '~/.local/bin/', '~/Library/Application Support/Code/User/snippets/', '~/Library/Application Support/espanso/match/', '~/Library/Application Support/espanso/config/']
+- clean: ['~', '~/.local/bin/', '~/Library/Application Support/espanso/match/', '~/Library/Application Support/espanso/config/']
 
 
 ###############################################################################
@@ -79,15 +79,6 @@
       create: true
     ~/.lein/profiles.clj:
       path: lein/profiles.clj
-    ~/Library/Application Support/Code/User/settings.json:
-      path: vscode/settings.json
-      create: true
-      relink: true
-      force: true
-    ~/Library/Application Support/Code/User/snippets/:
-      path: snippets/code/**
-      glob: true
-      create: true
     ~/Library/Application Support/espanso/config/default.yml:
       path: snippets/espanso/config.yml
       create: true
@@ -141,7 +132,6 @@
 - brew: # install writing & dev tools
   - pandoc
   - neovim
-  - visual-studio-code
   - obsidian
   - discord
   - espanso # text expansion
@@ -174,7 +164,7 @@
   - zoom
   - bartender
   - transmission
-  - cursor
+  - zed
   - hazel
 
 
@@ -184,15 +174,6 @@
 
 - shell:
   - [ test -e /Applications/Audio\ Hijack.app || open "https://rogueamoeba.com/audiohijack/download.php" ]
-
-
-###############################################################################
-############################## VSCODE EXTENSIONS ##############################
-###############################################################################
-
-# IF VSCODE EXISTS, INSTALL BASIC EXTENSIONS FROM FILE
-- shell:
-  - [ test -e `which code` && cat /Users/g/.dotfiles/vscode/extensions.txt | xargs -n 1 code --install-extension ]
 
 
 ###############################################################################

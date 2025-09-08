@@ -25,7 +25,9 @@ export GPG_TTY=$(tty)
 ##########
 # EDITOR #
 ##########
-if [ -f `which cursor` ]; then
+if [ -f `which zed` ]; then
+    export VISUAL=`which zed`
+elif [ -f `which cursor` ]; then
     export VISUAL=`which cursor`
 elif [ -f `which code` ]; then
     export VISUAL=`which code`

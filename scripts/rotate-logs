@@ -22,7 +22,7 @@ set -euo pipefail
 # -----------------------------------------------------------------------------
 
 readonly LOG_DIR="${LOG_DIR:-$HOME/Logs}"
-readonly MAX_SIZE_MB="${MAX_SIZE_MB:-10}"          # Rotate logs over this size
+readonly MAX_SIZE_MB="${MAX_SIZE_MB:-50}"          # Rotate logs over this size
 readonly MAX_SIZE_BYTES=$((MAX_SIZE_MB * 1024 * 1024))
 readonly KEEP_ROTATED="${KEEP_ROTATED:-5}"         # Number of rotated logs to keep
 readonly COMPRESS="${COMPRESS:-true}"              # Compress rotated logs
@@ -198,7 +198,7 @@ Options:
 
 Configuration (via environment variables):
   LOG_DIR       Log directory (default: ~/Logs)
-  MAX_SIZE_MB   Rotation threshold in MB (default: 10)
+  MAX_SIZE_MB   Rotation threshold in MB (default: 50)
   KEEP_ROTATED  Number of rotated logs to keep (default: 5)
   COMPRESS      Compress rotated logs (default: true)
 

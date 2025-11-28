@@ -1,42 +1,21 @@
-# espanso match file
-
-# For a complete introduction, visit the official docs at: https://espanso.org/docs/
-
-# You can use this file to define the base matches (aka snippets)
-# that will be available in every application when using espanso.
-
-# Matches are substitution rules: when you type the "trigger" string
-# it gets replaced by the "replace" string.
-
-# You can do...
-  
-  # Simple text replacement
-  # - trigger: ":espanso"
-  #   replace: "Hi there!"
-  
-  # But matches can also be dynamic:
-  # - trigger: "ddate"
-  #   replace: "{{mydate}}"
-  #   vars:
-  #     - name: mydate
-  #       type: date
-  #       params:
-  #         format: "%Y-%m-%d"
-
-  # Print the output of a shell command: 
-  # - trigger: ":shell"
-  #   replace: "{{output}}"
-  #   vars:
-  #     - name: output
-  #       type: shell
-  #       params:
-  #         cmd: "echo 'Hello from your shell'"
-
-  # And much more! For more information, visit the docs: https://espanso.org/docs/
-
+# =============================================================================
+# Espanso Base Matches - gcuth dotfiles
+# =============================================================================
+# Core snippets available in all applications.
+#
+# Trigger conventions:
+#   - Double letter prefix (ddate, ttime) for date/time
+#   - Double letter prefix (nname, mmail) for personal info
+#
+# For documentation: https://espanso.org/docs/
+# =============================================================================
 
 matches:
-  # Print the current date
+  # ---------------------------------------------------------------------------
+  # Date & Time
+  # ---------------------------------------------------------------------------
+
+  # ISO date: 2024-01-15
   - trigger: "ddate"
     replace: "{{mydate}}"
     vars:
@@ -45,7 +24,7 @@ matches:
         params:
           format: "%Y-%m-%d"
 
-  # Print the current time
+  # Time: 14:30:45
   - trigger: "ttime"
     replace: "{{mytime}}"
     vars:
@@ -53,11 +32,10 @@ matches:
         type: date
         params:
           format: "%H:%M:%S"
-  
-  # Print the current 'now' (ie, date+time+tz+ em-dash)
-  # (This is useful for quick journal logging etc.)
+
+  # Full timestamp for logging: 2024-01-15 14:30:45 (+1100) -
   - trigger: "nnow"
-    replace: "{{mydate}} {{mytime}} ({{myutcoffset}}) — "
+    replace: "{{mydate}} {{mytime}} ({{myutcoffset}}) - "
     vars:
       - name: mydate
         type: date
@@ -71,13 +49,13 @@ matches:
         type: date
         params:
           format: "%z"
-  
-  # Print a big break/horizontal rule for markdown text
-  - trigger: "bbr"
-    replace: "--------------------\n"
 
-  # Print some static/useful details about myself
+  # ---------------------------------------------------------------------------
+  # Personal Information
+  # ---------------------------------------------------------------------------
+
   - trigger: "nname"
     replace: "Galen Cuthbertson"
+
   - trigger: "mmail"
     replace: "g@galen.me"

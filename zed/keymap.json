@@ -1,0 +1,102 @@
+// =============================================================================
+// ZED KEYMAP
+// =============================================================================
+// Custom keybindings for Zed editor.
+// Documentation: https://zed.dev/docs/key-bindings
+//
+// Format: { "context": "...", "bindings": { "keys": "action" } }
+// To see default bindings: cmd+shift+p -> "zed: open default keymap"
+// =============================================================================
+
+[
+  // ---------------------------------------------------------------------------
+  // Global Bindings
+  // ---------------------------------------------------------------------------
+  {
+    "context": "Workspace",
+    "bindings": {
+      // File operations
+      "cmd-shift-n": "workspace::NewFile",
+
+      // Panel toggles
+      "cmd-b": "workspace::ToggleLeftDock",
+      "cmd-j": "terminal_panel::ToggleFocus",
+
+      // Quick navigation
+      "cmd-shift-o": "file_finder::Toggle",
+      "cmd-shift-f": "pane::DeploySearch"
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Editor Bindings
+  // ---------------------------------------------------------------------------
+  {
+    "context": "Editor",
+    "bindings": {
+      // Line manipulation
+      "alt-up": "editor::MoveLineUp",
+      "alt-down": "editor::MoveLineDown",
+
+      // Multi-cursor
+      "cmd-d": "editor::SelectNext",
+      "cmd-shift-l": "editor::SelectAllMatches",
+
+      // Code actions
+      "cmd-.": "editor::ToggleCodeActions",
+      "f2": "editor::Rename",
+      "f12": "editor::GoToDefinition",
+      "shift-f12": "editor::FindAllReferences",
+
+      // Comments
+      "cmd-/": "editor::ToggleComments"
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Vim Mode Bindings
+  // ---------------------------------------------------------------------------
+  {
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      // Window navigation (vim-style)
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+
+      // Quick save
+      "space w": "workspace::Save",
+
+      // Quick file finder
+      "space f": "file_finder::Toggle",
+
+      // Quick search
+      "space s": "pane::DeploySearch",
+
+      // Toggle file tree
+      "space e": "workspace::ToggleLeftDock",
+
+      // Close buffer
+      "space q": "pane::CloseActiveItem",
+
+      // Split panes
+      "space v": "pane::SplitRight",
+      "space h": "pane::SplitDown"
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // Terminal Bindings
+  // ---------------------------------------------------------------------------
+  {
+    "context": "Terminal",
+    "bindings": {
+      // Escape to editor
+      "cmd-escape": "workspace::ToggleBottomDock",
+
+      // Clear terminal
+      "cmd-k": "terminal::Clear"
+    }
+  }
+]

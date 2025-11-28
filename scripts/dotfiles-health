@@ -1,0 +1,515 @@
+#!/usr/bin/env bash
+# =============================================================================
+# DOTFILES HEALTH CHECK
+# =============================================================================
+# Verifies that the dotfiles setup is working correctly.
+#
+# Checks:
+#   - Required commands are installed
+#   - Symlinks are intact
+#   - Cron jobs are registered
+#   - Homebrew packages are up to date
+#   - Git configuration is valid
+#
+# Usage:
+#   dotfiles-health              # Run all checks
+#   dotfiles-health --quick      # Skip slow checks (brew outdated)
+#   dotfiles-health --fix        # Attempt to fix issues (re-run install)
+#
+# Exit codes:
+#   0 - All checks passed
+#   1 - Some checks failed
+# =============================================================================
+
+set -uo pipefail
+
+# -----------------------------------------------------------------------------
+# CONFIGURATION
+# -----------------------------------------------------------------------------
+
+readonly DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Counters
+PASS_COUNT=0
+FAIL_COUNT=0
+WARN_COUNT=0
+
+# -----------------------------------------------------------------------------
+# OUTPUT HELPERS
+# -----------------------------------------------------------------------------
+
+print_header() {
+    echo -e "\n${BLUE}=== $1 ===${NC}\n"
+}
+
+print_pass() {
+    echo -e "  ${GREEN}✓${NC} $1"
+    ((PASS_COUNT++))
+}
+
+print_fail() {
+    echo -e "  ${RED}✗${NC} $1"
+    ((FAIL_COUNT++))
+}
+
+print_warn() {
+    echo -e "  ${YELLOW}!${NC} $1"
+    ((WARN_COUNT++))
+}
+
+print_info() {
+    echo -e "  ${BLUE}ℹ${NC} $1"
+}
+
+# -----------------------------------------------------------------------------
+# CHECK FUNCTIONS
+# -----------------------------------------------------------------------------
+
+check_required_commands() {
+    print_header "Required Commands"
+
+    local commands=(
+        "git:Version control"
+        "brew:Package manager"
+        "bb:Babashka (Clojure scripting)"
+        "gpg:GPG for signing/encryption"
+        "rsync:File synchronization"
+        "starship:Shell prompt"
+        "nvim:Neovim editor"
+        "jq:JSON processor"
+        "rg:Ripgrep (fast search)"
+        "fzf:Fuzzy finder"
+    )
+
+    for entry in "${commands[@]}"; do
+        local cmd="${entry%%:*}"
+        local desc="${entry#*:}"
+
+        if command -v "$cmd" &>/dev/null; then
+            print_pass "$cmd - $desc"
+        else
+            print_fail "$cmd - $desc (not found)"
+        fi
+    done
+}
+
+check_symlinks() {
+    print_header "Symlinks"
+
+    local links=(
+        "$HOME/.zshrc:zsh/zshrc"
+        "$HOME/.zprofile:zsh/zprofile"
+        "$HOME/.profile:profile"
+        "$HOME/.aliases:aliases"
+        "$HOME/.gitconfig:git/config"
+        "$HOME/.gitignore:git/ignore"
+        "$HOME/.config/starship.toml:starship.toml"
+        "$HOME/Library/Application Support/espanso/config/default.yml:snippets/espanso/config.yml"
+        "$HOME/Library/Application Support/espanso/match/base.yml:snippets/espanso/matches/base.yml"
+    )
+
+    for entry in "${links[@]}"; do
+        local target="${entry%%:*}"
+        local source="${entry#*:}"
+        local expected="$DOTFILES_DIR/$source"
+
+        if [[ -L "$target" ]]; then
+            local actual
+            actual="$(readlink "$target")"
+
+            if [[ "$actual" == "$expected" ]] || [[ "$actual" == "$source" ]]; then
+                print_pass "$target"
+            else
+                print_warn "$target (points to $actual, expected $expected)"
+            fi
+        elif [[ -f "$target" ]]; then
+            print_warn "$target (exists but not a symlink)"
+        else
+            print_fail "$target (missing)"
+        fi
+    done
+
+    # Check scripts directory
+    local script_count
+    script_count=$(find "$HOME/.local/bin" -maxdepth 1 -type l 2>/dev/null | wc -l | tr -d ' ')
+
+    if [[ "$script_count" -gt 0 ]]; then
+        print_pass "~/.local/bin/ ($script_count scripts linked)"
+    else
+        print_fail "~/.local/bin/ (no scripts found)"
+    fi
+}
+
+check_directories() {
+    print_header "Required Directories"
+
+    local dirs=(
+        "$HOME/Developer"
+        "$HOME/Logs"
+        "$HOME/Snapshots"
+        "$HOME/.config"
+        "$HOME/.local/bin"
+    )
+
+    for dir in "${dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            print_pass "$dir"
+        else
+            print_fail "$dir (missing)"
+        fi
+    done
+}
+
+check_git_config() {
+    print_header "Git Configuration"
+
+    # Check user identity
+    local name email signingkey
+    name="$(git config --global user.name 2>/dev/null)"
+    email="$(git config --global user.email 2>/dev/null)"
+    signingkey="$(git config --global user.signingkey 2>/dev/null)"
+
+    if [[ -n "$name" ]]; then
+        print_pass "user.name: $name"
+    else
+        print_fail "user.name: not set"
+    fi
+
+    if [[ -n "$email" ]]; then
+        print_pass "user.email: $email"
+    else
+        print_fail "user.email: not set"
+    fi
+
+    if [[ -n "$signingkey" ]]; then
+        print_pass "user.signingkey: $signingkey"
+
+        # Check if key exists in GPG
+        if gpg --list-keys "$signingkey" &>/dev/null; then
+            print_pass "GPG key exists in keyring"
+        else
+            print_warn "GPG key not found in keyring"
+        fi
+    else
+        print_info "user.signingkey: not configured (optional)"
+    fi
+}
+
+check_cron_jobs() {
+    print_header "Cron Jobs"
+
+    local cron_output
+    cron_output="$(crontab -l 2>/dev/null || echo "")"
+
+    if [[ -z "$cron_output" ]]; then
+        print_fail "No crontab installed"
+        return
+    fi
+
+    local expected_jobs=(
+        "tunes.js:Music logging"
+        "logwords.bb:Word count tracking"
+        "refocus.applescript:Focus management"
+        "track_notes.sh:Notes backup"
+        "track_thesis.sh:Thesis sync"
+        "rotate-logs:Log rotation"
+    )
+
+    for entry in "${expected_jobs[@]}"; do
+        local pattern="${entry%%:*}"
+        local desc="${entry#*:}"
+
+        if echo "$cron_output" | grep -q "$pattern"; then
+            print_pass "$desc ($pattern)"
+        else
+            print_fail "$desc ($pattern not found)"
+        fi
+    done
+
+    # Count total jobs
+    local job_count
+    job_count="$(echo "$cron_output" | grep -c "^[^#]" || echo 0)"
+    print_info "Total cron jobs: $job_count"
+}
+
+check_shell_config() {
+    print_header "Shell Configuration"
+
+    # Check current shell
+    local current_shell
+    current_shell="$(basename "$SHELL")"
+
+    if [[ "$current_shell" == "zsh" ]]; then
+        print_pass "Default shell: zsh"
+    else
+        print_warn "Default shell: $current_shell (expected zsh)"
+    fi
+
+    # Check if starship is in prompt
+    if [[ -n "${STARSHIP_SESSION_KEY:-}" ]] || command -v starship &>/dev/null; then
+        print_pass "Starship prompt available"
+    else
+        print_warn "Starship prompt not detected"
+    fi
+
+    # Check PATH includes local bin
+    if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
+        print_pass "~/.local/bin in PATH"
+    else
+        print_fail "~/.local/bin not in PATH"
+    fi
+}
+
+check_icloud_paths() {
+    print_header "iCloud Paths"
+
+    local icloud_paths=(
+        "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes:Obsidian vault"
+        "$HOME/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents:Shortcuts documents"
+    )
+
+    for entry in "${icloud_paths[@]}"; do
+        local path="${entry%%:*}"
+        local desc="${entry#*:}"
+
+        if [[ -d "$path" ]]; then
+            print_pass "$desc"
+        else
+            print_warn "$desc (not synced or missing)"
+        fi
+    done
+}
+
+check_logging_library() {
+    print_header "Logging Library"
+
+    local lib_path="$DOTFILES_DIR/scripts/lib/logging.sh"
+
+    if [[ -f "$lib_path" ]]; then
+        print_pass "Logging library exists"
+
+        # Check if it's sourceable
+        if bash -n "$lib_path" 2>/dev/null; then
+            print_pass "Logging library syntax valid"
+        else
+            print_fail "Logging library has syntax errors"
+        fi
+
+        # Check if symlinked to ~/.local/bin
+        if [[ -L "$HOME/.local/bin/lib/logging.sh" ]] || [[ -f "$HOME/.local/bin/lib/logging.sh" ]]; then
+            print_pass "Logging library accessible in ~/.local/bin/lib/"
+        else
+            print_info "Logging library not in ~/.local/bin/lib/ (scripts use relative path)"
+        fi
+    else
+        print_fail "Logging library not found: $lib_path"
+    fi
+
+    # Check log directory
+    if [[ -d "$HOME/Logs" ]]; then
+        local log_count
+        log_count="$(find "$HOME/Logs" -maxdepth 1 -name "*.log" 2>/dev/null | wc -l | tr -d ' ')"
+        print_pass "Log directory exists ($log_count log files)"
+    else
+        print_warn "Log directory missing: ~/Logs"
+    fi
+}
+
+check_homebrew() {
+    print_header "Homebrew"
+
+    if ! command -v brew &>/dev/null; then
+        print_fail "Homebrew not installed"
+        return
+    fi
+
+    print_pass "Homebrew installed"
+
+    # Check for issues
+    local brew_doctor
+    brew_doctor="$(brew doctor 2>&1 || true)"
+
+    if echo "$brew_doctor" | grep -q "Your system is ready to brew"; then
+        print_pass "brew doctor: OK"
+    else
+        print_warn "brew doctor: issues detected (run 'brew doctor' for details)"
+    fi
+}
+
+check_homebrew_outdated() {
+    print_header "Homebrew Packages (Outdated)"
+
+    if ! command -v brew &>/dev/null; then
+        print_info "Skipping - Homebrew not installed"
+        return
+    fi
+
+    print_info "Checking for outdated packages (this may take a moment)..."
+
+    local outdated
+    outdated="$(brew outdated --quiet 2>/dev/null | head -10)"
+
+    if [[ -z "$outdated" ]]; then
+        print_pass "All packages up to date"
+    else
+        local count
+        count="$(brew outdated --quiet 2>/dev/null | wc -l | tr -d ' ')"
+        print_warn "$count packages can be updated"
+        print_info "Run 'brew upgrade' to update, or 'brew outdated' to see list"
+    fi
+}
+
+check_dotfiles_repo() {
+    print_header "Dotfiles Repository"
+
+    if [[ ! -d "$DOTFILES_DIR" ]]; then
+        print_fail "Dotfiles directory not found: $DOTFILES_DIR"
+        return
+    fi
+
+    print_pass "Dotfiles directory: $DOTFILES_DIR"
+
+    # Check if it's a git repo
+    if [[ -d "$DOTFILES_DIR/.git" ]]; then
+        print_pass "Git repository initialized"
+
+        # Check for uncommitted changes
+        local status
+        status="$(git -C "$DOTFILES_DIR" status --porcelain 2>/dev/null)"
+
+        if [[ -z "$status" ]]; then
+            print_pass "No uncommitted changes"
+        else
+            local change_count
+            change_count="$(echo "$status" | wc -l | tr -d ' ')"
+            print_info "$change_count uncommitted changes"
+        fi
+
+        # Check remote
+        local remote
+        remote="$(git -C "$DOTFILES_DIR" remote get-url origin 2>/dev/null || echo "")"
+
+        if [[ -n "$remote" ]]; then
+            print_pass "Remote: $remote"
+        else
+            print_info "No remote configured"
+        fi
+    else
+        print_warn "Not a git repository"
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# MAIN
+# -----------------------------------------------------------------------------
+
+print_usage() {
+    cat << EOF
+Usage: $SCRIPT_NAME [OPTIONS]
+
+Verify dotfiles setup and check for issues.
+
+Options:
+  --quick    Skip slow checks (brew outdated)
+  --fix      Attempt to fix issues by re-running install
+  --help     Show this help message
+
+Examples:
+  $SCRIPT_NAME           # Run all checks
+  $SCRIPT_NAME --quick   # Quick check (skip brew outdated)
+EOF
+}
+
+main() {
+    local quick_mode=false
+    local fix_mode=false
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --quick|-q)
+                quick_mode=true
+                shift
+                ;;
+            --fix|-f)
+                fix_mode=true
+                shift
+                ;;
+            --help|-h)
+                print_usage
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $1"
+                print_usage
+                exit 1
+                ;;
+        esac
+    done
+
+    echo -e "${BLUE}"
+    echo "╔════════════════════════════════════════╗"
+    echo "║       DOTFILES HEALTH CHECK            ║"
+    echo "╚════════════════════════════════════════╝"
+    echo -e "${NC}"
+
+    # Run checks
+    check_dotfiles_repo
+    check_required_commands
+    check_symlinks
+    check_directories
+    check_git_config
+    check_shell_config
+    check_cron_jobs
+    check_icloud_paths
+    check_logging_library
+    check_homebrew
+
+    if [[ "$quick_mode" == false ]]; then
+        check_homebrew_outdated
+    else
+        print_header "Homebrew Packages (Outdated)"
+        print_info "Skipped (--quick mode)"
+    fi
+
+    # Summary
+    print_header "Summary"
+    echo -e "  ${GREEN}Passed:${NC}   $PASS_COUNT"
+    echo -e "  ${RED}Failed:${NC}   $FAIL_COUNT"
+    echo -e "  ${YELLOW}Warnings:${NC} $WARN_COUNT"
+    echo
+
+    # Fix mode
+    if [[ "$fix_mode" == true ]] && [[ $FAIL_COUNT -gt 0 ]]; then
+        echo -e "${BLUE}Attempting to fix issues...${NC}"
+        echo
+
+        if [[ -x "$DOTFILES_DIR/install" ]]; then
+            "$DOTFILES_DIR/install"
+        else
+            echo -e "${RED}Cannot find install script at $DOTFILES_DIR/install${NC}"
+        fi
+    fi
+
+    # Exit code based on results
+    if [[ $FAIL_COUNT -gt 0 ]]; then
+        echo -e "${RED}Some checks failed. Run with --fix to attempt repairs.${NC}"
+        exit 1
+    elif [[ $WARN_COUNT -gt 0 ]]; then
+        echo -e "${YELLOW}All checks passed with warnings.${NC}"
+        exit 0
+    else
+        echo -e "${GREEN}All checks passed!${NC}"
+        exit 0
+    fi
+}
+
+main "$@"

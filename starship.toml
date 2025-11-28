@@ -1,27 +1,197 @@
-# Disable the blank line at the start of the prompt
+# =============================================================================
+# STARSHIP PROMPT CONFIGURATION
+# =============================================================================
+# Starship is a minimal, fast, and customizable prompt for any shell.
+# Documentation: https://starship.rs/config/
+#
+# Design goals for this config:
+#   - Fast: Minimal scanning, disable slow/unused modules
+#   - Clean: Single-line prompt, no clutter
+#   - Informative: Show git status, directory, command success/failure
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# GENERAL SETTINGS
+# -----------------------------------------------------------------------------
+
+# Don't add a blank line before the prompt
 add_newline = false
 
-# Disable the line break after the prompt info
+# Timeout for starship to scan files in current directory (milliseconds)
+# Lower values = faster prompt but may miss some context
+scan_timeout = 10
+
+# Timeout for commands executed by starship (milliseconds)
+command_timeout = 500
+
+
+# -----------------------------------------------------------------------------
+# PROMPT FORMAT
+# -----------------------------------------------------------------------------
+# Customize the order and appearance of prompt modules.
+# Default format shows: directory > git > character
+# See: https://starship.rs/config/#prompt
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$character"""
+
+# Right-side prompt (shown on the right edge of terminal)
+# Useful for command duration, time, etc.
+right_format = """$cmd_duration"""
+
+
+# -----------------------------------------------------------------------------
+# LINE BREAK
+# -----------------------------------------------------------------------------
+# Disable line break between prompt info and input line for a compact look
+
 [line_break]
 disabled = true
 
-# Only let starship scan the current dir for 10 milliseconds
-scan_timeout = 10
 
-# Set a simple prompt character
+# -----------------------------------------------------------------------------
+# PROMPT CHARACTER
+# -----------------------------------------------------------------------------
+# The character shown before your input. Changes color based on last command.
+
 [character]
-success_symbol = "[>](bold green)"
-error_symbol = "[!](bold red)"
+success_symbol = "[>](bold green)"   # Green > when last command succeeded
+error_symbol = "[!](bold red)"       # Red ! when last command failed
+vimcmd_symbol = "[<](bold green)"    # Shown in vim normal mode (if using vi-mode)
 
-# disable aws region (etc) info
-[aws]
-disabled = true
+
+# -----------------------------------------------------------------------------
+# DIRECTORY
+# -----------------------------------------------------------------------------
+# Shows the current working directory, truncated for readability.
 
 [directory]
-truncation_length = 2
+truncation_length = 3                # Show last 3 directory components
+truncate_to_repo = true              # Truncate to git repo root when in a repo
+truncation_symbol = ".../"           # Show this when path is truncated
+read_only = " [RO]"                  # Indicator for read-only directories
+read_only_style = "bold red"
+home_symbol = "~"                    # Show ~ for home directory
+style = "bold cyan"
 
-[python]
+
+# -----------------------------------------------------------------------------
+# GIT BRANCH
+# -----------------------------------------------------------------------------
+# Shows the current git branch name.
+
+[git_branch]
+format = "[$symbol$branch(:$remote_branch)]($style) "
+symbol = ""                          # No icon, just branch name (clean look)
+style = "bold purple"
+truncation_length = 20               # Truncate long branch names
+truncation_symbol = "..."
+
+
+# -----------------------------------------------------------------------------
+# GIT STATUS
+# -----------------------------------------------------------------------------
+# Shows the state of the git repository (modified, staged, ahead/behind, etc.)
+
+[git_status]
+format = '([$all_status$ahead_behind]($style) )'
+style = "bold yellow"
+
+# Status indicators (compact single characters)
+conflicted = "="                     # Merge conflicts
+ahead = "↑${count}"                  # Commits ahead of remote
+behind = "↓${count}"                 # Commits behind remote
+diverged = "↕"                       # Diverged from remote
+untracked = "?"                      # Untracked files
+stashed = "*"                        # Stashed changes exist
+modified = "!"                       # Modified files
+staged = "+"                         # Staged files
+renamed = "»"                        # Renamed files
+deleted = "x"                        # Deleted files
+
+
+# -----------------------------------------------------------------------------
+# COMMAND DURATION
+# -----------------------------------------------------------------------------
+# Shows how long the last command took to execute.
+# Only shows for commands taking longer than min_time.
+
+[cmd_duration]
+min_time = 2000                      # Show if command took > 2 seconds
+format = "[$duration]($style)"
+style = "bold yellow"
+show_milliseconds = false
+show_notifications = false           # Don't send system notifications
+
+
+# -----------------------------------------------------------------------------
+# DISABLED MODULES
+# -----------------------------------------------------------------------------
+# These modules are disabled to keep the prompt fast and uncluttered.
+# Enable any of these by changing `disabled = false` if you need them.
+
+# Cloud providers (rarely needed in prompt)
+[aws]
 disabled = true
 
 [gcloud]
 disabled = true
+
+[azure]
+disabled = true
+
+# Language version indicators (can slow down prompt)
+# Enable specific ones if you frequently switch versions
+[python]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[ruby]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+
+[java]
+disabled = true
+
+# Package version (rarely needed in prompt)
+[package]
+disabled = true
+
+# Container/environment indicators (enable if you use these)
+[docker_context]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[terraform]
+disabled = true
+
+# Other disabled modules
+[battery]
+disabled = true                      # Enable if you want battery indicator
+
+[time]
+disabled = true                      # Enable if you want time in prompt
+
+[username]
+disabled = true                      # Enable for multi-user systems
+
+[hostname]
+disabled = true                      # Enable for SSH sessions
+
+
+# =============================================================================
+# END OF STARSHIP CONFIG
+# =============================================================================

@@ -1,19 +1,55 @@
 #!/usr/bin/env bb
+;; =============================================================================
+;; LOGWORDS.BB - Writing Productivity Tracker
+;; =============================================================================
+;; Tracks daily word counts with streak tracking and goal monitoring.
 ;;
-;; A babashka script for logging the total number of words written in all files
-;; in a given directory and then outputting a brief report on the change in
-;; word count: the total number of words written in the last 24 hours, and the
-;; recent change in word count (calculated as the minimum of the exponentially
-;; weighted moving average and the average of the logged deltas).
+;; Features:
+;;   - Counts words in text/markdown files
+;;   - Tracks daily progress toward configurable goal
+;;   - Maintains writing streak (consecutive days meeting goal)
+;;   - Calculates exponentially weighted moving average (EWMA) of changes
+;;   - Outputs concise progress for menu bar display (One Thing)
 ;;
-;; Usage: ./logwords.bb --dir /path/to/directory --log /path/to/logfile --n 100
+;; Usage:
+;;   logwords.bb --dir <path> --log <path>     Track words and show progress
+;;   logwords.bb --report --log <path>         Show detailed daily report
+;;   logwords.bb --streak --log <path>         Show streak information
+;;   logwords.bb --help                        Show help
 ;;
-;; Note that an optional --flat flag is used to prevent the script from finding
-;; and counting words in subdirectories.
+;; Output format (default):
+;;   "523 (+12 | 45230)"  = today's words (change | total)
+;;   "523 🔥3 (+12)"      = with streak display (--show-streak)
+;;
+;; =============================================================================
 
 (require '[babashka.fs :as fs]
          '[clojure.string :as str]
-         '[babashka.cli :as cli])
+         '[babashka.cli :as cli]
+         '[cheshire.core :as json])
+
+;; -----------------------------------------------------------------------------
+;; Configuration
+;; -----------------------------------------------------------------------------
+
+(def ^:private config-path
+  "Path to the shared productivity config file."
+  (str (fs/expand-home "~/.dotfiles/config/productivity.json")))
+
+(defn- load-config
+  "Load configuration from the productivity.json file."
+  []
+  (if (fs/exists? config-path)
+    (try
+      (json/parse-string (slurp config-path) true)
+      (catch Exception _
+        {}))
+    {}))
+
+(defn- get-default-goal
+  "Get the default daily goal from config, or 1000 if not configured."
+  []
+  (get-in (load-config) [:writing :dailyGoal] 1000))
 
 (defn- count-words-in-file
   "Count the number of words in a file."
@@ -154,6 +190,109 @@
         local-date (.atZone date zone)]
     (.format local-date java.time.format.DateTimeFormatter/ISO_LOCAL_DATE)))
 
+(defn- today-local
+  "Get today's date as a local date string (YYYY-MM-DD)."
+  []
+  (let [zone (java.time.ZoneId/systemDefault)
+        now (java.time.LocalDate/now zone)]
+    (.format now java.time.format.DateTimeFormatter/ISO_LOCAL_DATE)))
+
+(defn- yesterday-local
+  "Get yesterday's date as a local date string (YYYY-MM-DD)."
+  []
+  (let [zone (java.time.ZoneId/systemDefault)
+        yesterday (.minusDays (java.time.LocalDate/now zone) 1)]
+    (.format yesterday java.time.format.DateTimeFormatter/ISO_LOCAL_DATE)))
+
+(defn- days-ago-local
+  "Get the date n days ago as a local date string (YYYY-MM-DD)."
+  [n]
+  (let [zone (java.time.ZoneId/systemDefault)
+        date (.minusDays (java.time.LocalDate/now zone) n)]
+    (.format date java.time.format.DateTimeFormatter/ISO_LOCAL_DATE)))
+
+(defn- get-daily-totals
+  "Read the log file and return a map of date -> daily word count change.
+   Returns a map like {\"2024-01-15\" 523, \"2024-01-14\" 892, ...}"
+  [log-file]
+  (if (fs/exists? log-file)
+    (let [local-log (->> (slurp log-file)
+                         (str/split-lines)
+                         (rest)
+                         (map #(str/split % #","))
+                         (filter #(= (count %) 3))
+                         (map #(map str/trim %))
+                         (map #(vector (date->local (second %)) (last %))))]
+      (->> (distinct (map first local-log))
+           (map (fn [date]
+                  (let [entries (filter #(= date (first %)) local-log)
+                        wcs (->> entries
+                                 (map second)
+                                 (map str/trim)
+                                 (filter #(re-matches #"\d+" %))
+                                 (map #(Integer/parseInt %)))
+                        first-wc (first wcs)
+                        last-wc (last wcs)
+                        net-change (if (and first-wc last-wc)
+                                     (- last-wc first-wc)
+                                     0)]
+                    [date net-change])))
+           (into {})))
+    {}))
+
+(defn- calculate-streak
+  "Calculate the current writing streak (consecutive days meeting goal).
+   Returns a map with :current, :longest, and :met-today? keys."
+  [log-file goal]
+  (let [daily-totals (get-daily-totals log-file)
+        today (today-local)
+        today-words (get daily-totals today 0)
+        met-today? (>= today-words goal)]
+    ;; Count consecutive days meeting goal, starting from yesterday
+    ;; (today counts separately since it might still be in progress)
+    (loop [day-offset 1
+           streak (if met-today? 1 0)
+           longest-streak (if met-today? 1 0)]
+      (let [check-date (days-ago-local day-offset)
+            day-words (get daily-totals check-date 0)]
+        (if (>= day-words goal)
+          ;; Continue the streak
+          (recur (inc day-offset)
+                 (inc streak)
+                 (max longest-streak (inc streak)))
+          ;; Streak broken - but check if we should continue counting for longest
+          {:current streak
+           :met-today? met-today?
+           :today-words today-words
+           :goal goal
+           :longest longest-streak})))))
+
+(defn- generate-streak-report
+  "Generate a detailed streak report."
+  [log-file goal]
+  (let [{:keys [current met-today? today-words longest]} (calculate-streak log-file goal)
+        daily-totals (get-daily-totals log-file)
+        today (today-local)]
+    (str "Writing Streak Report\n"
+         "=====================\n"
+         "\n"
+         "Daily Goal:     " goal " words\n"
+         "Today's Words:  " today-words (if met-today? " ✓" " (in progress)") "\n"
+         "Current Streak: " current " day" (if (not= current 1) "s" "") "\n"
+         "\n"
+         "Recent Days:\n"
+         (->> (range 7)
+              (map (fn [n]
+                     (let [date (days-ago-local n)
+                           words (get daily-totals date 0)
+                           met? (>= words goal)
+                           label (cond (= n 0) "Today"
+                                       (= n 1) "Yesterday"
+                                       :else date)]
+                       (str "  " label ": " words " words"
+                            (if met? " ✓" "")))))
+              (str/join "\n")))))
+
 (defn- generate-report
   "Read the log file and return a report on per-day changes."
   [log-file]
@@ -207,7 +346,52 @@
           :parse-fn #(= % "true")}
    :report {:default false
             :description "Print a report on the log file."
-            :parse-fn #(= % "true")}})
+            :parse-fn #(= % "true")}
+   :streak {:default false
+            :description "Show streak information."
+            :parse-fn #(= % "true")}
+   :goal {:default nil  ;; Will use config file or 1000
+          :description "Daily word count goal for streak tracking."
+          :parse-fn #(Integer/parseInt %)}
+   :show-streak {:default false
+                 :description "Include streak in default output (for menu bar)."
+                 :parse-fn #(= % "true")}
+   :help {:default false
+          :description "Show help message."
+          :parse-fn #(= % "true")}})
+
+(defn print-help
+  "Print help message."
+  []
+  (println "logwords.bb - Writing Productivity Tracker")
+  (println "")
+  (println "Track daily word counts with streak tracking and goal monitoring.")
+  (println "")
+  (println "Usage:")
+  (println "  logwords.bb --dir <path> --log <path>   Track words and show progress")
+  (println "  logwords.bb --report --log <path>       Show detailed daily report")
+  (println "  logwords.bb --streak --log <path>       Show streak information")
+  (println "  logwords.bb --help                      Show this help message")
+  (println "")
+  (println "Options:")
+  (println "  --dir <path>       Directory to count words in (required)")
+  (println "  --log <path>       Log file path (required)")
+  (println "  --goal <n>         Daily word count goal (default: from config or 1000)")
+  (println "  --show-streak      Include streak emoji in output")
+  (println "  --streak           Show detailed streak report")
+  (println "  --report           Show detailed daily report")
+  (println "  --flat             Don't count subdirectories")
+  (println "  -n <n>             Number of log entries to keep")
+  (println "  --help             Show this help message")
+  (println "")
+  (println "Output Formats:")
+  (println "  Default:     \"523 (+12 | 45230)\"   today's words (change | total)")
+  (println "  With streak: \"523 🔥3 (+12)\"        includes streak count")
+  (println "")
+  (println "Examples:")
+  (println "  logwords.bb --dir ~/Notes --log ~/Logs/words.log")
+  (println "  logwords.bb --dir ~/Notes --log ~/Logs/words.log --goal 500 --show-streak")
+  (println "  logwords.bb --streak --log ~/Logs/words.log --goal 1000"))
 
 (defn -main
   "Count the number of words in a target directory, log the total word count to
@@ -215,25 +399,68 @@
    midnight of the current day. If 'n' is provided, log file will be trimmed
    to the most recent n entries."
   []
-  (let [{:keys [dir log n report flat]} (cli/parse-opts *command-line-args* cli-opts)]
-    (cond (nil? dir) (println "Please provide a directory to count words in.")
-          (not (fs/exists? dir)) (println "Given directory does not exist.")
-          (nil? log) (println "Provide a file to write the word count log to.")
-          (not (fs/exists? log)) (spit log "\"path\",\"date\",\"wordcount\"\n")
-          (= true report) (println (generate-report log))
-          :else (do (log-total-word-count dir log ["txt" "md"] flat)
-                    (trim-log log (or n (get-in cli-opts [:n :default])))
-                    (let [deltas (->> (read-log log) (calculate-deltas)) ;; the deltas between each entry
-                          change (int (avg [(ewma deltas) (last deltas)]))
-                          change (if (pos? change)
-                                   (str "+" change)
-                                   (str change))
-                          wc-now (last (read-log log))
-                          ;; wc-24-hours-ago (first (read-log log (* 24 60 60)))
-                          ;; in-last-24h (- wc-now wc-24-hours-ago)
-                          wc-at-midnight (first (read-log log (+ (seconds-since-local-midnight) 60)))
-                          wc-since-midnight (- wc-now wc-at-midnight)]
-                      (println (str wc-since-midnight
-                                    " (" change " | " wc-now ")")))))))
+  (let [{:keys [dir log n report flat streak goal show-streak help]}
+        (cli/parse-opts *command-line-args* cli-opts)
+        ;; Use provided goal, or fall back to config file, or default to 1000
+        effective-goal (or goal (get-default-goal))]
+    (cond
+      ;; Help
+      (= true help)
+      (print-help)
+
+      ;; Streak report (only needs log file)
+      (= true streak)
+      (if (and log (fs/exists? log))
+        (println (generate-streak-report log effective-goal))
+        (println "Please provide a valid log file with --log"))
+
+      ;; Report (only needs log file)
+      (= true report)
+      (if (and log (fs/exists? log))
+        (println (generate-report log))
+        (println "Please provide a valid log file with --log"))
+
+      ;; Standard operation - needs dir and log
+      (nil? dir)
+      (println "Please provide a directory to count words in. Use --help for usage.")
+
+      (not (fs/exists? dir))
+      (println "Given directory does not exist.")
+
+      (nil? log)
+      (println "Provide a file to write the word count log to. Use --help for usage.")
+
+      ;; Create log file if it doesn't exist
+      (not (fs/exists? log))
+      (do
+        (spit log "\"path\",\"date\",\"wordcount\"\n")
+        (println "Created new log file. Run again to start tracking."))
+
+      ;; Main tracking logic
+      :else
+      (do
+        (log-total-word-count dir log ["txt" "md"] flat)
+        (trim-log log (or n (get-in cli-opts [:n :default])))
+        (let [deltas (->> (read-log log) (calculate-deltas))
+              change (int (avg [(ewma deltas) (last deltas)]))
+              change-str (if (pos? change)
+                           (str "+" change)
+                           (str change))
+              wc-now (last (read-log log))
+              wc-at-midnight (first (read-log log (+ (seconds-since-local-midnight) 60)))
+              wc-since-midnight (- wc-now wc-at-midnight)
+              ;; Calculate streak if showing
+              streak-info (when show-streak (calculate-streak log effective-goal))
+              streak-display (when (and show-streak
+                                        streak-info
+                                        (pos? (:current streak-info)))
+                               (str " 🔥" (:current streak-info)))]
+          ;; Output format depends on show-streak flag
+          (if show-streak
+            (println (str wc-since-midnight
+                          (or streak-display "")
+                          " (" change-str ")"))
+            (println (str wc-since-midnight
+                          " (" change-str " | " wc-now ")"))))))))
 
 (-main)

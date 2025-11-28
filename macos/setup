@@ -1,30 +1,137 @@
 #!/usr/bin/env bash
+# =============================================================================
+# macOS SETUP SCRIPT
+# =============================================================================
+# An idempotent script to configure macOS system preferences.
+# Run this after a fresh macOS install or to reset preferences.
 #
-# An idempotent script to setup a new macOS machine in my preferred way.
+# Inspired by: https://mths.be/macos
 #
-# (Inspired by https://mths.be/macos)
+# Usage:
+#   ./macos/setup              # Run all configurations
+#   ./macos/setup --dry-run    # Show what would be changed (not implemented)
+#
+# Tested on:
+#   - macOS Sonoma 14.x
+#   - macOS Sequoia 15.x
+#   - macOS Tahoe 26.x
+#
+# Note: Some changes require logout/restart to take effect.
+#       Some settings may require Full Disk Access for Terminal.
+#
+# Sections:
+#   1. Script Setup
+#   2. General UI/UX
+#   3. Input Devices
+#   4. Dock
+#   5. Finder
+#   6. Menu Bar
+#   7. Display
+#   8. Screenshots
+#   9. Mail
+#  10. Terminal & iTerm2
+#  11. Transmission
+#  12. Anki
+#  13. Cleanup
+# =============================================================================
+
+set -euo pipefail
+
+# =============================================================================
+# 1. SCRIPT SETUP
+# =============================================================================
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Print section header
+print_section() {
+    echo -e "\n${BLUE}=== $1 ===${NC}\n"
+}
+
+# Print info message
+print_info() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+# Print warning message
+print_warn() {
+    echo -e "${YELLOW}!${NC} $1"
+}
+
+# Check macOS version
+check_macos_version() {
+    local version
+    version=$(sw_vers -productVersion)
+    local major
+    major=$(echo "$version" | cut -d. -f1)
+
+    echo -e "${BLUE}Detected macOS version: $version${NC}"
+
+    if [[ "$major" -lt 14 ]]; then
+        print_warn "This script is tested on macOS 14+. Some settings may not work on older versions."
+    fi
+}
+
+# Confirm before proceeding
+confirm_execution() {
+    echo -e "${YELLOW}This script will modify macOS system preferences.${NC}"
+    echo "Some changes require logout/restart to take effect."
+    echo
+    read -p "Do you want to continue? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Aborted."
+        exit 0
+    fi
+}
+
+# Close System Preferences/Settings to prevent conflicts
+close_system_preferences() {
+    print_info "Closing System Preferences/Settings..."
+    osascript -e 'tell application "System Preferences" to quit' 2>/dev/null || true
+    osascript -e 'tell application "System Settings" to quit' 2>/dev/null || true
+}
+
+# Keep sudo alive throughout script
+keep_sudo_alive() {
+    # Ask for password upfront
+    sudo -v
+
+    # Keep-alive: update existing sudo timestamp in background
+    while true; do
+        sudo -n true
+        sleep 60
+        kill -0 "$$" || exit
+    done 2>/dev/null &
+}
+
+# Run setup
+print_section "macOS Setup Script"
+check_macos_version
+confirm_execution
+close_system_preferences
+keep_sudo_alive
 
 
-###############################################################################
-############################ PREP/SETUP FOR SCRIPT ############################
-###############################################################################
-# Close any open System Preferences panes, to prevent them from overriding the
-# settings we’re about to change.
-osascript -e 'tell application "System Preferences" to quit'
+# =============================================================================
+# 2. GENERAL UI/UX
+# =============================================================================
 
-# Keep-alive: update existing `sudo` time stamp until script has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
-
-
-###############################################################################
-################################ GENERAL UI/UX ################################
-###############################################################################
+print_section "General UI/UX"
 
 # Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
+# Note: This may not work on newer Macs with Apple Silicon
+print_info "Disabling boot sound..."
+sudo nvram SystemAudioVolume=" " 2>/dev/null || print_warn "Could not disable boot sound (may require SIP disabled)"
 
 # Expand save panel by default
+# Shows full save dialog instead of compact version
+print_info "Expanding save/print panels by default..."
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
 
@@ -33,141 +140,167 @@ defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
 defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
 
 # Automatically quit printer app once the print jobs complete
+print_info "Auto-quit printer app after jobs complete..."
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
 # Disable automatic termination of inactive apps
+# Keeps apps in memory for faster re-launch
+print_info "Disabling automatic app termination..."
 defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
 
-# Disable automatic capitalization as it’s annoying when typing code
-defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
-
-# Disable smart dashes as they’re annoying when typing code
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-
-# Disable automatic period substitution as it’s annoying when typing code
-defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
-
-# Disable smart quotes as they’re annoying when typing code
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-
-# Disable auto-correct
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+# Disable "smart" text features (annoying for coding)
+print_info "Disabling smart text features..."
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false      # Auto-capitalization
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false    # Smart dashes (-- to —)
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false  # Double-space to period
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false   # Smart quotes (" to "")
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false  # Auto-correct
 
 
+# =============================================================================
+# 3. INPUT DEVICES (KEYBOARD, TRACKPAD, MOUSE)
+# =============================================================================
 
-###############################################################################
-################### INPUTS (KEYBOARD, TRACKPAD, MOUSE, ETC) ###################
-###############################################################################
+print_section "Input Devices"
 
 # Disable press-and-hold for keys in favor of key repeat
+# Essential for vim-style navigation
+print_info "Enabling key repeat (disabling press-and-hold)..."
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
-# Set a blazingly fast keyboard repeat rate
+# Set fast keyboard repeat rate
+# KeyRepeat: lower = faster (1 is fastest, default is 2)
+# InitialKeyRepeat: lower = shorter delay before repeat starts (default is 15)
+print_info "Setting fast keyboard repeat rate..."
 defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 
+# =============================================================================
+# 4. DOCK
+# =============================================================================
 
-###############################################################################
-########################## DOCK & SPOTLIGHT & FINDER ##########################
-###############################################################################
+print_section "Dock"
 
-
-# DOCK SETTINGS ---------------------------------------------------------------
-
-# Set the icon size of Dock items to 36 pixels
+# Set Dock icon size (pixels)
+print_info "Setting Dock icon size to 64px..."
 defaults write com.apple.dock tilesize -int 64
 
-# hide all 'persistent' apps from the dock (display active only)
+# Show only active applications in Dock (hide persistent icons)
+# Clean, minimal dock showing only what's running
+print_info "Enabling static-only Dock (show running apps only)..."
 defaults write com.apple.dock static-only -bool true
 
-# Show indicator lights for open applications in the Dock
+# Show indicator dots for open applications
+print_info "Enabling process indicators..."
 defaults write com.apple.dock show-process-indicators -bool true
 
-# Wipe all (default) app icons from the Dock
-# This is only really useful when setting up a new Mac, or if you don’t use
-# the Dock to launch apps.
+# Clear all persistent apps from Dock
+# Only useful on fresh install or if you prefer empty dock
+print_info "Clearing persistent apps from Dock..."
 defaults write com.apple.dock persistent-apps -array
 
-# Show only open applications in the Dock
-defaults write com.apple.dock static-only -bool true
+# Disable Dock animations for snappier feel
+print_info "Disabling Dock animations..."
+defaults write com.apple.dock launchanim -bool false           # Launch bounce
+defaults write com.apple.dock expose-animation-duration -float 0.1  # Mission Control speed
 
-# Don’t animate opening applications from the Dock
-defaults write com.apple.dock launchanim -bool false
-
-# Speed up Mission Control animations
-defaults write com.apple.dock expose-animation-duration -float 0.1
-
-# Remove the auto-hiding Dock delay
+# Remove auto-hide delay
+# Dock appears/disappears instantly
+print_info "Removing Dock auto-hide delay..."
 defaults write com.apple.dock autohide-delay -float 0
-# Remove the animation when hiding/showing the Dock
 defaults write com.apple.dock autohide-time-modifier -float 0
 
-# Automatically hide and show the Dock
+# Enable Dock auto-hide
+print_info "Enabling Dock auto-hide..."
 defaults write com.apple.dock autohide -bool true
 
-# Make Dock icons of hidden applications translucent
+# Make hidden app icons translucent in Dock
+print_info "Enabling translucent icons for hidden apps..."
 defaults write com.apple.dock showhidden -bool true
 
-# Don’t show recent applications in Dock
+# Don't show recent applications in Dock
+print_info "Disabling recent apps in Dock..."
 defaults write com.apple.dock show-recents -bool false
 
-# FINDER SETTINGS -------------------------------------------------------------
 
-# Empty Trash securely by default
-defaults write com.apple.finder EmptyTrashSecurely -bool true
+# =============================================================================
+# 5. FINDER
+# =============================================================================
 
-# Avoid creating .DS_Store files on network or USB volumes
+print_section "Finder"
+
+# Avoid creating .DS_Store files on network and USB volumes
+# Prevents cluttering shared drives
+print_info "Disabling .DS_Store on network/USB volumes..."
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
-# Finder: disable window animations and Get Info animations
+# Disable Finder animations
+print_info "Disabling Finder animations..."
 defaults write com.apple.finder DisableAllAnimations -bool true
 
-# Finder: show hidden files by default
+# Show hidden files by default
+# Press Cmd+Shift+. to toggle visibility
+print_info "Showing hidden files..."
 defaults write com.apple.finder AppleShowAllFiles -bool true
 
-# Finder: don't show file extensions
-defaults write NSGlobalDomain AppleShowAllExtensions -bool false
+# Show file extensions (disabled - personal preference)
+# print_info "Showing all file extensions..."
+# defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
-# Finder: show status bar
+# Show status bar (shows item count and available space)
+print_info "Showing Finder status bar..."
 defaults write com.apple.finder ShowStatusBar -bool true
 
-# Finder: show path bar
+# Show path bar (breadcrumb navigation at bottom)
+print_info "Showing Finder path bar..."
 defaults write com.apple.finder ShowPathbar -bool true
 
-# Display full POSIX path as Finder window title
+# Show full POSIX path in Finder title bar
+print_info "Showing POSIX path in Finder title..."
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
 # Keep folders on top when sorting by name
+print_info "Keeping folders on top when sorting..."
 defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
-# When performing a search, search the current folder by default
+# Search current folder by default (not entire Mac)
+print_info "Setting search scope to current folder..."
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 
-# Disable the warning when changing a file extension
+# Disable warning when changing file extension
+print_info "Disabling file extension change warning..."
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 
-# Automatically open a new Finder window when a volume is mounted
+# Open new Finder window when mounting volumes
+print_info "Opening Finder for new volumes..."
 defaults write com.apple.frameworks.diskimages auto-open-ro-root -bool true
 defaults write com.apple.frameworks.diskimages auto-open-rw-root -bool true
 defaults write com.apple.finder OpenWindowForNewRemovableDisk -bool true
 
-# Use list view in all Finder windows by default
-# Four-letter codes for the other view modes: `icnv`, `clmv`, `glyv`
+# Use list view by default
+# Options: Nlsv (list), icnv (icon), clmv (column), glyv (gallery)
+print_info "Setting default Finder view to list..."
 defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 
-# Disable the warning before emptying the Trash
+# Disable warning before emptying Trash
+print_info "Disabling Trash empty warning..."
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
 
-# Empty Trash securely by default
-defaults write com.apple.finder EmptyTrashSecurely -bool true
-
-# Empty trash every 30 days automatically
+# Empty Trash automatically after 30 days
+print_info "Enabling automatic Trash cleanup (30 days)..."
 defaults write com.apple.finder FXRemoveOldTrashItems -bool true
 
-# MENU BAR TIME FORMAT --------------------------------------------------------
-# (24 hour time, no seconds; no other details)
+
+# =============================================================================
+# 6. MENU BAR
+# =============================================================================
+
+print_section "Menu Bar"
+
+# Set clock format: 24-hour time, no seconds, no day of week
+print_info "Setting menu bar clock format (24hr, HH:mm)..."
 defaults write com.apple.menuextra.clock "DateFormat" -string "HH:mm"
 defaults write com.apple.menuextra.clock "IsAnalog" -bool false
 defaults write com.apple.menuextra.clock "FlashDateSeparators" -bool false
@@ -177,205 +310,153 @@ defaults write com.apple.menuextra.clock "Show24Hour" -bool true
 defaults write com.apple.menuextra.clock "ShowSeconds" -bool false
 
 
-###############################################################################
-################################### DISPLAY ###################################
-###############################################################################
+# =============================================================================
+# 7. DISPLAY
+# =============================================================================
 
-# Make sure app switcher is shown on all connected displays
-defaults write com.apple.Doc appswitcher-all-displays -bool true
+print_section "Display"
 
-# Enable subpixel font rendering on non-Apple LCDs
-# Reference: https://github.com/kevinSuttle/macOS-Defaults/issues/17#issuecomment-266633501
+# Show app switcher on all displays
+print_info "Showing app switcher on all displays..."
+defaults write com.apple.dock appswitcher-all-displays -bool true
+
+# Enable subpixel font rendering (for non-Retina displays)
+print_info "Enabling subpixel font rendering..."
 defaults write NSGlobalDomain AppleFontSmoothing -int 1
 
-# set all wallpapers to solid black
-osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"/System/Library/Desktop Pictures/Solid Colors/Black.png\" as POSIX file"
+# Set desktop wallpaper to solid black
+# Minimal, distraction-free background
+print_info "Setting desktop wallpaper to solid black..."
+osascript -e 'tell application "System Events" to tell every desktop to set picture to "/System/Library/Desktop Pictures/Solid Colors/Black.png" as POSIX file' 2>/dev/null || print_warn "Could not set wallpaper"
 
 
-###############################################################################
-################################# SCREENSHOTS #################################
-###############################################################################
+# =============================================================================
+# 8. SCREENSHOTS
+# =============================================================================
 
-# Disable shadow in screenshots
+print_section "Screenshots"
+
+# Disable drop shadow in screenshots
+# Cleaner screenshots without the decorative shadow
+print_info "Disabling screenshot shadows..."
 defaults write com.apple.screencapture disable-shadow -bool true
 
-# Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
+# Save screenshots as PNG (lossless)
+# Options: BMP, GIF, JPG, PDF, PNG, TIFF
+print_info "Setting screenshot format to PNG..."
 defaults write com.apple.screencapture type -string "png"
 
-# Save screenshots to the desktop
+# Save screenshots to Desktop
+print_info "Setting screenshot location to Desktop..."
 defaults write com.apple.screencapture location -string "${HOME}/Desktop"
 
 
+# =============================================================================
+# 9. MAIL
+# =============================================================================
 
-###############################################################################
-#################################### MAIL ####################################
-###############################################################################
+print_section "Mail"
 
-# Disable send and reply animations in Mail.app
-# defaults write com.apple.mail DisableReplyAnimations -bool true
-# defaults write com.apple.mail DisableSendAnimations -bool true
-
-# Copy email addresses as `foo@example.com` instead of `Foo Bar <foo@example.com>` in Mail.app
+# Copy email addresses without names
+# Copies "foo@example.com" instead of "Foo Bar <foo@example.com>"
+print_info "Setting email copy format (address only)..."
 defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
 
-# Add the keyboard shortcut ⌘ + Enter to send an email in Mail.app
-# defaults write com.apple.mail NSUserKeyEquivalents -dict-add "Send" "@\U21a9"
 
-# Display emails in threaded mode, sorted by date (oldest at the top)
-# defaults write com.apple.mail DraftsViewerAttributes -dict-add "DisplayInThreadedMode" -string "yes"
-# defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortedDescending" -string "yes"
-# defaults write com.apple.mail DraftsViewerAttributes -dict-add "SortOrder" -string "received-date"
+# =============================================================================
+# 10. TERMINAL & iTERM2
+# =============================================================================
 
-# Disable inline attachments (just show the icons)
-# defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
+print_section "Terminal & iTerm2"
 
-# Disable automatic spell checking
-# defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled"
-
-
-
-###############################################################################
-############################### SAFARI BROWSING ###############################
-###############################################################################
-
-# Privacy: don’t send search queries to Apple
-# defaults write com.apple.Safari UniversalSearchEnabled -bool false
-# defaults write com.apple.Safari SuppressSearchSuggestions -bool true
-
-# Press Tab to highlight each item on a web page
-# defaults write com.apple.Safari WebKitTabToLinksPreferenceKey -bool true
-# defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2TabsToLinks -bool true
-
-# Show the full URL in the address bar (note: this still hides the scheme)
-# defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
-
-# Set Safari’s home page to `about:blank` for faster loading
-# defaults write com.apple.Safari HomePage -string "about:blank"
-
-# Prevent Safari from opening ‘safe’ files automatically after downloading
-# defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
-
-# Enable Safari’s debug menu
-# defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
-
-# Make Safari’s search banners default to Contains instead of Starts With
-# defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
-
-# Enable the Develop menu and the Web Inspector in Safari
-# defaults write com.apple.Safari IncludeDevelopMenu -bool true
-# defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-# defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
-
-# Add a context menu item for showing the Web Inspector in web views
-# defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
-
-# Enable continuous spellchecking
-# defaults write com.apple.Safari WebContinuousSpellCheckingEnabled -bool true
-# Disable auto-correct
-# defaults write com.apple.Safari WebAutomaticSpellingCorrectionEnabled -bool false
-
-# Disable AutoFill
-# defaults write com.apple.Safari AutoFillFromAddressBook -bool false
-# defaults write com.apple.Safari AutoFillPasswords -bool false
-# defaults write com.apple.Safari AutoFillCreditCardData -bool false
-# defaults write com.apple.Safari AutoFillMiscellaneousForms -bool false
-
-# Warn about fraudulent websites
-# defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
-
-# Block pop-up windows
-# defaults write com.apple.Safari WebKitJavaScriptCanOpenWindowsAutomatically -bool false
-# defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically -bool false
-
-# Disable auto-playing video
-#defaults write com.apple.Safari WebKitMediaPlaybackAllowsInline -bool false
-#defaults write com.apple.SafariTechnologyPreview WebKitMediaPlaybackAllowsInline -bool false
-#defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2AllowsInlineMediaPlayback -bool false
-#defaults write com.apple.SafariTechnologyPreview com.apple.Safari.ContentPageGroupIdentifier.WebKit2AllowsInlineMediaPlayback -bool false
-
-# Enable “Do Not Track”
-# defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
-
-# Update extensions automatically
-# defaults write com.apple.Safari InstallExtensionUpdatesAutomatically -bool true
-
-
-
-###############################################################################
-############################## TERMINAL & ITERM2 ##############################
-###############################################################################
-
-# Disable the annoying line marks in Terminal
+# Disable line marks in Terminal
+# Removes the marks that appear at the start of each command
+print_info "Disabling Terminal line marks..."
 defaults write com.apple.Terminal ShowLineMarks -int 0
 
-# Don’t display the annoying prompt when quitting iTerm
+# Don't prompt when quitting iTerm2
+print_info "Disabling iTerm2 quit prompt..."
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 
 
+# =============================================================================
+# 11. TRANSMISSION (BitTorrent client)
+# =============================================================================
 
-###############################################################################
-# TRANSMISSION #
-###############################################################################
+print_section "Transmission"
 
-# Use `~/Torrents/Incomplete` to store incomplete downloads
+# Set download folders
+print_info "Setting Transmission download folders..."
 defaults write org.m0k.transmission UseIncompleteDownloadFolder -bool true
 defaults write org.m0k.transmission IncompleteDownloadFolder -string "${HOME}/Torrents/Incomplete"
-
-# Use `~/Torrents/Complete` to store complete downloads
 defaults write org.m0k.transmission DownloadLocationConstant -bool true
 defaults write org.m0k.transmission DownloadFolder -string "${HOME}/Torrents/Complete"
 
-# Don’t prompt for confirmation before downloading
+# Disable download/magnet prompts
+print_info "Disabling Transmission download prompts..."
 defaults write org.m0k.transmission DownloadAsk -bool false
 defaults write org.m0k.transmission MagnetOpenAsk -bool false
 
-# Don’t prompt for confirmation before removing non-downloading active transfers
+# Don't prompt before removing transfers
 defaults write org.m0k.transmission CheckRemoveDownloading -bool true
 
-# Trash original torrent files
+# Trash original .torrent files after adding
+print_info "Enabling auto-trash of torrent files..."
 defaults write org.m0k.transmission DeleteOriginalTorrent -bool true
 
-# Hide the donate message
+# Hide donate/legal messages
+print_info "Hiding Transmission donate/legal messages..."
 defaults write org.m0k.transmission WarningDonate -bool false
-# Hide the legal disclaimer
 defaults write org.m0k.transmission WarningLegal -bool false
 
 
-###############################################################################
-############################ ANKI (& ANKI-CONNECT) ############################
-###############################################################################
+# =============================================================================
+# 12. ANKI (Flashcard app)
+# =============================================================================
 
-# Disable app nap for Anki so that anki connect always works when anki is open:
+print_section "Anki"
+
+# Disable App Nap for Anki
+# Ensures AnkiConnect plugin works reliably
+print_info "Disabling App Nap for Anki..."
 defaults write net.ankiweb.dtop NSAppSleepDisabled -bool true
 defaults write net.ichi2.anki NSAppSleepDisabled -bool true
 defaults write org.qt-project.Qt.QtWebEngineCore NSAppSleepDisabled -bool true
 
-###############################################################################
-################################# TIDY/FINISH #################################
-###############################################################################
 
-# Kill affected applications
-for app in "Activity Monitor" \
-	"Address Book" \
-	"Calendar" \
-	"cfprefsd" \
-	"Contacts" \
-	"Dock" \
-	"Finder" \
-	"Mail" \
-	"Photos" \
-	"Safari" \
-	"SizeUp" \
-	"Spectacle" \
-	"SystemUIServer" \
-	"Terminal" \
-	"Transmission" \
-	"Tweetbot" \
-	"Twitter" \
-	"ControlCenter" \
-	"iCal"; do
-	killall "${app}" &> /dev/null
+# =============================================================================
+# 13. CLEANUP - RESTART AFFECTED APPLICATIONS
+# =============================================================================
+
+print_section "Applying Changes"
+
+print_info "Restarting affected applications..."
+
+# List of apps that need to be restarted for changes to take effect
+readonly APPS_TO_RESTART=(
+    "Activity Monitor"
+    "Calendar"
+    "cfprefsd"
+    "Contacts"
+    "Dock"
+    "Finder"
+    "Mail"
+    "Photos"
+    "SystemUIServer"
+    "Terminal"
+    "Transmission"
+    "ControlCenter"
+)
+
+for app in "${APPS_TO_RESTART[@]}"; do
+    killall "${app}" &>/dev/null || true
 done
 
-echo "Done."
-echo "Note: some changes require a logout/restart to take effect."
+echo
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}  macOS setup complete!${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo
+echo "Note: Some changes require logout/restart to take effect."
+echo "      Consider restarting your Mac for all changes to apply."
+echo

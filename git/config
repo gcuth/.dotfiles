@@ -1,61 +1,395 @@
-[alias]
-	# View the SHA, description, and history graph of the latest 20 commits
-	l = log --pretty=oneline -n 20 --graph
-	# View the current working tree status using the short format
-	s = status -s
-	# Diff
-	d = diff --patch-with-stat
-	# Pull in remote changes for the current repository and all its submodules
-	p = !"git pull; git submodule foreach git pull origin master"
-	# Clone a repository including all submodules
-	c = clone --recursive
-	# Commit all changes
-	ca = commit -a
-	# Switch to a branch, creating it if necessary
-	go = checkout -B
-	# Undo a `git push`
-	undopush = push -f origin HEAD^:master
+# =============================================================================
+# GIT CONFIGURATION
+# =============================================================================
+# Global git configuration file.
+# Symlinked to ~/.gitconfig by dotfiles installer.
+#
+# Sections:
+#   1. User Identity & Signing
+#   2. Core Settings
+#   3. Aliases
+#   4. Colors
+#   5. Diff & Merge
+#   6. Push & Pull
+#   7. URL Shorthands
+#   8. Tools & Integrations
+# =============================================================================
 
-[apply]
-	# Detect whitespace errors when applying a patch
-	whitespace = fix
 
-[core]
-	# Use custom `.gitignore`
-	excludesfile = ~/.gitignore
-	# Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
-	whitespace = space-before-tab,trailing-space
-	autocrlf = input
+# =============================================================================
+# 1. USER IDENTITY & SIGNING
+# =============================================================================
 
-[merge]
-	# Include summaries of merged commits in newly created merge commit messages
-	log = true
-
-# URL shorthands
-[url "git@github.com:"]
-	insteadOf = "gh:"
-	pushInsteadOf = "github:"
-	pushInsteadOf = "git://github.com/"
-[url "git://github.com/"]
-	insteadOf = "github:"
-[url "git@gist.github.com:"]
-	insteadOf = "gst:"
-	pushInsteadOf = "gist:"
-	pushInsteadOf = "git://gist.github.com/"
-[url "git://gist.github.com/"]
-	insteadOf = "gist:"
 [user]
 	name = Galen Cuthbertson
 	email = g@galen.me
+	# GPG signing key for verified commits
 	signingkey = B61949EDE15C2FA1
+
 [github]
 	user = gcuth
+
+[commit]
+	# Sign all commits by default (can override with --no-gpg-sign)
+	# Uncomment to enable automatic signing:
+	# gpgsign = true
+
+[tag]
+	# Sign all tags by default
+	# gpgsign = true
+
+
+# =============================================================================
+# 2. CORE SETTINGS
+# =============================================================================
+
+[core]
+	# Use custom global gitignore (patterns always ignored)
+	excludesfile = ~/.gitignore
+
+	# Detect whitespace problems:
+	# - space-before-tab: spaces before tabs in indentation
+	# - trailing-space: trailing whitespace at end of lines
+	whitespace = space-before-tab,trailing-space
+
+	# Line ending handling:
+	# - input: Convert CRLF to LF on commit, leave LF on checkout
+	# - Good for cross-platform work (Windows compatibility)
+	autocrlf = input
+
+	# Default editor for commit messages (falls back to $EDITOR)
+	# editor = nvim
+
+	# Enable file system caching for better performance
+	fscache = true
+
+	# Prevent unicode filename issues
+	precomposeunicode = true
+
+[init]
+	# Default branch name for new repositories
+	defaultBranch = main
+
+
+# =============================================================================
+# 3. ALIASES
+# =============================================================================
+# Git shortcuts for common operations.
+# Use: git <alias>
+#
+# Note: Shell commands use ! prefix; git commands don't need it.
+
+[alias]
+	# -------------------------------------------------------------------------
+	# Status & Information
+	# -------------------------------------------------------------------------
+
+	# Short status
+	s = status -s
+
+	# Detailed status with branch info
+	ss = status -sb
+
+	# Show all aliases
+	aliases = config --get-regexp ^alias\\.
+
+	# Show last commit
+	last = log -1 HEAD --stat
+
+	# Show recent commits (pretty graph)
+	l = log --pretty=oneline -n 20 --graph --abbrev-commit
+
+	# Beautiful log with graph, colors, and relative dates
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+
+	# Full log with all refs
+	ll = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative --all
+
+	# List contributors with number of commits
+	contributors = shortlog --summary --numbered
+
+	# -------------------------------------------------------------------------
+	# Branching
+	# -------------------------------------------------------------------------
+
+	# List branches sorted by last modified
+	b = branch
+
+	# List all branches (including remote)
+	ba = branch -a
+
+	# Create and checkout a new branch
+	go = checkout -b
+
+	# Switch branches (alias for checkout)
+	co = checkout
+
+	# Delete a branch (safe - won't delete unmerged)
+	bd = branch -d
+
+	# Delete a branch (force)
+	bD = branch -D
+
+	# -------------------------------------------------------------------------
+	# Staging & Committing
+	# -------------------------------------------------------------------------
+
+	# Stage all changes
+	a = add --all
+
+	# Interactive staging
+	ap = add --patch
+
+	# Commit all tracked changes
+	ca = commit -a
+
+	# Commit with message
+	cm = commit -m
+
+	# Commit all with message
+	cam = commit -a -m
+
+	# Amend the last commit
+	amend = commit --amend --no-edit
+
+	# Amend with new message
+	reword = commit --amend
+
+	# Unstage files (opposite of git add)
+	unstage = reset HEAD --
+
+	# Discard changes in working directory
+	discard = checkout --
+
+	# -------------------------------------------------------------------------
+	# Diffing
+	# -------------------------------------------------------------------------
+
+	# Diff with stats
+	d = diff --patch-with-stat
+
+	# Diff staged changes
+	ds = diff --staged --patch-with-stat
+
+	# Diff with word-level highlighting
+	dw = diff --word-diff
+
+	# Show what changed in last commit
+	dlast = diff HEAD~1 HEAD
+
+	# -------------------------------------------------------------------------
+	# Pulling & Pushing
+	# -------------------------------------------------------------------------
+
+	# Pull with rebase (cleaner history)
+	p = pull --rebase
+
+	# Pull and update submodules
+	pall = "!git pull; git submodule foreach git pull origin main"
+
+	# Push to origin
+	po = push origin
+
+	# Push to origin (current branch)
+	poh = push origin HEAD
+
+	# Force push safely (fails if someone else pushed)
+	pushf = push --force-with-lease
+
+	# -------------------------------------------------------------------------
+	# Stashing
+	# -------------------------------------------------------------------------
+
+	# Stash changes
+	st = stash
+
+	# Stash with message
+	stm = stash push -m
+
+	# Pop latest stash
+	stp = stash pop
+
+	# List stashes
+	stl = stash list
+
+	# Show stash contents
+	sts = stash show -p
+
+	# -------------------------------------------------------------------------
+	# Cleanup & Maintenance
+	# -------------------------------------------------------------------------
+
+	# Remove untracked files (dry run first)
+	clean-dry = clean -n -d
+
+	# Remove untracked files and directories
+	clean-all = clean -f -d
+
+	# Prune remote branches
+	prune = fetch --prune
+
+	# Garbage collect
+	gc-now = gc --prune=now
+
+	# -------------------------------------------------------------------------
+	# Cloning
+	# -------------------------------------------------------------------------
+
+	# Clone with submodules
+	c = clone --recursive
+
+	# -------------------------------------------------------------------------
+	# Undo Operations
+	# -------------------------------------------------------------------------
+
+	# Undo last commit (keep changes staged)
+	undo = reset --soft HEAD~1
+
+	# Undo last commit (unstage changes)
+	undo-hard = reset HEAD~1
+
+	# Undo a pushed commit (creates reverting commit)
+	undopush = push -f origin HEAD^:master
+
+	# -------------------------------------------------------------------------
+	# Utility
+	# -------------------------------------------------------------------------
+
+	# Find commits by message
+	find = "!f() { git log --pretty=format:'%C(yellow)%h %Cblue%ad %Creset%s%Cgreen [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+
+	# Find commits by content
+	search = "!f() { git log --pretty=format:'%C(yellow)%h %Cblue%ad %Creset%s%Cgreen [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+
+	# Show file history with diffs
+	filelog = log -u
+
+	# List ignored files
+	ignored = ls-files --others --ignored --exclude-standard
+
+
+# =============================================================================
+# 4. COLORS
+# =============================================================================
+# Enable colors in git output for better readability.
+
+[color]
+	ui = auto
+
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red
+	new = green
+
+[color "status"]
+	added = green
+	changed = yellow
+	untracked = red
+
+
+# =============================================================================
+# 5. DIFF & MERGE
+# =============================================================================
+
+[diff]
+	# Use better diff algorithm
+	algorithm = histogram
+
+	# Detect renames and copies
+	renames = copies
+
+	# Show submodule changes
+	submodule = log
+
+[merge]
+	# Include summaries of merged commits in merge commit message
+	log = true
+
+	# Use diff3 conflict style (shows original in conflicts)
+	conflictstyle = diff3
+
+[apply]
+	# Fix whitespace errors when applying patches
+	whitespace = fix
+
+[rerere]
+	# Remember how you resolved merge conflicts
+	# Git will auto-resolve identical conflicts in the future
+	enabled = true
+
+
+# =============================================================================
+# 6. PUSH & PULL
+# =============================================================================
+
+[push]
+	# Push current branch to same-named remote branch
+	default = current
+
+	# Push tags along with commits
+	followTags = true
+
+[pull]
+	# Rebase instead of merge when pulling (cleaner history)
+	rebase = true
+
+[fetch]
+	# Prune deleted remote branches on fetch
+	prune = true
+
+
+# =============================================================================
+# 7. URL SHORTHANDS
+# =============================================================================
+# Convenient shortcuts for common git hosts.
+# Usage: git clone gh:username/repo
+
+[url "git@github.com:"]
+	# gh: prefix for SSH GitHub URLs
+	insteadOf = "gh:"
+	pushInsteadOf = "github:"
+	pushInsteadOf = "git://github.com/"
+
+[url "git://github.com/"]
+	insteadOf = "github:"
+
+[url "git@gist.github.com:"]
+	# gst: prefix for GitHub Gists
+	insteadOf = "gst:"
+	pushInsteadOf = "gist:"
+	pushInsteadOf = "git://gist.github.com/"
+
+[url "git://gist.github.com/"]
+	insteadOf = "gist:"
+
+
+# =============================================================================
+# 8. TOOLS & INTEGRATIONS
+# =============================================================================
+
 [credential]
+	# Store credentials in plaintext file (~/.git-credentials)
+	# Consider using osxkeychain on macOS or libsecret on Linux
 	helper = store
+
 [filter "lfs"]
+	# Git Large File Storage configuration
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
-[init]
-	defaultBranch = main
+
+[help]
+	# Automatically correct mistyped commands after 1 second
+	autocorrect = 10
+
+
+# =============================================================================
+# END OF GIT CONFIG
+# =============================================================================

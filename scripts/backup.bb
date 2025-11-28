@@ -1,9 +1,20 @@
 #!/usr/bin/env bb
+;; =============================================================================
+;; BACKUP.BB - Encrypted Directory Backup
+;; =============================================================================
+;; Creates GPG-encrypted tar archives of directories.
 ;;
-;; A script for taking a path to a directory and backing it up to an encrypted
-;; tarball in a specified target location.
-
-;; Usage: backup.bb --input <source-directory> --output <destination-file-path>
+;; Usage:
+;;   backup.bb --input <dir> --output <path>   Create encrypted backup
+;;   backup.bb --help                          Show this help message
+;;
+;; Requirements:
+;;   - tar (standard on macOS/Linux)
+;;   - gpg (brew install gpg)
+;;
+;; Output:
+;;   Encrypted tarball: YYYY-MM-DD-HH-MM-SS-dirname.tar.gz.gpg
+;; =============================================================================
 
 
 
@@ -86,13 +97,41 @@
 
 (def cli-spec
   {:input {:desc "Source directory to back up (required)"
+           :alias :i
            :require true
            :coerce :string
            :validate {:pred is-directory?
                       :msg "Must be a readable directory"}}
    :output {:desc "Destination path for the backup (required)"
+            :alias :o
             :require true
-            :coerce :string}})
+            :coerce :string}
+   :help {:desc "Show help message"
+          :alias :h
+          :coerce :boolean}})
+
+(defn print-help []
+  (println "backup.bb - Encrypted Directory Backup")
+  (println)
+  (println "Creates GPG-encrypted tar archives of directories.")
+  (println)
+  (println "Usage: backup.bb --input <dir> --output <path>")
+  (println)
+  (println "Options:")
+  (println "  -i, --input <dir>    Source directory to back up (required)")
+  (println "  -o, --output <path>  Destination path or directory (required)")
+  (println "  -h, --help           Show this help message")
+  (println)
+  (println "Examples:")
+  (println "  backup.bb --input ~/Documents --output ~/Backups/")
+  (println "  backup.bb -i ~/Photos -o /Volumes/External/")
+  (println)
+  (println "Output:")
+  (println "  Creates: YYYY-MM-DD-HH-MM-SS-dirname.tar.gz.gpg")
+  (println "  You will be prompted for a passphrase by GPG.")
+  (println)
+  (println "To decrypt:")
+  (println "  gpg -d backup.tar.gz.gpg | tar -xvzf -"))
 
 (defn validate-environment! []
   (when-not (has-command? "tar")
@@ -102,14 +141,22 @@
 
 (defn -main [& args]
   (try
-    (validate-environment!)
+    (let [{:keys [help input output] :as opts} (cli/parse-opts args {:spec cli-spec})]
+      (cond
+        help
+        (print-help)
 
-    (if (empty? args)
-      (println "Usage: backup.bb --input <source-dir> --output <target-path>")
-      (let [{:keys [input output] :as opts} (cli/parse-opts args {:spec cli-spec})]
-        (let [{:keys [success message]} (backup! input output)]
-          (println message)
-          (System/exit (if success 0 1)))))
+        (empty? args)
+        (do
+          (println "Usage: backup.bb --input <source-dir> --output <target-path>")
+          (println "Try 'backup.bb --help' for more information."))
+
+        :else
+        (do
+          (validate-environment!)
+          (let [{:keys [success message]} (backup! input output)]
+            (println message)
+            (System/exit (if success 0 1))))))
 
     (catch clojure.lang.ExceptionInfo e
       (case (:type (ex-data e))

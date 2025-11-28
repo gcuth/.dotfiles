@@ -1,0 +1,430 @@
+#!/usr/bin/env bash
+# =============================================================================
+# BACKUP-STATUS - Dashboard for all backup systems
+# =============================================================================
+# Shows the status of all backup and sync mechanisms in the dotfiles.
+#
+# Checks:
+#   - track_notes.sh: Obsidian vault backup to local git
+#   - track_thesis.sh: Thesis sync to GitHub
+#   - iCloud sync status
+#   - Cron job health
+#   - Log file status
+#
+# Usage:
+#   backup-status              # Show full status
+#   backup-status --quick      # Quick check (exit code only)
+#   backup-status --json       # Output as JSON
+#   backup-status --help       # Show help
+#
+# =============================================================================
+
+set -uo pipefail
+
+# -----------------------------------------------------------------------------
+# CONFIGURATION
+# -----------------------------------------------------------------------------
+
+readonly SCRIPT_NAME="backup-status"
+
+# Paths
+readonly NOTES_SNAPSHOT_DIR="${HOME}/Snapshots/notes"
+readonly OBSIDIAN_PATH="${HOME}/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes"
+readonly THESIS_PATH="${HOME}/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes/Thesis"
+readonly ICLOUD_SHORTCUTS="${HOME}/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents"
+readonly LOGS_DIR="${HOME}/Logs"
+readonly CRON_FAILURE_LOG="${LOGS_DIR}/cron-failures.log"
+
+# Thresholds (in minutes)
+readonly NOTES_STALE_THRESHOLD=30      # Notes backup considered stale after 30 min
+readonly THESIS_STALE_THRESHOLD=60     # Thesis sync considered stale after 60 min
+
+# Colors
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly CYAN='\033[0;36m'
+readonly BOLD='\033[1m'
+readonly NC='\033[0m'
+
+# Counters
+OK_COUNT=0
+WARN_COUNT=0
+ERROR_COUNT=0
+
+# -----------------------------------------------------------------------------
+# OUTPUT HELPERS
+# -----------------------------------------------------------------------------
+
+print_header() {
+    echo -e "\n${BLUE}━━━ $1 ━━━${NC}\n"
+}
+
+print_ok() {
+    echo -e "  ${GREEN}●${NC} $1"
+    ((OK_COUNT++))
+}
+
+print_warn() {
+    echo -e "  ${YELLOW}●${NC} $1"
+    ((WARN_COUNT++))
+}
+
+print_error() {
+    echo -e "  ${RED}●${NC} $1"
+    ((ERROR_COUNT++))
+}
+
+print_info() {
+    echo -e "  ${CYAN}○${NC} $1"
+}
+
+# Get time since file was modified (in minutes)
+minutes_since_modified() {
+    local file="$1"
+    if [[ ! -e "$file" ]]; then
+        echo "999999"
+        return
+    fi
+    local now
+    now=$(date +%s)
+    local modified
+    modified=$(stat -f %m "$file" 2>/dev/null || stat -c %Y "$file" 2>/dev/null || echo "$now")
+    echo $(( (now - modified) / 60 ))
+}
+
+# Format minutes as human-readable time
+format_time() {
+    local minutes="$1"
+    if [[ $minutes -lt 60 ]]; then
+        echo "${minutes}m ago"
+    elif [[ $minutes -lt 1440 ]]; then
+        echo "$((minutes / 60))h ago"
+    else
+        echo "$((minutes / 1440))d ago"
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# CHECK FUNCTIONS
+# -----------------------------------------------------------------------------
+
+check_notes_backup() {
+    print_header "Notes Backup (track_notes.sh)"
+
+    # Check if snapshot directory exists
+    if [[ ! -d "$NOTES_SNAPSHOT_DIR" ]]; then
+        print_error "Snapshot directory not found: $NOTES_SNAPSHOT_DIR"
+        return
+    fi
+
+    # Check if it's a git repo
+    if [[ ! -d "$NOTES_SNAPSHOT_DIR/.git" ]]; then
+        print_error "Not a git repository"
+        return
+    fi
+
+    # Get last commit time
+    local last_commit_time
+    last_commit_time=$(git -C "$NOTES_SNAPSHOT_DIR" log -1 --format=%ct 2>/dev/null || echo "0")
+    local now
+    now=$(date +%s)
+    local minutes_ago=$(( (now - last_commit_time) / 60 ))
+
+    if [[ $minutes_ago -lt $NOTES_STALE_THRESHOLD ]]; then
+        print_ok "Last backup: $(format_time $minutes_ago)"
+    elif [[ $minutes_ago -lt $((NOTES_STALE_THRESHOLD * 2)) ]]; then
+        print_warn "Last backup: $(format_time $minutes_ago) (getting stale)"
+    else
+        print_error "Last backup: $(format_time $minutes_ago) (STALE)"
+    fi
+
+    # Show commit count
+    local commit_count
+    commit_count=$(git -C "$NOTES_SNAPSHOT_DIR" rev-list --count HEAD 2>/dev/null || echo "0")
+    print_info "Total commits: $commit_count"
+
+    # Check git repo health
+    if git -C "$NOTES_SNAPSHOT_DIR" fsck --quiet 2>/dev/null; then
+        print_ok "Repository integrity: OK"
+    else
+        print_error "Repository integrity: ISSUES DETECTED"
+    fi
+
+    # Check source exists
+    if [[ -d "$OBSIDIAN_PATH" ]]; then
+        local source_files
+        source_files=$(find "$OBSIDIAN_PATH" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+        print_info "Source files: $source_files markdown files"
+    else
+        print_warn "Source path not accessible (iCloud sync?)"
+    fi
+}
+
+check_thesis_sync() {
+    print_header "Thesis Sync (track_thesis.sh)"
+
+    # Check if thesis path exists
+    if [[ ! -d "$THESIS_PATH" ]]; then
+        print_warn "Thesis path not found (may not be set up)"
+        return
+    fi
+
+    # Check for recent thesis files
+    local thesis_files
+    thesis_files=$(find "$THESIS_PATH" -name "*.md" -o -name "*.tex" 2>/dev/null | wc -l | tr -d ' ')
+
+    if [[ $thesis_files -gt 0 ]]; then
+        print_ok "Thesis files found: $thesis_files"
+
+        # Check most recent modification
+        local newest_file
+        newest_file=$(find "$THESIS_PATH" -type f \( -name "*.md" -o -name "*.tex" \) -exec stat -f "%m %N" {} \; 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+        if [[ -n "$newest_file" ]]; then
+            local minutes_ago
+            minutes_ago=$(minutes_since_modified "$newest_file")
+            print_info "Most recent change: $(format_time $minutes_ago)"
+        fi
+    else
+        print_info "No thesis files found"
+    fi
+}
+
+check_icloud_sync() {
+    print_header "iCloud Sync"
+
+    local paths=(
+        "$OBSIDIAN_PATH:Obsidian vault"
+        "$ICLOUD_SHORTCUTS:Shortcuts data"
+    )
+
+    for entry in "${paths[@]}"; do
+        local path="${entry%%:*}"
+        local name="${entry#*:}"
+
+        if [[ -d "$path" ]]; then
+            # Check for .icloud placeholder files (indicates not synced)
+            local placeholder_count
+            placeholder_count=$(find "$path" -name "*.icloud" 2>/dev/null | wc -l | tr -d ' ')
+
+            if [[ $placeholder_count -eq 0 ]]; then
+                print_ok "$name: Synced"
+            elif [[ $placeholder_count -lt 10 ]]; then
+                print_warn "$name: $placeholder_count files pending download"
+            else
+                print_error "$name: $placeholder_count files not synced"
+            fi
+        else
+            print_warn "$name: Not found"
+        fi
+    done
+}
+
+check_cron_jobs() {
+    print_header "Cron Jobs"
+
+    # Check if crontab exists
+    local cron_output
+    cron_output=$(crontab -l 2>/dev/null || echo "")
+
+    if [[ -z "$cron_output" ]]; then
+        print_error "No crontab installed"
+        return
+    fi
+
+    # Count jobs
+    local job_count
+    job_count=$(echo "$cron_output" | grep -c "^[^#]" || echo 0)
+    print_ok "Cron jobs installed: $job_count"
+
+    # Check for recent failures
+    if [[ -f "$CRON_FAILURE_LOG" ]]; then
+        local failure_count
+        failure_count=$(grep -c "^Timestamp:" "$CRON_FAILURE_LOG" 2>/dev/null || echo 0)
+
+        if [[ $failure_count -eq 0 ]]; then
+            print_ok "No logged failures"
+        else
+            # Check for recent failures (last 24 hours)
+            local recent_failures
+            recent_failures=$(find "$CRON_FAILURE_LOG" -mmin -1440 -exec grep -c "^Timestamp:" {} \; 2>/dev/null || echo 0)
+
+            if [[ $recent_failures -gt 0 ]]; then
+                print_warn "Failures in last 24h: $recent_failures (run 'cron-notify --status')"
+            else
+                print_ok "No recent failures"
+            fi
+        fi
+    else
+        print_ok "No failure log (good sign)"
+    fi
+}
+
+check_logs() {
+    print_header "Log Files"
+
+    if [[ ! -d "$LOGS_DIR" ]]; then
+        print_warn "Log directory not found: $LOGS_DIR"
+        return
+    fi
+
+    # Count log files
+    local log_count
+    log_count=$(find "$LOGS_DIR" -maxdepth 1 -name "*.log" 2>/dev/null | wc -l | tr -d ' ')
+    print_info "Log files: $log_count"
+
+    # Check total size
+    local total_size
+    total_size=$(du -sh "$LOGS_DIR" 2>/dev/null | cut -f1)
+    print_info "Total size: $total_size"
+
+    # Check for very large logs
+    local large_logs
+    large_logs=$(find "$LOGS_DIR" -name "*.log" -size +10M 2>/dev/null | wc -l | tr -d ' ')
+
+    if [[ $large_logs -gt 0 ]]; then
+        print_warn "$large_logs log files over 10MB (run 'rotate-logs')"
+    else
+        print_ok "Log sizes: OK"
+    fi
+
+    # Check word delta log specifically
+    local word_log="${LOGS_DIR}/word_delta.log"
+    if [[ -f "$word_log" ]]; then
+        local word_entries
+        word_entries=$(wc -l < "$word_log" | tr -d ' ')
+        local word_modified
+        word_modified=$(minutes_since_modified "$word_log")
+        print_info "Word tracking: $word_entries entries, updated $(format_time $word_modified)"
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# OUTPUT MODES
+# -----------------------------------------------------------------------------
+
+show_full_status() {
+    echo -e "${BOLD}"
+    echo "╔════════════════════════════════════════╗"
+    echo "║         BACKUP STATUS DASHBOARD        ║"
+    echo "╚════════════════════════════════════════╝"
+    echo -e "${NC}"
+    echo -e "  ${CYAN}$(date '+%Y-%m-%d %H:%M:%S')${NC}"
+
+    check_notes_backup
+    check_thesis_sync
+    check_icloud_sync
+    check_cron_jobs
+    check_logs
+
+    # Summary
+    print_header "Summary"
+    echo -e "  ${GREEN}OK:${NC}       $OK_COUNT"
+    echo -e "  ${YELLOW}Warnings:${NC} $WARN_COUNT"
+    echo -e "  ${RED}Errors:${NC}   $ERROR_COUNT"
+    echo
+
+    if [[ $ERROR_COUNT -gt 0 ]]; then
+        echo -e "${RED}Some systems need attention.${NC}"
+        return 1
+    elif [[ $WARN_COUNT -gt 0 ]]; then
+        echo -e "${YELLOW}All systems operational with warnings.${NC}"
+        return 0
+    else
+        echo -e "${GREEN}All backup systems healthy!${NC}"
+        return 0
+    fi
+}
+
+show_quick_status() {
+    # Silent check - just return exit code
+    check_notes_backup > /dev/null 2>&1
+    check_cron_jobs > /dev/null 2>&1
+
+    if [[ $ERROR_COUNT -gt 0 ]]; then
+        exit 1
+    else
+        exit 0
+    fi
+}
+
+show_json_status() {
+    # Collect data silently
+    local notes_ok=true
+    local icloud_ok=true
+    local cron_ok=true
+
+    [[ ! -d "$NOTES_SNAPSHOT_DIR/.git" ]] && notes_ok=false
+    [[ ! -d "$OBSIDIAN_PATH" ]] && icloud_ok=false
+
+    local cron_output
+    cron_output=$(crontab -l 2>/dev/null || echo "")
+    [[ -z "$cron_output" ]] && cron_ok=false
+
+    cat << EOF
+{
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "notes_backup": $notes_ok,
+  "icloud_sync": $icloud_ok,
+  "cron_jobs": $cron_ok,
+  "errors": $ERROR_COUNT,
+  "warnings": $WARN_COUNT
+}
+EOF
+}
+
+show_help() {
+    cat << 'EOF'
+backup-status - Dashboard for all backup systems
+
+Usage:
+  backup-status              Show full status dashboard
+  backup-status --quick      Quick check (exit code only)
+  backup-status --json       Output status as JSON
+  backup-status --help       Show this help
+
+Checks performed:
+  - Notes backup (track_notes.sh → ~/Snapshots/notes)
+  - Thesis sync (track_thesis.sh → GitHub)
+  - iCloud sync status (Obsidian, Shortcuts)
+  - Cron job health
+  - Log file status
+
+Exit codes:
+  0 - All systems healthy (or warnings only)
+  1 - Errors detected
+
+Examples:
+  backup-status              # Full dashboard
+  backup-status --quick && echo "OK"  # Script integration
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# MAIN
+# -----------------------------------------------------------------------------
+
+main() {
+    case "${1:-}" in
+        --quick|-q)
+            show_quick_status
+            ;;
+        --json|-j)
+            show_json_status
+            ;;
+        --help|-h)
+            show_help
+            ;;
+        "")
+            show_full_status
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

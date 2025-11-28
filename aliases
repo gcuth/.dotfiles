@@ -1,41 +1,240 @@
-# BASICS
+# =============================================================================
+# SHELL ALIASES
+# =============================================================================
+# This file contains shell aliases for common commands and workflows.
+# Sourced by .zshrc for interactive shells.
+#
+# Organization:
+#   1. Navigation & File Operations
+#   2. Editor Shortcuts
+#   3. Git Aliases
+#   4. Development Tools
+#   5. Text Processing
+#   6. System Utilities
+#   7. Safety Aliases
+# =============================================================================
+
+
+# =============================================================================
+# 1. NAVIGATION & FILE OPERATIONS
+# =============================================================================
+
+# Clear screen and list files (quick workspace overview)
 alias c="clear; ls"
-alias vi="nvim" # should be installed
-alias e="$VISUAL" # quick-open visual editor
-alias l="ls -Glah" # override to add colour
-alias ls="ls -G" # override ls usual to add colour by default
-alias grep="grep --color=auto" # who *doesn't* want grep colour?
+
+# Enhanced ls commands with color
+alias ls="ls -G"                    # Colorized output (macOS)
+alias l="ls -Glah"                  # Long format, all files, human-readable sizes
+alias ll="ls -Glh"                  # Long format, human-readable (no hidden)
+alias la="ls -GA"                   # Almost all (exclude . and ..)
+alias lt="ls -GlahT"                # Sort by modification time, newest first
+
+# Directory navigation shortcuts
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias ~="cd ~"
+alias -- -="cd -"                   # Go to previous directory
+
+# Create directory and cd into it
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Quick directory listing after cd
+cd() {
+    builtin cd "$@" && ls -G
+}
 
 
-# GIT
-alias gs="git status -bs"
-alias gd="git diff"
+# =============================================================================
+# 2. EDITOR SHORTCUTS
+# =============================================================================
+
+# Quick editor access (uses $VISUAL from .zshrc)
+alias e="\$VISUAL"                  # Open in preferred GUI editor
+alias v="nvim"                      # Neovim shortcut
+alias vi="nvim"                     # Override vi with neovim
+
+# Edit common config files
+alias ez="$VISUAL ~/.zshrc"         # Edit zsh config
+alias ea="$VISUAL ~/.aliases"       # Edit this aliases file
+alias eg="$VISUAL ~/.gitconfig"     # Edit git config
+
+
+# =============================================================================
+# 3. GIT ALIASES
+# =============================================================================
+# Note: Additional git aliases are defined in ~/.gitconfig [alias] section.
+# These shell aliases supplement them for quicker access.
+
+# Status and info
+alias gs="git status -sb"           # Short status with branch info
+alias gss="git status"              # Full status
+alias gl="git log --oneline -20"    # Brief log of last 20 commits
+alias gll="git log --graph --oneline --all"  # Visual branch graph
+
+# Staging and committing
 alias ga="git add"
-alias gc="git commit -m"
-alias gcs="git commit -S -m" # sign
-alias gcam="git commit -a -m"
-alias gcams="git commit -a -S -m" # sign
+alias gaa="git add --all"           # Stage all changes
+alias gap="git add -p"              # Interactive staging (patch mode)
+alias gc="git commit -m"            # Commit with message
+alias gca="git commit -a -m"        # Stage all tracked + commit
+alias gcs="git commit -S -m"        # Signed commit
+alias gcas="git commit -a -S -m"    # Stage all + signed commit
+alias gca!="git commit -a --amend"  # Amend last commit with staged changes
+alias gc!="git commit --amend"      # Amend last commit
+
+# Branching and checkout
+alias gb="git branch"               # List branches
+alias gba="git branch -a"           # List all branches (including remote)
+alias gco="git checkout"
+alias gcb="git checkout -b"         # Create and checkout new branch
+alias gm="git merge"
+alias gcp="git cherry-pick"
+
+# Pulling and pushing
 alias gp="git pull"
+alias gpr="git pull --rebase"       # Pull with rebase
 alias gpo="git push origin"
-alias gpom="git push origin master"
-alias gph="git push heroku"
-# jump to top level of git repo
-alias gt="cd \$(git rev-parse --show-toplevel)"
-# Remove all traces of git from a folder
-alias degit="find . -name '.git' -exec rm -rf {} \;"
+alias gpom="git push origin main"   # Push to origin main
+alias gpof="git push origin --force-with-lease"  # Safe force push
 
-# Use ack to locate TOD* and FIXM* lines in current folder tree
-alias todos='ack --nobreak --nocolor "(TODO|FIXME):"|sed -E "s/(.*:[[:digit:]]+):.*((TODO|FIXME):.*)/\2 :>> \1/"|grep -E --color=always ":>>.*:\d+"'
+# Diffing
+alias gd="git diff"                 # Diff working tree
+alias gds="git diff --staged"       # Diff staged changes
+alias gdt="git difftool"
 
-# those pesky permissions
-alias ax='chmod a+x'
+# Stashing
+alias gst="git stash"
+alias gstp="git stash pop"
+alias gstl="git stash list"
 
-# trim newlines
+# Navigation
+alias gt='cd "$(git rev-parse --show-toplevel)"'  # Jump to repo root
+
+# Cleanup and maintenance
+alias gclean="git clean -fd"        # Remove untracked files
+alias gprune="git fetch --prune"    # Prune stale remote branches
+
+# Remove all .git directories recursively (DANGEROUS - use with caution)
+alias degit="find . -name '.git' -type d -exec rm -rf {} + 2>/dev/null"
+
+
+# =============================================================================
+# 4. DEVELOPMENT TOOLS
+# =============================================================================
+
+# Homebrew
+alias brewup="brew update && brew upgrade && brew cleanup"
+alias brewinfo="brew leaves"        # List top-level installed packages
+
+# Python
+alias py="python3"
+alias pip="pip3"
+alias venv="python3 -m venv"
+alias activate="source venv/bin/activate"
+
+# Docker (if used)
+alias dk="docker"
+alias dkc="docker-compose"
+alias dkps="docker ps"
+alias dkpsa="docker ps -a"
+alias dkimg="docker images"
+alias dkrm="docker rm"
+alias dkrmi="docker rmi"
+
+# Find TODOs and FIXMEs in codebase
+# Uses ripgrep if available (faster), falls back to grep
+if command -v rg &>/dev/null; then
+    alias todos='rg --no-heading "(TODO|FIXME|HACK|XXX):" .'
+else
+    alias todos='grep -rn "TODO\|FIXME\|HACK\|XXX" . --include="*.*"'
+fi
+
+# Make script executable
+alias ax="chmod a+x"
+
+
+# =============================================================================
+# 5. TEXT PROCESSING
+# =============================================================================
+
+# Colorized grep by default
+alias grep="grep --color=auto"
+alias egrep="egrep --color=auto"
+alias fgrep="fgrep --color=auto"
+
+# Trim trailing newlines
 alias tn='tr -d "\n"'
 
-# recursive grep
-recursivegrep () { grep -r "$*" . }
-alias rg="recursivegrep"
-
-# rot13
+# ROT13 encode/decode (same operation both ways)
 alias rot13="tr 'A-MN-Za-mn-z' 'N-ZA-Mn-za-m'"
+
+# Count lines, words, characters
+alias wc="wc"
+alias wcl="wc -l"                   # Count lines only
+
+# JSON pretty print (requires jq)
+alias json="jq ."
+
+# Quick search function (uses current directory)
+# Note: We don't alias 'rg' since ripgrep binary uses that name
+search() {
+    grep -rn "$*" .
+}
+
+
+# =============================================================================
+# 6. SYSTEM UTILITIES
+# =============================================================================
+
+# Disk usage
+alias df="df -h"                    # Human-readable disk free
+alias du="du -h"                    # Human-readable disk usage
+alias dud="du -d 1 -h"              # Disk usage of directories (depth 1)
+alias duf="du -sh *"                # Disk usage of files/dirs in current dir
+
+# Process management
+alias psg="ps aux | grep -v grep | grep"  # Search processes
+
+# Network
+alias ip="curl -s ifconfig.me"      # External IP address
+alias localip="ipconfig getifaddr en0"  # Local IP (Wi-Fi)
+alias ports="lsof -i -P -n | grep LISTEN"  # Show listening ports
+
+# macOS specific
+alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+alias showfiles="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
+alias hidefiles="defaults write com.apple.finder AppleShowAllFiles NO; killall Finder"
+
+# Reload shell configuration
+alias reload="source ~/.zshrc"
+
+# Quick system info
+alias path='echo -e ${PATH//:/\\n}'  # Print PATH entries on separate lines
+
+
+# =============================================================================
+# 7. SAFETY ALIASES
+# =============================================================================
+# These aliases add confirmation prompts for potentially destructive operations.
+# Comment out if you prefer the default behavior.
+
+# Interactive mode for destructive commands
+alias rm="rm -i"                    # Confirm before removing
+alias mv="mv -i"                    # Confirm before overwriting
+alias cp="cp -i"                    # Confirm before overwriting
+
+# Prevent accidental overwrites with redirection
+# (requires zsh: setopt noclobber, or bash: set -o noclobber)
+
+
+# =============================================================================
+# END OF ALIASES
+# =============================================================================
+# Local aliases can be added to ~/.aliases.local (not tracked in dotfiles)
+
+if [[ -f "$HOME/.aliases.local" ]]; then
+    source "$HOME/.aliases.local"
+fi

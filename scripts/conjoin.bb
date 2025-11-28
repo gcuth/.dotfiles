@@ -1,7 +1,15 @@
 #!/usr/bin/env bb
+;; =============================================================================
+;; CONJOIN.BB - Audiobook MP3 Joiner
+;; =============================================================================
+;; Join, sort, and chapterize audiobook MP3 files using ffmpeg.
 ;;
-;; a script for finding, sorting, joining, and outputting audiobooks in using
-;; ffmpeg.
+;; Usage:
+;;   conjoin.bb -i <input_dir> -o <output_dir>
+;;   conjoin.bb --help
+;;
+;; Requires: ffmpeg, ffprobe
+;; =============================================================================
 
 (require '[babashka.fs :as fs]
          '[babashka.cli :as cli]
@@ -200,8 +208,7 @@
     (println (str "Renaming " outpath fs/file-separator
                   "out_chaptered_small.mp3 to " (fs/file-name inpath) ".mp3"))
     (fs/move (str outpath fs/file-separator "out_chaptered_small.mp3")
-             (str outpath fs/file-separator (fs/file-name inpath) ".mp3"))
-    ))
+             (str outpath fs/file-separator (fs/file-name inpath) ".mp3"))))
 
 (def cli-spec {:input  {:ref          "<directory>"
                         :desc         "The input directory (which contains mp3s)."
@@ -210,22 +217,57 @@
                :output {:ref          "<directory>"
                         :desc         "The output directory (to save a joined mp3)."
                         :alias        :o
-                        :default      nil}})
+                        :default      nil}
+               :help   {:desc         "Show this help message."
+                        :alias        :h
+                        :coerce       :boolean}})
+
+(defn print-help
+  "Print help message and usage information."
+  []
+  (println "conjoin.bb - Audiobook MP3 Joiner")
+  (println "")
+  (println "Join, sort, and chapterize audiobook MP3 files using ffmpeg.")
+  (println "")
+  (println "Usage:")
+  (println "  conjoin.bb -i <input_dir> -o <output_dir>")
+  (println "  conjoin.bb --help")
+  (println "")
+  (println "Options:")
+  (println "  -i, --input <dir>   Input directory containing MP3 files")
+  (println "  -o, --output <dir>  Output directory for joined audiobook")
+  (println "  -h, --help          Show this help message")
+  (println "")
+  (println "Process:")
+  (println "  1. Sorts MP3s by numeric filename order")
+  (println "  2. Creates chapter metadata from filenames")
+  (println "  3. Joins files with ffmpeg")
+  (println "  4. Adds chapter markers")
+  (println "  5. Downsamples to 32kbps for smaller file size")
+  (println "")
+  (println "Requires: ffmpeg, ffprobe"))
 
 (defn -main
   "Run the conjoining process."
   [& args]
-  (let [arguments (cli/parse-opts (first args) (:spec cli-spec))
-        inpath (first (filter some? [(:input arguments) (:i arguments)]))
-        outpath (first (filter some? [(:output arguments) (:o arguments)]))]
-    (if (and inpath outpath)
+  (let [{:keys [opts]} (cli/parse-args args {:spec cli-spec})
+        inpath (:input opts)
+        outpath (:output opts)]
+    (cond
+      (:help opts)
+      (print-help)
+
+      (and inpath outpath)
       (if (and (fs/exists? (fs/expand-home inpath))
                (has-mp3s? (fs/expand-home inpath))
                (fs/exists? (fs/expand-home outpath)))
         (conjoin (fs/expand-home inpath) (fs/expand-home outpath))
         (println "Input or output directory does not exist or does not contain mp3s."))
-      (println (str "Usage: conjoin.clj -i <input dir> -o <output dir>"
-                    "\n\n"
-                    (cli/format-opts {:spec cli-spec}))))))
+
+      :else
+      (do
+        (println "Usage: conjoin.bb -i <input dir> -o <output dir>")
+        (println "")
+        (println "Run 'conjoin.bb --help' for more information.")))))
 
 (-main *command-line-args*)

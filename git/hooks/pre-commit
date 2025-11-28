@@ -1,0 +1,272 @@
+#!/usr/bin/env bash
+# =============================================================================
+# PRE-COMMIT HOOK - Dotfiles Repository
+# =============================================================================
+# Validates changes before committing to ensure quality and prevent errors.
+#
+# Checks:
+#   - Shell script syntax (bash -n)
+#   - Babashka script syntax (bb --dry-run)
+#   - YAML syntax for config files
+#   - No trailing whitespace in staged files
+#   - No TODO/FIXME in staged code (warning only)
+#
+# Installation:
+#   This hook is automatically installed by dotbot via symlink.
+#   Manual: ln -sf ../../git/hooks/pre-commit .git/hooks/pre-commit
+#
+# Skip hook: git commit --no-verify
+# =============================================================================
+
+set -uo pipefail
+
+# Colors
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m'
+
+# Counters
+ERRORS=0
+WARNINGS=0
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+print_header() {
+    echo -e "${BLUE}=== $1 ===${NC}"
+}
+
+print_pass() {
+    echo -e "  ${GREEN}✓${NC} $1"
+}
+
+print_fail() {
+    echo -e "  ${RED}✗${NC} $1"
+    ((ERRORS++))
+}
+
+print_warn() {
+    echo -e "  ${YELLOW}!${NC} $1"
+    ((WARNINGS++))
+}
+
+# Get list of staged files
+get_staged_files() {
+    git diff --cached --name-only --diff-filter=ACM
+}
+
+# Check if a file is staged
+is_staged() {
+    get_staged_files | grep -q "^$1$"
+}
+
+# -----------------------------------------------------------------------------
+# Checks
+# -----------------------------------------------------------------------------
+
+check_shell_syntax() {
+    print_header "Shell Script Syntax"
+
+    local shell_files
+    shell_files=$(get_staged_files | grep -E '\.(sh|bash)$' || true)
+
+    # Also check files with bash/sh shebang but no extension
+    local shebang_files
+    shebang_files=$(get_staged_files | while read -r file; do
+        if [[ -f "$file" ]] && head -1 "$file" 2>/dev/null | grep -qE '^#!.*\b(bash|sh)\b'; then
+            echo "$file"
+        fi
+    done)
+
+    local all_files
+    all_files=$(echo -e "$shell_files\n$shebang_files" | sort -u | grep -v '^$' || true)
+
+    if [[ -z "$all_files" ]]; then
+        echo "  No shell scripts staged"
+        return
+    fi
+
+    while IFS= read -r file; do
+        if [[ -f "$file" ]]; then
+            if bash -n "$file" 2>/dev/null; then
+                print_pass "$file"
+            else
+                print_fail "$file (syntax error)"
+            fi
+        fi
+    done <<< "$all_files"
+}
+
+check_babashka_syntax() {
+    print_header "Babashka Script Syntax"
+
+    local bb_files
+    bb_files=$(get_staged_files | grep -E '\.bb$' || true)
+
+    if [[ -z "$bb_files" ]]; then
+        echo "  No Babashka scripts staged"
+        return
+    fi
+
+    if ! command -v bb &>/dev/null; then
+        print_warn "Babashka not installed, skipping check"
+        return
+    fi
+
+    while IFS= read -r file; do
+        if [[ -f "$file" ]]; then
+            # Use bb to parse the file without running it
+            if bb -e "(load-file \"$file\")" --dry-run 2>/dev/null; then
+                print_pass "$file"
+            else
+                # Try a simpler syntax check
+                if bb -e "(read-string (slurp \"$file\"))" 2>/dev/null; then
+                    print_pass "$file"
+                else
+                    print_fail "$file (syntax error)"
+                fi
+            fi
+        fi
+    done <<< "$bb_files"
+}
+
+check_yaml_syntax() {
+    print_header "YAML Syntax"
+
+    local yaml_files
+    yaml_files=$(get_staged_files | grep -E '\.(ya?ml)$' || true)
+
+    if [[ -z "$yaml_files" ]]; then
+        echo "  No YAML files staged"
+        return
+    fi
+
+    # Try to use python for YAML validation
+    if command -v python3 &>/dev/null; then
+        while IFS= read -r file; do
+            if [[ -f "$file" ]]; then
+                if python3 -c "import yaml; yaml.safe_load(open('$file'))" 2>/dev/null; then
+                    print_pass "$file"
+                else
+                    print_fail "$file (invalid YAML)"
+                fi
+            fi
+        done <<< "$yaml_files"
+    else
+        print_warn "Python3 not available, skipping YAML validation"
+    fi
+}
+
+check_trailing_whitespace() {
+    print_header "Trailing Whitespace"
+
+    local files_with_whitespace
+    files_with_whitespace=$(get_staged_files | while read -r file; do
+        if [[ -f "$file" ]] && grep -qE '\s+$' "$file" 2>/dev/null; then
+            echo "$file"
+        fi
+    done)
+
+    if [[ -z "$files_with_whitespace" ]]; then
+        print_pass "No trailing whitespace found"
+    else
+        while IFS= read -r file; do
+            print_warn "$file has trailing whitespace"
+        done <<< "$files_with_whitespace"
+    fi
+}
+
+check_todos() {
+    print_header "TODO/FIXME Comments"
+
+    local staged_files
+    staged_files=$(get_staged_files)
+
+    if [[ -z "$staged_files" ]]; then
+        return
+    fi
+
+    local files_with_todos
+    files_with_todos=$(echo "$staged_files" | while read -r file; do
+        # Skip markdown and TODO.md itself
+        if [[ -f "$file" ]] && [[ "$file" != "TODO.md" ]] && [[ ! "$file" =~ \.md$ ]]; then
+            if grep -qiE '\b(TODO|FIXME|XXX|HACK)\b' "$file" 2>/dev/null; then
+                echo "$file"
+            fi
+        fi
+    done)
+
+    if [[ -z "$files_with_todos" ]]; then
+        print_pass "No TODO/FIXME comments found"
+    else
+        while IFS= read -r file; do
+            local count
+            count=$(grep -ciE '\b(TODO|FIXME|XXX|HACK)\b' "$file" 2>/dev/null || echo 0)
+            print_warn "$file has $count TODO/FIXME comment(s)"
+        done <<< "$files_with_todos"
+    fi
+}
+
+check_large_files() {
+    print_header "Large Files"
+
+    local max_size=1048576  # 1MB
+
+    local large_files
+    large_files=$(get_staged_files | while read -r file; do
+        if [[ -f "$file" ]]; then
+            local size
+            size=$(stat -f%z "$file" 2>/dev/null || stat --printf="%s" "$file" 2>/dev/null || echo 0)
+            if [[ "$size" -gt "$max_size" ]]; then
+                echo "$file ($(( size / 1024 ))KB)"
+            fi
+        fi
+    done)
+
+    if [[ -z "$large_files" ]]; then
+        print_pass "No large files (>1MB)"
+    else
+        while IFS= read -r file; do
+            print_warn "Large file: $file"
+        done <<< "$large_files"
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# Main
+# -----------------------------------------------------------------------------
+
+main() {
+    echo -e "${BLUE}Running pre-commit checks...${NC}"
+    echo
+
+    check_shell_syntax
+    check_babashka_syntax
+    check_yaml_syntax
+    check_trailing_whitespace
+    check_todos
+    check_large_files
+
+    echo
+    echo -e "${BLUE}=== Summary ===${NC}"
+    echo -e "  Errors:   $ERRORS"
+    echo -e "  Warnings: $WARNINGS"
+    echo
+
+    if [[ $ERRORS -gt 0 ]]; then
+        echo -e "${RED}Commit blocked due to errors.${NC}"
+        echo -e "Fix the issues above or use ${YELLOW}git commit --no-verify${NC} to skip checks."
+        exit 1
+    elif [[ $WARNINGS -gt 0 ]]; then
+        echo -e "${YELLOW}Commit proceeding with warnings.${NC}"
+    else
+        echo -e "${GREEN}All checks passed!${NC}"
+    fi
+
+    exit 0
+}
+
+main

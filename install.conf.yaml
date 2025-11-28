@@ -1,84 +1,165 @@
-###############################################################################
-###################### DEFAULT BEHAVIOUR FOR LINKING ETC ######################
-###############################################################################
+# =============================================================================
+# DOTBOT CONFIGURATION
+# =============================================================================
+# This file configures dotbot to set up the development environment.
+# Run with: ./install
+#
+# Sections:
+#   1. Default Settings
+#   2. Submodule Setup
+#   3. Cleanup
+#   4. Directory Creation
+#   5. Symlinks
+#   6. Package Installation (Homebrew)
+#   7. Manual App Installation
+#   8. Cron Jobs
+#
+# Documentation: https://github.com/anishathalye/dotbot
+# =============================================================================
+
+# =============================================================================
+# 1. DEFAULT SETTINGS
+# =============================================================================
+# Configure default behavior for dotbot directives.
 
 - defaults:
     link:
-      create: true
-      relink: true
-
+      create: true # Create parent directories if needed
+      relink: true # Replace existing symlinks
     brew:
-        stdin: true
-        stderr: true
-        stdout: true
-
+      stdin: true
+      stderr: true
+      stdout: true
     cask:
-        stdin: true
-        stderr: true
-        stdout: true
-
+      stdin: true
+      stderr: true
+      stdout: true
     brewfile:
-        stdin: true
-        stderr: true
-        stdout: true
+      stdin: true
+      stderr: true
+      stdout: true
 
+# =============================================================================
+# 2. SUBMODULE SETUP
+# =============================================================================
+# Initialize git submodules (dotbot plugins, etc.)
 
 - shell:
-  - [git submodule update --init --recursive, Installing submodules]
+    - description: Installing git submodules
+      command: git submodule update --init --recursive
+      quiet: true
 
+# =============================================================================
+# 3. CLEANUP
+# =============================================================================
+# Remove dead symlinks from managed directories.
+# This prevents orphaned links when files are renamed/removed.
 
-###############################################################################
-################################# CLEAN START #################################
-###############################################################################
+- clean:
+    - "~"
+    - "~/.local/bin/"
+    - "~/.config/"
+    - "~/Library/Application Support/espanso/match/"
+    - "~/Library/Application Support/espanso/config/"
 
-- clean: ['~', '~/.local/bin/', '~/Library/Application Support/espanso/match/', '~/Library/Application Support/espanso/config/']
-
-
-###############################################################################
-############### CREATE THE BASIC DIRECTORY FOR ALL DEV PROJECTS ###############
-###############################################################################
+# =============================================================================
+# 4. DIRECTORY CREATION
+# =============================================================================
+# Create required directories that may not exist on fresh systems.
 
 - create:
-    - ~/Developer/           # main directory for all dev projects
-    - ~/Torrents/            # directory for torrent downloads etc
-    - ~/Torrents/Incomplete/ # directory for incomplete torrent downloads
-    - ~/Torrents/Complete/   # directory for complete torrent downloads
-    - ~/Logs/                # convenience for lil script logs etc
-    - ~/Snapshots/           # directory for incremental snapshots of things
+    # Development
+    - ~/Developer/ # Main directory for all dev projects
 
+    # Downloads & Media
+    - ~/Torrents/ # Base torrent directory
+    - ~/Torrents/Incomplete/ # In-progress downloads
+    - ~/Torrents/Complete/ # Finished downloads
 
-###############################################################################
-############### LINK GLOBAL SETTINGS FILES, SNIPPETS, & SCRIPTS ###############
-###############################################################################
+    # Data & Logs
+    - ~/Logs/ # Script output and logs
+    - ~/Snapshots/ # Incremental backups (notes, etc.)
+
+    # Config directories
+    - ~/.config/ # XDG config base
+    - ~/.local/bin/ # User scripts
+
+# =============================================================================
+# 5. SYMLINKS
+# =============================================================================
+# Create symlinks from dotfiles repo to their expected locations.
+# Order: Shell config → Editor config → Git → Scripts → Apps
 
 - link:
+    # -------------------------------------------------------------------------
+    # Shell Configuration
+    # -------------------------------------------------------------------------
     ~/.zshrc:
-      path: zshrc
-      create: true
-      relink: true
-      force: true
-    ~/.stack/config.yaml:
-      path: stack/config.yaml
+      path: zsh/zshrc
+      force: true # Replace existing file
     ~/.zprofile:
-      path: zprofile
+      path: zsh/zprofile
     ~/.profile:
       path: profile
-    ~/.RProfile:
-      path: RProfile
     ~/.aliases:
       path: aliases
-    ~/.gitignore:
-      path: git/ignore
-    ~/.gitconfig:
-      path: git/config
+
+    # -------------------------------------------------------------------------
+    # Editor & Prompt Configuration
+    # -------------------------------------------------------------------------
     ~/.config/starship.toml:
       path: starship.toml
+      create: true
+
+    # Zed Editor
+    ~/.config/zed/settings.json:
+      path: zed/settings.json
+      create: true
+    ~/.config/zed/keymap.json:
+      path: zed/keymap.json
+      create: true
+
+    # -------------------------------------------------------------------------
+    # Git Configuration
+    # -------------------------------------------------------------------------
+    ~/.gitconfig:
+      path: git/config
+    ~/.gitignore:
+      path: git/ignore
+
+    # Pre-commit hook for dotfiles repo itself
+    .git/hooks/pre-commit:
+      path: git/hooks/pre-commit
+      force: true
+
+    # -------------------------------------------------------------------------
+    # Language-Specific Configuration
+    # -------------------------------------------------------------------------
+    # R Statistics
+    ~/.RProfile:
+      path: R/RProfile
+
+    # Clojure / Leiningen
+    ~/.lein/profiles.clj:
+      path: lein/profiles.clj
+      create: true
+
+    # Haskell / Stack
+    ~/.stack/config.yaml:
+      path: stack/config.yaml
+      create: true
+
+    # -------------------------------------------------------------------------
+    # Scripts (symlink all to ~/.local/bin/)
+    # -------------------------------------------------------------------------
     ~/.local/bin/:
       path: scripts/**
       glob: true
       create: true
-    ~/.lein/profiles.clj:
-      path: lein/profiles.clj
+
+    # -------------------------------------------------------------------------
+    # Text Expansion (Espanso)
+    # -------------------------------------------------------------------------
     ~/Library/Application Support/espanso/config/default.yml:
       path: snippets/espanso/config.yml
       create: true
@@ -89,119 +170,240 @@
       path: snippets/espanso/matches/pretty.yml
       create: true
 
+# =============================================================================
+# 6. PACKAGE INSTALLATION (HOMEBREW)
+# =============================================================================
+# Install packages via Homebrew. Organized by category.
+# Note: Casks are GUI apps, formulas are CLI tools.
 
-###############################################################################
-######################## INSTALL & SETUP DEFAULT STACK ########################
-###############################################################################
-
-# BREW INSTALLS
-- shell: # make sure brew is installed
-  - [ test -e `which brew` || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ]
-- shell: # update brew and upgrade all packages
-  - brew update && brew upgrade
-- cask: # install 1password first so that we can use it to authenticate others
-  - 1password
-- brew: # install git & git-lfs (& the github cli)
-  - git
-  - git-lfs
-  - gh
-- brew: # install tmux, fzf, etc for general easy terminal use
-  - tmux
-  - ripgrep
-  - starship
-  - iterm2
-  - fzf
-- brew: # install the python stack
-  - python
-  - pipx
-- brew: # install the node stack
-  - nvm
-- brew: # install a ruby environment manager
-  - rbenv
-- brew: # install the "I use clojure all the time" stack
-  - java
-  - leiningen
-  - borkdude/brew/babashka
-- brew: # install some general db tools
-  - sqlite
-  - postgresql
-  - sqlcipher
-- brew: # install some general security-related tools
-  - gpg
-  - 1password-cli
-- brew: # install writing & dev tools
-  - pandoc
-  - neovim
-  - obsidian
-  - discord
-  - espanso # text expansion
-- brew: # install some other general tools & qol improvements
-  - jq
-  - ffmpeg
-  - rclone
-  - rust
-  - gdu
-  - coreutils # the missing GNU coreutils, macOS style
-  - ollama
-  - exiftool
-  - hovrly
-  - yt-dlp
-- cask: # install docker desktop
-  - docker
-- cask: # fonts of my choosing
-  - font-fira-code # monospace with ligatures for code
-  - font-hack-nerd-font # nerd icons for use in the terminal
-  - font-b612 # the most legible humanist sans serif so far (thanks airbus!)
-  - font-b612-mono # the most legible sans serif font's mutant monospace sister
-- cask: # install tasks & fonts that require a cask
-  - signal
-  - anki
-  - rescuetime
-  - protonvpn
-  - protonmail-bridge
-  - proton-drive
-  - zotero
-  - zoom
-  - bartender
-  - transmission
-  - zed
-  - hazel
-
-
-###############################################################################
-################# INSTALL REMAINING APPS (IF NOT YET PRESENT) #################
-###############################################################################
+# -----------------------------------------------------------------------------
+# 6.1 Homebrew Setup
+# -----------------------------------------------------------------------------
+# Ensure Homebrew is installed and up to date
 
 - shell:
-  - [ test -e /Applications/Audio\ Hijack.app || open "https://rogueamoeba.com/audiohijack/download.php" ]
+    - description: Checking for Homebrew installation
+      command: test -e $(which brew) || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+- shell:
+    - description: Updating Homebrew and upgrading packages
+      command: brew update && brew upgrade
+      quiet: true
 
-###############################################################################
-################################## CRON JOBS ##################################
-###############################################################################
+# -----------------------------------------------------------------------------
+# 6.2 Authentication (install first)
+# -----------------------------------------------------------------------------
+# 1Password installed early to enable auth for other installations
+
+- cask:
+    - 1password # Password manager (GUI)
+
+- brew:
+    - 1password-cli # 1Password CLI for scripting
+
+# -----------------------------------------------------------------------------
+# 6.3 Core CLI Tools
+# -----------------------------------------------------------------------------
+# Essential command-line utilities
+
+- brew:
+    # Git & Version Control
+    - git # Version control
+    - git-lfs # Large file storage for git
+    - gh # GitHub CLI
+
+    # Shell & Terminal
+    - tmux # Terminal multiplexer
+    - starship # Cross-shell prompt
+    - fzf # Fuzzy finder
+    - ripgrep # Fast grep replacement
+
+    # File & Text Processing
+    - jq # JSON processor
+    - pandoc # Document converter
+    - coreutils # GNU core utilities for macOS
+
+    # Security
+    - gpg # GNU Privacy Guard
+
+# -----------------------------------------------------------------------------
+# 6.4 Development Languages & Tools
+# -----------------------------------------------------------------------------
+
+- brew:
+    # Python
+    - python # Python 3
+    - pipx # Install Python apps in isolation
+
+    # Node.js
+    - nvm # Node Version Manager
+
+    # Ruby
+    - rbenv # Ruby version manager
+
+    # Clojure / JVM
+    - java # OpenJDK
+    - leiningen # Clojure build tool
+    - borkdude/brew/babashka # Fast Clojure scripting
+
+    # Rust
+    - rust # Rust toolchain
+
+    # Editors
+    - neovim # Modern vim
+
+# -----------------------------------------------------------------------------
+# 6.5 Database Tools
+# -----------------------------------------------------------------------------
+
+- brew:
+    - sqlite # Embedded database
+    - postgresql # Relational database
+    - sqlcipher # Encrypted SQLite
+
+# -----------------------------------------------------------------------------
+# 6.6 Media & File Tools
+# -----------------------------------------------------------------------------
+
+- brew:
+    - ffmpeg # Media processing
+    - exiftool # Image metadata tool
+    - yt-dlp # Video downloader
+    - rclone # Cloud storage sync
+
+# -----------------------------------------------------------------------------
+# 6.7 Productivity & Utilities
+# -----------------------------------------------------------------------------
+
+- brew:
+    - gdu # Disk usage analyzer
+    - ollama # Local LLM runtime
+    - espanso # Text expansion
+
+# -----------------------------------------------------------------------------
+# 6.8 GUI Applications (Casks)
+# -----------------------------------------------------------------------------
+
+- cask:
+    # Terminals & Editors
+    - iterm2 # Terminal emulator
+    - zed # Modern code editor
+
+    # Containers
+    - docker # Container runtime
+
+    # Productivity
+    - obsidian # Note-taking
+    - anki # Spaced repetition flashcards
+    - zotero # Reference manager
+    - rescuetime # Time tracking
+    - hazel # File automation
+    - bartender # Menu bar management
+
+    # Communication
+    - signal # Encrypted messaging
+    - discord # Chat/voice
+    - zoom # Video conferencing
+
+    # Privacy & Security
+    - protonvpn # VPN client
+    - protonmail-bridge # ProtonMail IMAP bridge
+    - proton-drive # Encrypted cloud storage
+
+    # Media
+    - transmission # BitTorrent client
+
+# -----------------------------------------------------------------------------
+# 6.9 Fonts
+# -----------------------------------------------------------------------------
+
+- cask:
+    # Coding Fonts
+    - font-fira-code # Monospace with ligatures
+    - font-hack-nerd-font # Nerd font icons for terminal
+
+    # Reading Fonts (Airbus B612 - optimized for legibility)
+    - font-b612 # Humanist sans serif
+    - font-b612-mono # Monospace variant
+
+# =============================================================================
+# 7. MANUAL APP INSTALLATION
+# =============================================================================
+# Some apps aren't available via Homebrew or require manual download.
+# This opens the download page if the app isn't installed.
+
+- shell:
+    - description: Checking for Audio Hijack
+      command: test -e /Applications/Audio\ Hijack.app || open "https://rogueamoeba.com/audiohijack/download.php"
+
+# =============================================================================
+# 8. CRON JOBS
+# =============================================================================
+# Automated tasks running on schedules.
+# Uses crontab-dotbot plugin.
+#
+# Cron format: minute hour day-of-month month day-of-week
+#   * = every
+#   */5 = every 5 units
+#
+# Note: Full paths used for reliability in cron environment.
 
 - crontab:
-  # every minute, log the currently playing song (if any) to a csv file
-  - cron: "* * * * *"
-    command: osascript /Users/g/.dotfiles/applescripts/tunes.js >> ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv
-  # every minute, set the One Thing menu bar item to match writing progress
-  - cron: "* * * * *"
-    command: open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb ~/.dotfiles/scripts/logwords.bb --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/ --log ~/Logs/word_delta.log | tr -d "\n")"
-  # every minute, run the 'refocus' applescript ... unless you've logged over 1000 words already
-  - cron: "* * * * *"
-    command: number=$(/usr/bin/defaults read com.sindresorhus.One-Thing text 2>/dev/null | /usr/bin/tr -d "\n" | /usr/bin/sed 's/ .*//g') && [[ "$number" =~ ^-?[0-9]+$ ]] && (( number < 1000 )) && /usr/bin/osascript ~/.dotfiles/applescripts/refocus.applescript
-  # every five minutes, run the 'every five minutes' shortcut
-  - cron: "*/5 * * * *"
-    command: shortcuts run "Every Five Minutes"
-  # every five minutes, track notes
-  - cron: "*/5 * * * *"
-    command: /bin/bash ~/.dotfiles/scripts/track_notes.sh
-  # every five minutes, track thesis
-  - cron: "*/5 * * * *"
-    command: /bin/bash ~/.dotfiles/scripts/track_thesis.sh
-  # run the 'every hour' shortcut every hour at 59 minutes past
-  - cron: "59 * * * *"
-    command: shortcuts run "Every Hour"
-  # Run the misc 'every day' shortcut every day at 4am
-  - cron: "0 4 * * *"
-    command: shortcuts run "Every Day"
+    # -------------------------------------------------------------------------
+    # Per-Minute Jobs (High Frequency)
+    # -------------------------------------------------------------------------
+
+    # Log currently playing music to CSV
+    # - Tracks: datetime, source, title, artist, album, duration, genre
+    - cron: "* * * * *"
+      command: >
+        osascript /Users/g/.dotfiles/applescripts/tunes.js
+        >> ~/Library/Mobile\ Documents/iCloud\~is\~workflow\~my\~workflows/Documents/Logs/Consumption/Music/playing.csv
+
+    # Update One Thing menu bar with writing progress
+    # - Shows: words written today, delta, total
+    - cron: "* * * * *"
+      command: >
+        open --background 'one-thing:?text='"$(/opt/homebrew/bin/bb
+        ~/.dotfiles/scripts/logwords.bb
+        --dir ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Notes/
+        --log ~/Logs/word_delta.log | tr -d "\n")"
+
+    # -------------------------------------------------------------------------
+    # Every 5 Minutes
+    # -------------------------------------------------------------------------
+
+    # Run iOS Shortcuts automation
+    - cron: "*/5 * * * *"
+      command: shortcuts run "Every Five Minutes"
+
+    # Backup Obsidian notes to local git repo
+    - cron: "*/5 * * * *"
+      command: /bin/bash ~/.dotfiles/scripts/track_notes.sh
+
+    # Sync thesis chapters to GitHub
+    - cron: "*/5 * * * *"
+      command: /bin/bash ~/.dotfiles/scripts/track_thesis.sh
+
+    # -------------------------------------------------------------------------
+    # Hourly Jobs
+    # -------------------------------------------------------------------------
+
+    # Run hourly iOS Shortcuts automation (at 59 minutes past each hour)
+    - cron: "59 * * * *"
+      command: shortcuts run "Every Hour"
+
+    # -------------------------------------------------------------------------
+    # Daily Jobs
+    # -------------------------------------------------------------------------
+
+    # Run daily iOS Shortcuts automation (at 4:00 AM)
+    - cron: "0 4 * * *"
+      command: shortcuts run "Every Day"
+
+    # Rotate log files to prevent disk space issues (at 3:00 AM)
+    - cron: "0 3 * * *"
+      command: /Users/g/.local/bin/rotate-logs
+# =============================================================================
+# END OF DOTBOT CONFIGURATION
+# =============================================================================

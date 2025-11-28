@@ -1,13 +1,91 @@
-# espanso match file
+# =============================================================================
+# Espanso Pretty Text - gcuth dotfiles
+# =============================================================================
+# Automatic text corrections and typographic improvements.
+# These replace common words with their properly-formatted versions.
 #
-# This file is used to define 'pretty' snippets: words where I want to replace
-# the trigger word with one containing special non-ascii characters for
-# 'correctness' and/or persnicketyness (eg 'naive'-> 'naïve').
-#
-# (It's an ad-hoc list, and it needs expansion (pun intended).)
+# Note: Be careful with these - they trigger on exact matches.
+# Consider using word boundaries or propagate_case if needed.
+# =============================================================================
 
 matches:
+  # ---------------------------------------------------------------------------
+  # Diacritics & Accents
+  # ---------------------------------------------------------------------------
+
+  # French-origin words
   - trigger: "naive"
     replace: "naïve"
   - trigger: "facade"
     replace: "façade"
+  - trigger: "cafe"
+    replace: "café"
+  - trigger: "cliche"
+    replace: "cliché"
+  - trigger: "fiance"
+    replace: "fiancé"
+  - trigger: "fiancee"
+    replace: "fiancée"
+  - trigger: "protege"
+    replace: "protégé"
+  - trigger: "touche"
+    replace: "touché"
+
+  # German-origin words
+  - trigger: "uber"
+    replace: "über"
+    # Note: Might conflict with the company name
+
+  # Other common words with diacritics
+  - trigger: "cooperate"
+    replace: "coöperate"
+    # Note: New Yorker style - uncomment if you prefer this
+    propagate_case: true
+
+  # ---------------------------------------------------------------------------
+  # Ligatures & Special Characters
+  # ---------------------------------------------------------------------------
+
+  # Note: These are optional stylistic choices
+  # - trigger: "ffi"
+  #   replace: "ﬃ"
+  # - trigger: "ffl"
+  #   replace: "ﬄ"
+  # - trigger: "fi"
+  #   replace: "ﬁ"
+  # - trigger: "fl"
+  #   replace: "ﬂ"
+
+  # ---------------------------------------------------------------------------
+  # Common Autocorrections
+  # ---------------------------------------------------------------------------
+
+  # Note: Uncomment these if you want automatic typo correction
+  # Be cautious - these can be intrusive
+
+  # - trigger: "teh"
+  #   replace: "the"
+  #   propagate_case: true
+
+  # - trigger: "adn"
+  #   replace: "and"
+  #   propagate_case: true
+
+  # - trigger: "dont"
+  #   replace: "don't"
+
+  # - trigger: "cant"
+  #   replace: "can't"
+
+  # - trigger: "wont"
+  #   replace: "won't"
+
+  # - trigger: "im"
+  #   replace: "I'm"
+  #   word: true
+
+  # - trigger: "youre"
+  #   replace: "you're"
+
+  # - trigger: "theyre"
+  #   replace: "they're"

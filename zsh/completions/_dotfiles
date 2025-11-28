@@ -1,0 +1,165 @@
+#compdef dotfiles-health block_social rotate-logs sync-blocked-sites dotfiles-diff deepwork cron-notify backup-status daily-summary
+
+# =============================================================================
+# ZSH COMPLETIONS - Custom Dotfiles Scripts
+# =============================================================================
+# Provides tab completion for custom scripts in the dotfiles repository.
+#
+# Installation:
+#   Add to fpath in .zshrc before compinit:
+#   fpath=(~/.dotfiles/zsh/completions $fpath)
+#
+# =============================================================================
+
+# dotfiles-health completions
+_dotfiles-health() {
+    local -a options
+    options=(
+        '--quick[Skip slow checks like brew outdated]:'
+        '-q[Skip slow checks like brew outdated]:'
+        '--fix[Attempt to fix issues by re-running install]:'
+        '-f[Attempt to fix issues by re-running install]:'
+        '--help[Show help message]:'
+        '-h[Show help message]:'
+    )
+    _describe 'dotfiles-health options' options
+}
+
+# block_social completions
+_block_social() {
+    local -a options
+    options=(
+        '--unblock[Restore default hosts file]'
+        '-u[Restore default hosts file]'
+        '--status[Show current blocking status]'
+        '-s[Show current blocking status]'
+        '--list[List all sites that will be blocked]'
+        '-l[List all sites that will be blocked]'
+        '--help[Show help message]'
+        '-h[Show help message]'
+    )
+    _describe 'block_social options' options
+}
+
+# rotate-logs completions
+_rotate-logs() {
+    local -a options
+    options=(
+        '--status[Show log file sizes and status]'
+        '-s[Show log file sizes and status]'
+        '--dry-run[Show what would be rotated without making changes]'
+        '-n[Show what would be rotated without making changes]'
+        '--force[Rotate all logs regardless of size]'
+        '-f[Rotate all logs regardless of size]'
+        '--help[Show help message]'
+        '-h[Show help message]'
+    )
+    _describe 'rotate-logs options' options
+}
+
+# sync-blocked-sites completions
+_sync-blocked-sites() {
+    local -a options
+    options=(
+        '--check[Check if configurations are in sync]'
+        '-c[Check if configurations are in sync]'
+        '--list[List all blocked sites from shared config]'
+        '-l[List all blocked sites from shared config]'
+        '--help[Show help message]'
+        '-h[Show help message]'
+    )
+    _describe 'sync-blocked-sites options' options
+}
+
+# dotfiles-diff completions
+_dotfiles-diff() {
+    local -a options
+    options=(
+        '--quick[Only check symlink status, skip content comparison]'
+        '-q[Only check symlink status, skip content comparison]'
+        '--fix[Attempt to fix issues by re-running install]'
+        '-f[Attempt to fix issues by re-running install]'
+        '--help[Show help message]'
+        '-h[Show help message]'
+    )
+    _describe 'dotfiles-diff options' options
+    _files
+}
+
+# deepwork completions
+_deepwork() {
+    local -a options
+    options=(
+        '-d[Set session duration in minutes]:duration:'
+        '--duration[Set session duration in minutes]:duration:'
+        '-s[Check if currently in deep work mode]'
+        '--status[Check if currently in deep work mode]'
+        '-e[End the current deep work session]'
+        '--end[End the current deep work session]'
+        '-q[Suppress output for scripting]'
+        '--quiet[Suppress output for scripting]'
+        '-h[Show help message]'
+        '--help[Show help message]'
+    )
+    _describe 'deepwork options' options
+}
+
+# cron-notify completions
+_cron-notify() {
+    local -a options
+    options=(
+        '-s[Show recent failures]'
+        '--status[Show recent failures]'
+        '-c[Archive and clear failure log]'
+        '--clear[Archive and clear failure log]'
+        '-t[Send a test notification]'
+        '--test[Send a test notification]'
+        '-h[Show help message]'
+        '--help[Show help message]'
+    )
+    _describe 'cron-notify options' options
+    _files
+}
+
+# backup-status completions
+_backup-status() {
+    local -a options
+    options=(
+        '-q[Quick check with exit code only]'
+        '--quick[Quick check with exit code only]'
+        '-j[Output status as JSON]'
+        '--json[Output status as JSON]'
+        '-h[Show help message]'
+        '--help[Show help message]'
+    )
+    _describe 'backup-status options' options
+}
+
+# daily-summary completions
+_daily-summary() {
+    local -a options
+    options=(
+        '-y[Show yesterday summary]'
+        '--yesterday[Show yesterday summary]'
+        '-d[Show specific date]:date:'
+        '--date[Show specific date]:date:'
+        '-m[Output as markdown]'
+        '--markdown[Output as markdown]'
+        '-h[Show help message]'
+        '--help[Show help message]'
+    )
+    _describe 'daily-summary options' options
+}
+
+# Dispatch to the right completion function
+case "$service" in
+    dotfiles-health) _dotfiles-health ;;
+    block_social) _block_social ;;
+    rotate-logs) _rotate-logs ;;
+    sync-blocked-sites) _sync-blocked-sites ;;
+    dotfiles-diff) _dotfiles-diff ;;
+    deepwork) _deepwork ;;
+    cron-notify) _cron-notify ;;
+    backup-status) _backup-status ;;
+    daily-summary) _daily-summary ;;
+esac

@@ -1,0 +1,223 @@
+#!/bin/zsh
+# =============================================================================
+# ZSHRC - Zsh Configuration File
+# =============================================================================
+# This file configures the interactive zsh shell environment. It is sourced
+# for every new interactive shell session.
+#
+# Loading order: zshenv → zprofile (login) → zshrc (interactive) → zlogin
+#
+# Contents:
+#   1. History Configuration
+#   2. Security (GPG)
+#   3. Editor Configuration
+#   4. PATH Configuration
+#   5. Aliases
+#   6. Terminal Settings
+#   7. Language Version Managers (NVM, rbenv)
+#   8. Prompt (Starship)
+# =============================================================================
+
+
+# =============================================================================
+# 1. HISTORY CONFIGURATION
+# =============================================================================
+# Zsh history settings for command recall and sharing across sessions.
+# See: man zshoptions (search for "History")
+
+HISTFILE="${HISTFILE:-$HOME/.zsh_history}"  # Location of history file
+HISTSIZE=10000                               # Max entries in memory
+SAVEHIST=10000                               # Max entries in history file
+
+# History options (setopt)
+setopt EXTENDED_HISTORY       # Record timestamp of command in HISTFILE
+setopt HIST_EXPIRE_DUPS_FIRST # Delete duplicates first when HISTFILE exceeds HISTSIZE
+setopt HIST_IGNORE_DUPS       # Don't record entry if it's the same as previous
+setopt HIST_IGNORE_ALL_DUPS   # Remove older duplicate entries from history
+setopt HIST_IGNORE_SPACE      # Don't record entries starting with a space
+setopt HIST_FIND_NO_DUPS      # Don't display duplicates when searching history
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks from each line
+setopt HIST_VERIFY            # Show command with history expansion before running it
+setopt INC_APPEND_HISTORY     # Write to history file immediately, not on exit
+setopt SHARE_HISTORY          # Share history between all zsh sessions
+
+
+# =============================================================================
+# 2. SECURITY - GPG CONFIGURATION
+# =============================================================================
+# Configure GPG for commit signing and other cryptographic operations.
+# GPG_TTY tells GPG which terminal to use for passphrase prompts.
+
+export GPG_TTY=$(tty)
+
+
+# =============================================================================
+# 3. EDITOR CONFIGURATION
+# =============================================================================
+# VISUAL: Used by programs that can launch a full-screen editor (git commit, etc.)
+# EDITOR: Used by programs expecting a line-based editor (crontab -e, etc.)
+#
+# Priority cascade for VISUAL: Zed → Cursor → VSCode → Neovim → Vim
+# EDITOR always prefers terminal-based editors (nvim/vim)
+
+# Helper function to find first available editor
+_find_editor() {
+    for editor in "$@"; do
+        if command -v "$editor" &>/dev/null; then
+            echo "$(command -v "$editor")"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Set VISUAL (GUI-capable editor preferred)
+export VISUAL="$(_find_editor zed cursor code nvim vim)"
+
+# Set EDITOR (terminal editor for CLI contexts)
+export EDITOR="$(_find_editor nvim vim vi)"
+
+# Fallback if nothing found
+: "${VISUAL:=/usr/bin/vim}"
+: "${EDITOR:=/usr/bin/vim}"
+
+
+# =============================================================================
+# 4. PATH CONFIGURATION
+# =============================================================================
+# Modify PATH to include custom scripts and language-specific binaries.
+# Order matters: earlier entries take precedence.
+
+# Prevent duplicate PATH entries
+typeset -U PATH path
+
+# Homebrew (must be early for ARM Macs)
+# Note: Homebrew shellenv is sourced in .zprofile for login shells
+if [[ -d "/opt/homebrew/bin" ]]; then
+    export PATH="/opt/homebrew/bin:$PATH"
+fi
+
+# OpenJDK from Homebrew (before system Java)
+if [[ -d "/opt/homebrew/opt/openjdk/bin" ]]; then
+    export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+fi
+
+# Go language paths
+if [[ -d "/usr/lib/go" ]]; then
+    export GOROOT="/usr/lib/go"
+elif [[ -d "/opt/homebrew/opt/go/libexec" ]]; then
+    export GOROOT="/opt/homebrew/opt/go/libexec"
+fi
+export GOPATH="${GOPATH:-$HOME/go}"
+[[ -d "$GOROOT/bin" ]] && export PATH="$PATH:$GOROOT/bin"
+[[ -d "$GOPATH/bin" ]] && export PATH="$PATH:$GOPATH/bin"
+
+# User's local scripts (installed via dotfiles)
+export PATH="$PATH:$HOME/.local/bin"
+
+
+# =============================================================================
+# 5. ALIASES
+# =============================================================================
+# Shell aliases are kept in a separate file for organization.
+# See ~/.aliases for the full list.
+
+if [[ -f "$HOME/.aliases" ]]; then
+    source "$HOME/.aliases"
+fi
+
+
+# =============================================================================
+# 6. TERMINAL SETTINGS
+# =============================================================================
+# General terminal behavior and appearance settings.
+
+# Enable 256 color support
+export TERM="xterm-256color"
+
+# Case-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# Add custom completions to fpath (before compinit)
+if [[ -d "$HOME/.dotfiles/zsh/completions" ]]; then
+    fpath=("$HOME/.dotfiles/zsh/completions" $fpath)
+fi
+
+# Enable completion system
+autoload -Uz compinit
+# Only regenerate completion dump once per day for faster startup
+if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+else
+    compinit -C
+fi
+
+
+# =============================================================================
+# 7. LANGUAGE VERSION MANAGERS
+# =============================================================================
+# Initialize version managers for Node.js (nvm) and Ruby (rbenv).
+# These are loaded conditionally to avoid errors if not installed.
+
+# -----------------------------------------------------------------------------
+# NVM (Node Version Manager)
+# -----------------------------------------------------------------------------
+# NVM can slow down shell startup significantly. It's loaded normally here,
+# but if startup becomes slow, consider lazy-loading (see commented section).
+
+export NVM_DIR="$HOME/.nvm"
+
+# Standard NVM loading
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    source "$NVM_DIR/nvm.sh"
+fi
+
+# Load NVM bash completion (works in zsh too)
+if [[ -s "$NVM_DIR/bash_completion" ]]; then
+    source "$NVM_DIR/bash_completion"
+fi
+
+# Alternative: Lazy-load NVM for faster shell startup (uncomment to enable)
+# This only loads NVM when you actually use node/npm/nvm commands.
+# -----------------------------------------------------------------------------
+# _nvm_lazy_load() {
+#     unset -f nvm node npm npx
+#     if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+#         source "$NVM_DIR/nvm.sh"
+#     fi
+# }
+# nvm() { _nvm_lazy_load; nvm "$@"; }
+# node() { _nvm_lazy_load; node "$@"; }
+# npm() { _nvm_lazy_load; npm "$@"; }
+# npx() { _nvm_lazy_load; npx "$@"; }
+
+# -----------------------------------------------------------------------------
+# RBENV (Ruby Version Manager)
+# -----------------------------------------------------------------------------
+# Initialize rbenv for managing Ruby versions.
+
+if command -v rbenv &>/dev/null; then
+    eval "$(rbenv init - zsh)"
+fi
+
+
+# =============================================================================
+# 8. PROMPT - STARSHIP
+# =============================================================================
+# Starship is a fast, customizable, cross-shell prompt.
+# Configuration lives in ~/.config/starship.toml
+# See: https://starship.rs/
+
+if command -v starship &>/dev/null; then
+    eval "$(starship init zsh)"
+fi
+
+
+# =============================================================================
+# END OF ZSHRC
+# =============================================================================
+# Local customizations can be added to ~/.zshrc.local (not tracked in dotfiles)
+
+if [[ -f "$HOME/.zshrc.local" ]]; then
+    source "$HOME/.zshrc.local"
+fi

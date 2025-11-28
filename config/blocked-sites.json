@@ -1,0 +1,50 @@
+{
+  "_comment": "Shared list of distracting sites used by block_social and refocus.applescript",
+
+  "streaming": [
+    "youtube.com",
+    "netflix.com",
+    "vimeo.com",
+    "primevideo.com",
+    "hulu.com",
+    "twitch.tv",
+    "stan.com.au",
+    "iview.abc.net.au"
+  ],
+
+  "social": [
+    "tiktok.com",
+    "instagram.com",
+    "x.com",
+    "twitter.com",
+    "facebook.com",
+    "snapchat.com",
+    "discord.com",
+    "discord.gg",
+    "reddit.com"
+  ],
+
+  "news": [
+    "abc.net.au",
+    "sbs.com.au",
+    "theguardian.com",
+    "news.ycombinator.com",
+    "kottke.org",
+    "fandom.com"
+  ],
+
+  "shopping": [
+    "amazon.com",
+    "amazon.com.au",
+    "aliexpress.com",
+    "gumtree.com.au"
+  ],
+
+  "misc": [
+    "manifold.markets",
+    "heroforge.com",
+    "pathbuilder2e.com",
+    "aonprd.com",
+    "2e.aonprd.com"
+  ]
+}

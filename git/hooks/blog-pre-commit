@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# Make sure to add the updated log & data & post files to the commit
-git add ~/Documents/blog/_data ~/Documents/blog/public ~/Documents/blog/_posts ~/Documents/blog/_archive

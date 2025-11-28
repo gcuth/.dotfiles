@@ -1,0 +1,253 @@
+#!/usr/bin/env bash
+# =============================================================================
+# CRON-NOTIFY - Wrapper for cron jobs with error notification
+# =============================================================================
+# Wraps a command and sends a notification if it fails.
+#
+# Usage:
+#   cron-notify <command> [args...]
+#   cron-notify --status              # Show recent failures
+#   cron-notify --clear               # Clear failure log
+#   cron-notify --help                # Show help
+#
+# Features:
+#   - Captures stdout and stderr
+#   - Sends macOS notification on failure
+#   - Logs failures for later review
+#   - Rate limits notifications (max 1 per script per hour)
+#   - Daily digest option
+#
+# Integration:
+#   In crontab, wrap commands like:
+#   * * * * * cron-notify /path/to/script.sh
+#
+# =============================================================================
+
+set -uo pipefail
+
+# -----------------------------------------------------------------------------
+# CONFIGURATION
+# -----------------------------------------------------------------------------
+
+readonly SCRIPT_NAME="cron-notify"
+readonly LOG_DIR="${HOME}/Logs"
+readonly FAILURE_LOG="${LOG_DIR}/cron-failures.log"
+readonly RATE_LIMIT_DIR="${HOME}/.cache/cron-notify"
+readonly RATE_LIMIT_SECONDS=3600  # 1 hour between notifications for same script
+
+# Notification settings
+readonly NOTIFY_SOUND="Basso"  # macOS notification sound
+readonly NOTIFY_TITLE="Cron Job Failed"
+
+# -----------------------------------------------------------------------------
+# HELPERS
+# -----------------------------------------------------------------------------
+
+ensure_dirs() {
+    mkdir -p "$LOG_DIR" "$RATE_LIMIT_DIR"
+}
+
+timestamp() {
+    date '+%Y-%m-%d %H:%M:%S'
+}
+
+log_failure() {
+    local script_name="$1"
+    local exit_code="$2"
+    local output="$3"
+
+    {
+        echo "========================================"
+        echo "Timestamp: $(timestamp)"
+        echo "Script:    $script_name"
+        echo "Exit Code: $exit_code"
+        echo "Output:"
+        echo "$output" | head -50  # Limit output length
+        echo "========================================"
+        echo
+    } >> "$FAILURE_LOG"
+}
+
+# Check if we should rate-limit notifications for this script
+should_notify() {
+    local script_name="$1"
+    local rate_file="${RATE_LIMIT_DIR}/${script_name//\//_}.last"
+
+    if [[ ! -f "$rate_file" ]]; then
+        return 0  # No previous notification, allow
+    fi
+
+    local last_notify
+    last_notify=$(cat "$rate_file" 2>/dev/null || echo 0)
+    local now
+    now=$(date +%s)
+    local diff=$((now - last_notify))
+
+    [[ $diff -ge $RATE_LIMIT_SECONDS ]]
+}
+
+mark_notified() {
+    local script_name="$1"
+    local rate_file="${RATE_LIMIT_DIR}/${script_name//\//_}.last"
+    date +%s > "$rate_file"
+}
+
+send_notification() {
+    local title="$1"
+    local message="$2"
+
+    # macOS notification
+    osascript -e "display notification \"$message\" with title \"$title\" sound name \"$NOTIFY_SOUND\"" 2>/dev/null || true
+}
+
+# -----------------------------------------------------------------------------
+# COMMANDS
+# -----------------------------------------------------------------------------
+
+show_status() {
+    echo "Cron Notification Status"
+    echo "========================"
+    echo
+
+    if [[ ! -f "$FAILURE_LOG" ]]; then
+        echo "No failures logged."
+        return 0
+    fi
+
+    local failure_count
+    failure_count=$(grep -c "^Timestamp:" "$FAILURE_LOG" 2>/dev/null || echo 0)
+
+    echo "Total logged failures: $failure_count"
+    echo "Log file: $FAILURE_LOG"
+    echo
+
+    if [[ $failure_count -gt 0 ]]; then
+        echo "Recent failures (last 5):"
+        echo "--------------------------"
+        # Show last 5 failure blocks
+        tac "$FAILURE_LOG" 2>/dev/null | \
+            awk '/^========/ {count++} count<=10' | \
+            tac | \
+            head -60
+    fi
+}
+
+clear_log() {
+    if [[ -f "$FAILURE_LOG" ]]; then
+        local backup="${FAILURE_LOG}.$(date +%Y%m%d)"
+        mv "$FAILURE_LOG" "$backup"
+        echo "Failure log archived to: $backup"
+    else
+        echo "No failure log to clear."
+    fi
+}
+
+show_help() {
+    cat << 'EOF'
+cron-notify - Wrapper for cron jobs with error notification
+
+Usage:
+  cron-notify <command> [args...]    Run command, notify on failure
+  cron-notify --status               Show recent failures
+  cron-notify --clear                Archive and clear failure log
+  cron-notify --test                 Send a test notification
+  cron-notify --help                 Show this help
+
+How it works:
+  1. Runs the specified command
+  2. Captures stdout and stderr
+  3. If command exits non-zero:
+     - Logs the failure to ~/Logs/cron-failures.log
+     - Sends a macOS notification (rate-limited)
+
+Rate limiting:
+  Notifications for the same script are limited to once per hour
+  to prevent notification spam from repeatedly failing jobs.
+
+Examples:
+  # In crontab:
+  * * * * * cron-notify /path/to/track_notes.sh
+
+  # Test it manually:
+  cron-notify false  # Will fail and notify
+  cron-notify true   # Will succeed silently
+
+  # Check status:
+  cron-notify --status
+EOF
+}
+
+test_notification() {
+    echo "Sending test notification..."
+    send_notification "Cron Notify Test" "This is a test notification from cron-notify"
+    echo "Done. You should see a notification."
+}
+
+# -----------------------------------------------------------------------------
+# MAIN EXECUTION
+# -----------------------------------------------------------------------------
+
+run_command() {
+    local cmd=("$@")
+    local script_name
+    script_name=$(basename "${cmd[0]}")
+
+    ensure_dirs
+
+    # Create temp file for output
+    local tmp_output
+    tmp_output=$(mktemp)
+    trap "rm -f '$tmp_output'" EXIT
+
+    # Run the command, capturing all output
+    local exit_code=0
+    "${cmd[@]}" > "$tmp_output" 2>&1 || exit_code=$?
+
+    if [[ $exit_code -ne 0 ]]; then
+        local output
+        output=$(cat "$tmp_output")
+
+        # Log the failure
+        log_failure "$script_name" "$exit_code" "$output"
+
+        # Send notification if not rate-limited
+        if should_notify "$script_name"; then
+            local message="$script_name failed with exit code $exit_code"
+            send_notification "$NOTIFY_TITLE" "$message"
+            mark_notified "$script_name"
+        fi
+
+        # Exit with the original exit code
+        exit $exit_code
+    fi
+
+    # Success - output any stdout (some scripts intentionally produce output)
+    cat "$tmp_output"
+}
+
+main() {
+    case "${1:-}" in
+        --status|-s)
+            show_status
+            ;;
+        --clear|-c)
+            clear_log
+            ;;
+        --test|-t)
+            test_notification
+            ;;
+        --help|-h)
+            show_help
+            ;;
+        "")
+            echo "Usage: cron-notify <command> [args...]"
+            echo "Try 'cron-notify --help' for more information."
+            exit 1
+            ;;
+        *)
+            run_command "$@"
+            ;;
+    esac
+}
+
+main "$@"

@@ -1,0 +1,258 @@
+#!/usr/bin/env bash
+# =============================================================================
+# ROTATE-LOGS - Log rotation utility for dotfiles
+# =============================================================================
+# Rotates and compresses log files in ~/Logs to prevent disk space issues.
+#
+# Usage:
+#   rotate-logs              # Rotate all logs over 10MB
+#   rotate-logs --dry-run    # Show what would be rotated
+#   rotate-logs --force      # Rotate all logs regardless of size
+#   rotate-logs --status     # Show log file sizes
+#
+# Can be added to cron for automatic rotation:
+#   0 3 * * * ~/.local/bin/rotate-logs
+#
+# =============================================================================
+
+set -euo pipefail
+
+# -----------------------------------------------------------------------------
+# Configuration
+# -----------------------------------------------------------------------------
+
+readonly LOG_DIR="${LOG_DIR:-$HOME/Logs}"
+readonly MAX_SIZE_MB="${MAX_SIZE_MB:-10}"          # Rotate logs over this size
+readonly MAX_SIZE_BYTES=$((MAX_SIZE_MB * 1024 * 1024))
+readonly KEEP_ROTATED="${KEEP_ROTATED:-5}"         # Number of rotated logs to keep
+readonly COMPRESS="${COMPRESS:-true}"              # Compress rotated logs
+
+# Colors
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m'
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+print_info() { echo -e "${GREEN}✓${NC} $1"; }
+print_warn() { echo -e "${YELLOW}!${NC} $1"; }
+print_error() { echo -e "${RED}✗${NC} $1" >&2; }
+
+human_size() {
+    local bytes=$1
+    if [[ $bytes -ge 1073741824 ]]; then
+        printf "%.1fGB" "$(echo "scale=1; $bytes/1073741824" | bc)"
+    elif [[ $bytes -ge 1048576 ]]; then
+        printf "%.1fMB" "$(echo "scale=1; $bytes/1048576" | bc)"
+    elif [[ $bytes -ge 1024 ]]; then
+        printf "%.1fKB" "$(echo "scale=1; $bytes/1024" | bc)"
+    else
+        echo "${bytes}B"
+    fi
+}
+
+get_file_size() {
+    stat -f%z "$1" 2>/dev/null || stat --printf="%s" "$1" 2>/dev/null || echo 0
+}
+
+# -----------------------------------------------------------------------------
+# Main functions
+# -----------------------------------------------------------------------------
+
+show_status() {
+    echo -e "${BLUE}=== Log File Status ===${NC}"
+    echo
+
+    if [[ ! -d "$LOG_DIR" ]]; then
+        print_error "Log directory not found: $LOG_DIR"
+        return 1
+    fi
+
+    local total_size=0
+    local file_count=0
+
+    printf "%-50s %10s %s\n" "FILE" "SIZE" "STATUS"
+    printf "%s\n" "$(printf '%.0s-' {1..70})"
+
+    while IFS= read -r -d '' file; do
+        local size
+        size=$(get_file_size "$file")
+        local size_human
+        size_human=$(human_size "$size")
+        local name
+        name=$(basename "$file")
+        local status=""
+
+        if [[ $size -gt $MAX_SIZE_BYTES ]]; then
+            status="${YELLOW}needs rotation${NC}"
+        elif [[ $size -gt $((MAX_SIZE_BYTES / 2)) ]]; then
+            status="${BLUE}getting large${NC}"
+        else
+            status="${GREEN}ok${NC}"
+        fi
+
+        printf "%-50s %10s %b\n" "$name" "$size_human" "$status"
+
+        total_size=$((total_size + size))
+        ((file_count++))
+    done < <(find "$LOG_DIR" -maxdepth 1 -type f -name "*.log" -print0 2>/dev/null | sort -z)
+
+    echo
+    echo "Total: $file_count log files, $(human_size $total_size)"
+    echo "Rotation threshold: ${MAX_SIZE_MB}MB"
+}
+
+rotate_file() {
+    local file="$1"
+    local dry_run="${2:-false}"
+    local name
+    name=$(basename "$file")
+
+    if [[ "$dry_run" == "true" ]]; then
+        print_info "[dry-run] Would rotate: $name"
+        return 0
+    fi
+
+    # Remove oldest rotated log
+    local oldest="${file}.${KEEP_ROTATED}"
+    [[ -f "$oldest" ]] && rm -f "$oldest"
+    [[ -f "${oldest}.gz" ]] && rm -f "${oldest}.gz"
+
+    # Shift existing rotated logs
+    for ((i = KEEP_ROTATED - 1; i >= 1; i--)); do
+        local current="${file}.${i}"
+        local next="${file}.$((i + 1))"
+
+        [[ -f "$current" ]] && mv "$current" "$next"
+        [[ -f "${current}.gz" ]] && mv "${current}.gz" "${next}.gz"
+    done
+
+    # Rotate current log
+    if [[ -f "$file" ]]; then
+        mv "$file" "${file}.1"
+
+        # Compress if enabled
+        if [[ "$COMPRESS" == "true" ]] && command -v gzip &>/dev/null; then
+            gzip "${file}.1" &
+        fi
+
+        # Create new empty log file
+        touch "$file"
+
+        print_info "Rotated: $name"
+    fi
+}
+
+rotate_all() {
+    local dry_run="${1:-false}"
+    local force="${2:-false}"
+
+    echo -e "${BLUE}=== Rotating Log Files ===${NC}"
+    echo
+
+    if [[ ! -d "$LOG_DIR" ]]; then
+        print_error "Log directory not found: $LOG_DIR"
+        return 1
+    fi
+
+    local rotated=0
+    local skipped=0
+
+    while IFS= read -r -d '' file; do
+        local size
+        size=$(get_file_size "$file")
+        local name
+        name=$(basename "$file")
+
+        if [[ "$force" == "true" ]] || [[ $size -gt $MAX_SIZE_BYTES ]]; then
+            rotate_file "$file" "$dry_run"
+            ((rotated++))
+        else
+            ((skipped++))
+        fi
+    done < <(find "$LOG_DIR" -maxdepth 1 -type f -name "*.log" -print0 2>/dev/null)
+
+    echo
+    echo "Rotated: $rotated, Skipped: $skipped"
+
+    if [[ "$dry_run" == "true" ]]; then
+        echo -e "${YELLOW}(dry-run mode - no changes made)${NC}"
+    fi
+}
+
+print_usage() {
+    cat << 'EOF'
+Usage: rotate-logs [OPTIONS]
+
+Rotate log files in ~/Logs to manage disk space.
+
+Options:
+  --status      Show log file sizes and status
+  --dry-run     Show what would be rotated without making changes
+  --force       Rotate all logs regardless of size
+  --help        Show this help message
+
+Configuration (via environment variables):
+  LOG_DIR       Log directory (default: ~/Logs)
+  MAX_SIZE_MB   Rotation threshold in MB (default: 10)
+  KEEP_ROTATED  Number of rotated logs to keep (default: 5)
+  COMPRESS      Compress rotated logs (default: true)
+
+Examples:
+  rotate-logs --status      # Check log sizes
+  rotate-logs               # Rotate logs over 10MB
+  rotate-logs --force       # Rotate all logs
+  MAX_SIZE_MB=5 rotate-logs # Rotate logs over 5MB
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# Main
+# -----------------------------------------------------------------------------
+
+main() {
+    local action="rotate"
+    local dry_run=false
+    local force=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --status|-s)
+                action="status"
+                shift
+                ;;
+            --dry-run|-n)
+                dry_run=true
+                shift
+                ;;
+            --force|-f)
+                force=true
+                shift
+                ;;
+            --help|-h)
+                print_usage
+                exit 0
+                ;;
+            *)
+                print_error "Unknown option: $1"
+                print_usage
+                exit 1
+                ;;
+        esac
+    done
+
+    case "$action" in
+        status)
+            show_status
+            ;;
+        rotate)
+            rotate_all "$dry_run" "$force"
+            ;;
+    esac
+}
+
+main "$@"

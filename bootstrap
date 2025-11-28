@@ -1,0 +1,271 @@
+#!/usr/bin/env bash
+# =============================================================================
+# BOOTSTRAP - Fresh macOS Installation Script
+# =============================================================================
+# This script sets up a fresh macOS machine from scratch.
+# It can be run directly from curl on a new machine.
+#
+# Usage (fresh machine):
+#   curl -fsSL https://raw.githubusercontent.com/gcuth/.dotfiles/master/bootstrap | bash
+#
+# Or if you've already cloned:
+#   cd ~/.dotfiles && ./bootstrap
+#
+# What it does:
+#   1. Installs Xcode Command Line Tools
+#   2. Installs Homebrew
+#   3. Clones dotfiles repository
+#   4. Runs dotfiles installer
+#   5. Optionally runs macOS setup
+#
+# =============================================================================
+
+set -euo pipefail
+
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
+
+readonly DOTFILES_REPO="https://github.com/gcuth/.dotfiles.git"
+readonly DOTFILES_DIR="$HOME/.dotfiles"
+readonly HOMEBREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+
+# Colors
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly BOLD='\033[1m'
+readonly NC='\033[0m'
+
+# =============================================================================
+# HELPERS
+# =============================================================================
+
+print_header() {
+    echo
+    echo -e "${BLUE}${BOLD}╔════════════════════════════════════════╗${NC}"
+    echo -e "${BLUE}${BOLD}║  $1$(printf '%*s' $((38 - ${#1})) '')║${NC}"
+    echo -e "${BLUE}${BOLD}╚════════════════════════════════════════╝${NC}"
+    echo
+}
+
+print_step() {
+    echo -e "${BLUE}==>${NC} ${BOLD}$1${NC}"
+}
+
+print_success() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+print_warn() {
+    echo -e "${YELLOW}!${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}✗${NC} $1" >&2
+}
+
+print_info() {
+    echo -e "  $1"
+}
+
+command_exists() {
+    command -v "$1" &>/dev/null
+}
+
+# =============================================================================
+# INSTALLATION STEPS
+# =============================================================================
+
+install_xcode_cli() {
+    print_step "Checking Xcode Command Line Tools..."
+
+    if xcode-select -p &>/dev/null; then
+        print_success "Xcode Command Line Tools already installed"
+        return 0
+    fi
+
+    print_info "Installing Xcode Command Line Tools..."
+    print_info "A dialog box may appear - please click 'Install'"
+
+    # Trigger the install prompt
+    xcode-select --install 2>/dev/null || true
+
+    # Wait for installation to complete
+    print_info "Waiting for installation to complete..."
+    until xcode-select -p &>/dev/null; do
+        sleep 5
+    done
+
+    print_success "Xcode Command Line Tools installed"
+
+    # Accept license if needed
+    if ! sudo xcodebuild -license check &>/dev/null; then
+        print_info "Accepting Xcode license..."
+        sudo xcodebuild -license accept
+    fi
+}
+
+install_homebrew() {
+    print_step "Checking Homebrew..."
+
+    if command_exists brew; then
+        print_success "Homebrew already installed"
+        return 0
+    fi
+
+    print_info "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL $HOMEBREW_INSTALL_URL)"
+
+    # Add Homebrew to PATH for this session
+    if [[ -f "/opt/homebrew/bin/brew" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -f "/usr/local/bin/brew" ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+
+    if command_exists brew; then
+        print_success "Homebrew installed"
+    else
+        print_error "Homebrew installation failed"
+        exit 1
+    fi
+}
+
+install_git() {
+    print_step "Checking Git..."
+
+    if command_exists git; then
+        print_success "Git already installed ($(git --version))"
+        return 0
+    fi
+
+    print_info "Installing Git via Homebrew..."
+    brew install git
+
+    print_success "Git installed"
+}
+
+clone_dotfiles() {
+    print_step "Checking dotfiles repository..."
+
+    if [[ -d "$DOTFILES_DIR" ]]; then
+        print_success "Dotfiles already cloned at $DOTFILES_DIR"
+
+        # Pull latest changes
+        print_info "Pulling latest changes..."
+        git -C "$DOTFILES_DIR" pull --rebase || print_warn "Could not pull latest changes"
+
+        return 0
+    fi
+
+    print_info "Cloning dotfiles repository..."
+    git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
+
+    print_success "Dotfiles cloned to $DOTFILES_DIR"
+}
+
+run_dotfiles_install() {
+    print_step "Running dotfiles installer..."
+
+    if [[ ! -x "$DOTFILES_DIR/install" ]]; then
+        print_error "Install script not found or not executable"
+        exit 1
+    fi
+
+    cd "$DOTFILES_DIR"
+    ./install
+
+    print_success "Dotfiles installed"
+}
+
+run_macos_setup() {
+    print_step "macOS setup..."
+
+    echo
+    read -p "Do you want to run macOS system configuration? (y/N) " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if [[ -x "$DOTFILES_DIR/macos/setup" ]]; then
+            "$DOTFILES_DIR/macos/setup"
+            print_success "macOS setup complete"
+        else
+            print_warn "macOS setup script not found"
+        fi
+    else
+        print_info "Skipping macOS setup"
+        print_info "You can run it later with: ~/.dotfiles/macos/setup"
+    fi
+}
+
+run_health_check() {
+    print_step "Running health check..."
+
+    if [[ -x "$HOME/.local/bin/dotfiles-health" ]]; then
+        "$HOME/.local/bin/dotfiles-health" --quick
+    elif [[ -x "$DOTFILES_DIR/scripts/dotfiles-health" ]]; then
+        "$DOTFILES_DIR/scripts/dotfiles-health" --quick
+    else
+        print_warn "Health check script not found"
+    fi
+}
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+main() {
+    print_header "DOTFILES BOOTSTRAP"
+
+    echo "This script will set up your macOS development environment."
+    echo
+    echo "Steps:"
+    echo "  1. Install Xcode Command Line Tools"
+    echo "  2. Install Homebrew"
+    echo "  3. Clone dotfiles repository"
+    echo "  4. Run dotfiles installer"
+    echo "  5. (Optional) Configure macOS settings"
+    echo
+
+    read -p "Continue? (y/N) " -n 1 -r
+    echo
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Aborted."
+        exit 0
+    fi
+
+    echo
+
+    # Run installation steps
+    install_xcode_cli
+    install_homebrew
+    install_git
+    clone_dotfiles
+    run_dotfiles_install
+    run_macos_setup
+    run_health_check
+
+    # Final message
+    print_header "SETUP COMPLETE"
+
+    echo "Your development environment is ready!"
+    echo
+    echo "Next steps:"
+    echo "  1. Restart your terminal (or run: source ~/.zshrc)"
+    echo "  2. Configure Git: git config --global user.name 'Your Name'"
+    echo "  3. Set up SSH keys for GitHub"
+    echo "  4. Sign in to 1Password and other apps"
+    echo
+    echo "Useful commands:"
+    echo "  dotfiles-health     - Check if everything is working"
+    echo "  brewup              - Update Homebrew packages"
+    echo "  block_social        - Block distracting websites"
+    echo
+
+    print_success "Happy coding!"
+}
+
+main "$@"

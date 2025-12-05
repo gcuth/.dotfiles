@@ -35,7 +35,7 @@ matches:
 
   # Full timestamp for logging: 2024-01-15 14:30:45 (+1100) -
   - trigger: "nnow"
-    replace: "{{mydate}} {{mytime}} ({{myutcoffset}}) - "
+    replace: "{{mydate}} {{mytime}} ({{myutcoffset}}) — "
     vars:
       - name: mydate
         type: date

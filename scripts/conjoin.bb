@@ -270,4 +270,4 @@
         (println "")
         (println "Run 'conjoin.bb --help' for more information.")))))
 
-(-main *command-line-args*)
+(apply -main *command-line-args*)

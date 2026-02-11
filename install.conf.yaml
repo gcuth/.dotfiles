@@ -169,6 +169,9 @@
     ~/Library/Application Support/espanso/match/pretty.yml:
       path: snippets/espanso/matches/pretty.yml
       create: true
+    ~/Library/Application Support/espanso/match/ai.yml:
+      path: snippets/espanso/matches/ai.yml
+      create: true
 
 # =============================================================================
 # 6. PACKAGE INSTALLATION (HOMEBREW)

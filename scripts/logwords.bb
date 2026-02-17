@@ -460,7 +460,6 @@
             (println (str wc-since-midnight
                           (or streak-display "")
                           " (" change-str ")"))
-            (println (str wc-since-midnight
-                          " (" change-str " | " wc-now ")"))))))))
+            (println (str wc-since-midnight))))))))
 
 (-main)

@@ -135,8 +135,6 @@ logwords.bb --dir ~/Documents/Writing --log ~/Logs/words.csv --report
 logwords.bb --dir ~/Documents/Writing --log ~/Logs/words.csv --streak
 ```
 
-Configure goals in `config/productivity.json`.
-
 ### Backup Status
 
 ```bash
@@ -187,8 +185,6 @@ These files are automatically sourced if they exist.
 | File                        | What to Customize                      |
 | --------------------------- | -------------------------------------- |
 | `install.conf.yaml`         | Homebrew packages, symlinks, cron jobs |
-| `config/productivity.json`  | Writing goals, focus session length    |
-| `config/blocked-sites.json` | Sites to block (by category)           |
 | `starship.toml`             | Prompt appearance                      |
 | `git/config`                | Git aliases and settings               |
 | `macos/setup`               | macOS system preferences               |

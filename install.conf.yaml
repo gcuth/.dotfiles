@@ -237,6 +237,7 @@
     # Python
     - python # Python 3
     - pipx # Install Python apps in isolation
+    - uv # 
 
     # Node.js
     - nvm # Node Version Manager

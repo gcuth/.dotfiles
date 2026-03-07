@@ -116,6 +116,7 @@ alias gt='cd "$(git rev-parse --show-toplevel)"'  # Jump to repo root
 # Cleanup and maintenance
 alias gclean="git clean -fd"        # Remove untracked files
 alias gprune="git fetch --prune"    # Prune stale remote branches
+alias gcia='git branch --merged origin/main | grep -vE "^\s*(\*|main|develop)" | xargs -n 1 git branch -d' # Clean up merged branches - thanks https://spencer.wtf/2026/02/20/cleaning-up-merged-git-branches-a-one-liner-from-the-cias-leaked-dev-docs.html
 
 # Remove all .git directories recursively (DANGEROUS - use with caution)
 alias degit="find . -name '.git' -type d -exec rm -rf {} + 2>/dev/null"

@@ -347,7 +347,7 @@
     # - Shows: words written today, delta, total
     - cron: "* * * * *"
       command: >
-        open --background 'one-thing:?text='"$(~/Documents/Dev/Scripts/wordcounter progress tr -d "\n")"
+        open --background 'one-thing:?text='"$(~/Documents/Dev/Scripts/wordcounter progress | tr -d "\n")"
 
     # -------------------------------------------------------------------------
     # Every 5 Minutes

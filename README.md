@@ -1,6 +1,6 @@
 # .dotfiles
 
-Personal dotfiles for a macOS development environment, focused on productivity, writing, and research workflows. Made painless and idempotent with [dotbot](https://github.com/anishathalye/dotbot). Scripts lean heavily on [babashka](https://github.com/babashka/babashka) (Clojure scripting).
+dotfiles made painless and idempotent with [dotbot](https://github.com/anishathalye/dotbot).
 
 ## Quick Start
 
@@ -74,8 +74,6 @@ Located in `scripts/`, symlinked to `~/.local/bin/`:
 | `dotfiles-health` | Verify dotfiles setup is working                           |
 | `dotfiles-diff`   | Audit symlinks and detect divergence from repo             |
 | `backup.bb`       | Create GPG-encrypted tarball backups                       |
-| `backup-status`   | Dashboard showing status of all backup systems             |
-| `rotate-logs`     | Log rotation utility to manage disk space                  |
 | `cron-notify`     | Wrapper for cron jobs with failure notifications           |
 
 ### Shared Libraries
@@ -83,13 +81,6 @@ Located in `scripts/`, symlinked to `~/.local/bin/`:
 | File                     | Purpose                                   |
 | ------------------------ | ----------------------------------------- |
 | `scripts/lib/logging.sh` | Unified logging library for shell scripts |
-
-### Configuration Files
-
-| File                        | Purpose                                          |
-| --------------------------- | ------------------------------------------------ |
-| `config/productivity.json`  | Writing goals, focus settings, streak thresholds |
-| `config/blocked-sites.json` | Categorized list of sites to block               |
 
 ### Automation (Cron Jobs)
 
@@ -108,40 +99,6 @@ Hourly/Daily tasks:
 
 - iOS Shortcuts automations
 - Log file rotation (3 AM daily)
-
-## Usage Examples
-
-### Distraction Blocking
-
-```bash
-sudo block_social            # Enable blocking
-sudo block_social --unblock  # Disable blocking
-block_social --list          # Show blocked sites
-block_social --status        # Check if blocking is active
-```
-
-Configure blocked sites in `config/blocked-sites.json`.
-
-### Writing Productivity
-
-```bash
-# Track word count in a directory
-logwords.bb --dir ~/Documents/Writing --log ~/Logs/words.csv
-
-# View report of daily progress
-logwords.bb --dir ~/Documents/Writing --log ~/Logs/words.csv --report
-
-# Check writing streak
-logwords.bb --dir ~/Documents/Writing --log ~/Logs/words.csv --streak
-```
-
-### Backup Status
-
-```bash
-backup-status           # Full dashboard of all backup systems
-backup-status --quick   # Quick check (exit code only)
-backup-status --json    # Output as JSON
-```
 
 ### System Maintenance
 
@@ -211,10 +168,6 @@ These files are automatically sourced if they exist.
 │   ├── ignore             # Global gitignore
 │   └── hooks/pre-commit   # Syntax validation hook
 │
-├── config/
-│   ├── productivity.json  # Writing goals & focus settings
-│   └── blocked-sites.json # Site blocking categories
-│
 ├── scripts/               # Symlinked to ~/.local/bin/
 │   ├── lib/logging.sh     # Shared logging library (used by the shell scripts)
 │   ├── *.bb               # Babashka (Clojure) scripts
@@ -227,15 +180,11 @@ These files are automatically sourced if they exist.
 ├── applescripts/          # macOS automation
 │   └── tunes.js           # Music logging
 │
-├── snippets/espanso/      # Text expansion
-│   ├── config.yml
-│   └── matches/
-│       ├── base.yml       # Date/time, personal info
-│       └── pretty.yml     # Typography improvements
-│
-├── R/RProfile             # R console config
-├── lein/profiles.clj      # Clojure/Leiningen config
-└── stack/config.yaml      # Haskell config
+└── snippets/espanso/      # Text expansion
+    ├── config.yml
+    └── matches/
+        ├── base.yml       # Date/time, personal info
+        └── pretty.yml     # Typography improvements
 ```
 
 ## Dependencies

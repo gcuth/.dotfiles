@@ -262,7 +262,6 @@ main() {
     echo "Useful commands:"
     echo "  dotfiles-health     - Check if everything is working"
     echo "  brewup              - Update Homebrew packages"
-    echo "  block_social        - Block distracting websites"
     echo
 
     print_success "Happy coding!"

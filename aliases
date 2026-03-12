@@ -136,15 +136,6 @@ alias pip="pip3"
 alias venv="python3 -m venv"
 alias activate="source venv/bin/activate"
 
-# Docker (if used)
-alias dk="docker"
-alias dkc="docker-compose"
-alias dkps="docker ps"
-alias dkpsa="docker ps -a"
-alias dkimg="docker images"
-alias dkrm="docker rm"
-alias dkrmi="docker rmi"
-
 # Find TODOs and FIXMEs in codebase
 # Uses ripgrep if available (faster), falls back to grep
 if command -v rg &>/dev/null; then
@@ -171,10 +162,6 @@ alias tn='tr -d "\n"'
 
 # ROT13 encode/decode (same operation both ways)
 alias rot13="tr 'A-MN-Za-mn-z' 'N-ZA-Mn-za-m'"
-
-# Count lines, words, characters
-alias wc="wc"
-alias wcl="wc -l"                   # Count lines only
 
 # JSON pretty print (requires jq)
 alias json="jq ."

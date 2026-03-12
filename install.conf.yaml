@@ -69,20 +69,20 @@
 
 - create:
     # Development
-    - ~/Developer/ # Main directory for all dev projects
+    - ~/Developer/           # Main directory for all dev projects
 
     # Downloads & Media
-    - ~/Torrents/ # Base torrent directory
+    - ~/Torrents/            # Base torrent directory
     - ~/Torrents/Incomplete/ # In-progress downloads
-    - ~/Torrents/Complete/ # Finished downloads
+    - ~/Torrents/Complete/   # Finished downloads
 
     # Data & Logs
-    - ~/Logs/ # Script output and logs
-    - ~/Snapshots/ # Incremental backups (notes, etc.)
+    - ~/Logs/                # Script output and logs
+    - ~/Snapshots/           # Incremental backups (notes, etc.)
 
     # Config directories
-    - ~/.config/ # XDG config base
-    - ~/.local/bin/ # User scripts
+    - ~/.config/             # XDG config base
+    - ~/.local/bin/          # User scripts
 
 # =============================================================================
 # 5. SYMLINKS
@@ -133,23 +133,6 @@
       force: true
 
     # -------------------------------------------------------------------------
-    # Language-Specific Configuration
-    # -------------------------------------------------------------------------
-    # R Statistics
-    ~/.RProfile:
-      path: R/RProfile
-
-    # Clojure / Leiningen
-    ~/.lein/profiles.clj:
-      path: lein/profiles.clj
-      create: true
-
-    # Haskell / Stack
-    ~/.stack/config.yaml:
-      path: stack/config.yaml
-      create: true
-
-    # -------------------------------------------------------------------------
     # Scripts (symlink all to ~/.local/bin/)
     # -------------------------------------------------------------------------
     ~/.local/bin/:
@@ -168,9 +151,6 @@
       create: true
     ~/Library/Application Support/espanso/match/pretty.yml:
       path: snippets/espanso/matches/pretty.yml
-      create: true
-    ~/Library/Application Support/espanso/match/ai.yml:
-      path: snippets/espanso/matches/ai.yml
       create: true
 
 # =============================================================================
@@ -237,7 +217,7 @@
     # Python
     - python # Python 3
     - pipx # Install Python apps in isolation
-    - uv # 
+    - uv # Modern
 
     # Node.js
     - nvm # Node Version Manager
@@ -272,7 +252,6 @@
 - brew:
     - ffmpeg # Media processing
     - exiftool # Image metadata tool
-    - yt-dlp # Video downloader
     - rclone # Cloud storage sync
 
 # -----------------------------------------------------------------------------
@@ -281,7 +260,6 @@
 
 - brew:
     - gdu # Disk usage analyzer
-    - ollama # Local LLM runtime
     - espanso # Text expansion
 
 # -----------------------------------------------------------------------------
@@ -301,12 +279,9 @@
     - anki # Spaced repetition flashcards
     - zotero # Reference manager
     - rescuetime # Time tracking
-    - hazel # File automation
-    - bartender # Menu bar management
 
     # Communication
     - signal # Encrypted messaging
-    - discord # Chat/voice
     - zoom # Video conferencing
 
     # Privacy & Security

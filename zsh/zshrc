@@ -168,28 +168,28 @@ fi
 export NVM_DIR="$HOME/.nvm"
 
 # Standard NVM loading
-if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-    source "$NVM_DIR/nvm.sh"
-fi
+# if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+#     source "$NVM_DIR/nvm.sh"
+# fi
 
 # Load NVM bash completion (works in zsh too)
-if [[ -s "$NVM_DIR/bash_completion" ]]; then
-    source "$NVM_DIR/bash_completion"
-fi
+# if [[ -s "$NVM_DIR/bash_completion" ]]; then
+#     source "$NVM_DIR/bash_completion"
+# fi
 
 # Alternative: Lazy-load NVM for faster shell startup (uncomment to enable)
 # This only loads NVM when you actually use node/npm/nvm commands.
 # -----------------------------------------------------------------------------
-# _nvm_lazy_load() {
-#     unset -f nvm node npm npx
-#     if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-#         source "$NVM_DIR/nvm.sh"
-#     fi
-# }
-# nvm() { _nvm_lazy_load; nvm "$@"; }
-# node() { _nvm_lazy_load; node "$@"; }
-# npm() { _nvm_lazy_load; npm "$@"; }
-# npx() { _nvm_lazy_load; npx "$@"; }
+_nvm_lazy_load() {
+    unset -f nvm node npm npx
+    if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+        source "$NVM_DIR/nvm.sh"
+    fi
+}
+nvm() { _nvm_lazy_load; nvm "$@"; }
+node() { _nvm_lazy_load; node "$@"; }
+npm() { _nvm_lazy_load; npm "$@"; }
+npx() { _nvm_lazy_load; npx "$@"; }
 
 # -----------------------------------------------------------------------------
 # RBENV (Ruby Version Manager)

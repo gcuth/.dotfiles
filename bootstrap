@@ -184,7 +184,7 @@ run_macos_setup() {
     print_step "macOS setup..."
 
     echo
-    read -p "Do you want to run macOS system configuration? (y/N) " -n 1 -r
+    read -p "Do you want to run macOS system configuration? (y/N) " -n 1 -r < /dev/tty
     echo
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -229,7 +229,7 @@ main() {
     echo "  5. (Optional) Configure macOS settings"
     echo
 
-    read -p "Continue? (y/N) " -n 1 -r
+    read -p "Continue? (y/N) " -n 1 -r < /dev/tty
     echo
 
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then

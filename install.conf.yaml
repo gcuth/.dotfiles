@@ -355,12 +355,12 @@
       command: shortcuts run "Every Five Minutes"
 
     # Backup Obsidian notes to local git repo
-    - cron: "*/5 * * * *"
-      command: /bin/bash ~/.dotfiles/scripts/track_notes.sh
+    # - cron: "*/5 * * * *"
+    #   command: /bin/bash ~/.dotfiles/scripts/track_notes.sh
 
     # Sync thesis chapters to GitHub
-    - cron: "*/5 * * * *"
-      command: /bin/bash ~/.dotfiles/scripts/track_thesis.sh
+    # - cron: "*/5 * * * *"
+    #   command: /bin/bash ~/.dotfiles/scripts/track_thesis.sh
 
     # -------------------------------------------------------------------------
     # Hourly Jobs

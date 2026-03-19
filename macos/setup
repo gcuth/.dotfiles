@@ -326,8 +326,8 @@ defaults write NSGlobalDomain AppleFontSmoothing -int 1
 
 # Set desktop wallpaper to solid black
 # Minimal, distraction-free background
-print_info "Setting desktop wallpaper to solid black..."
-osascript -e 'tell application "System Events" to tell every desktop to set picture to "/System/Library/Desktop Pictures/Solid Colors/Black.png" as POSIX file' 2>/dev/null || print_warn "Could not set wallpaper"
+# print_info "Setting desktop wallpaper to solid black..."
+# osascript -e 'tell application "System Events" to tell every desktop to set picture to "/System/Library/Desktop Pictures/Solid Colors/Black.png" as POSIX file' 2>/dev/null || print_warn "Could not set wallpaper"
 
 
 # =============================================================================

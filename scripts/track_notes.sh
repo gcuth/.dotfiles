@@ -36,7 +36,7 @@ set -euo pipefail
 # -----------------------------------------------------------------------------
 # Paths can be overridden via environment variables
 
-readonly OBSIDIAN_PATH="${OBSIDIAN_PATH:-$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes/}"
+readonly OBSIDIAN_PATH="${OBSIDIAN_PATH:-$HOME/Notes/}"
 readonly SNAPSHOT_DIR="${SNAPSHOT_DIR:-$HOME/Snapshots/notes}"
 readonly TARGET_DIR="obsidian"
 readonly TARGET_BRANCH="main"

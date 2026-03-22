@@ -37,7 +37,7 @@ set -euo pipefail
 # -----------------------------------------------------------------------------
 # Paths can be overridden via environment variables
 
-readonly OBSIDIAN_PATH="${THESIS_PATH:-$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes/Thesis}"
+readonly OBSIDIAN_PATH="${THESIS_PATH:-$HOME/Notes/Thesis}"
 readonly BIB_PATH="${BIB_PATH:-$HOME/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/Productivity/Thesis/phd.bib}"
 readonly REPO_URL="${REPO_URL:-git@github.com:gcuth/phd_thesis.git}"
 readonly TEMP_DIR="/tmp/phd_thesis_temp_$$"  # Use PID for unique temp dir

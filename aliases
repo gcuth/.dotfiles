@@ -160,6 +160,9 @@ alias fgrep="fgrep --color=auto"
 # Trim trailing newlines
 alias tn='tr -d "\n"'
 
+# Trim surrounding whitespace
+alias tw="sed 's/^[[:space:]]*//;s/[[:space:]]*$//'"
+
 # ROT13 encode/decode (same operation both ways)
 alias rot13="tr 'A-MN-Za-mn-z' 'N-ZA-Mn-za-m'"
 

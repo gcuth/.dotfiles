@@ -46,7 +46,7 @@ readonly CITATIONS_DIR="citations"
 readonly TARGET_BRANCH="master"
 readonly LOG_PATH="${LOG_PATH:-$HOME/Logs/track_thesis.log}"
 readonly LOCK_FILE="/tmp/track_thesis.lock"
-readonly CHANGE_WINDOW_MINUTES=5
+readonly CHANGE_WINDOW_MINUTES=1440
 readonly MAX_RETRIES=3
 readonly RETRY_DELAY=5
 

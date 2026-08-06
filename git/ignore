@@ -284,3 +284,5 @@ deps/deps.jl
 
 # lein
 .lein-failures
+
+**/.claude/settings.local.json
